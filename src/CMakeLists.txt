@@ -1,0 +1,11 @@
+
+file(GLOB LABRENDER_SRC "*.cpp")
+add_library(LabRender SHARED ${LABRENDER_SRC})
+target_include_directories(LabRender PRIVATE "${LABRENDER_ROOT}/include")
+target_include_directories(LabRender PRIVATE "${LOCAL_ROOT}/include")
+target_compile_definitions(LabRender PRIVATE BUILDING_LABRENDER=1)
+target_compile_definitions(LabRender PUBLIC PLATFORM_WINDOWS=1)
+target_link_libraries(LabRender ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
+file(GLOB LABRENDER_INC "${CMAKE_CURRENT_SOURCE_DIR}/include/LabRender/*.h")
+install (FILES LABRENDER_INC DESTINATION include)
+install (TARGETS LabRender DESTINATION bin)

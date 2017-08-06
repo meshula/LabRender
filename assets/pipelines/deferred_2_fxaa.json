@@ -1,0 +1,77 @@
+{
+	"name": "Deferred Example with FXAA",
+	"version": "1.0",
+	"buffers": [
+		{ "name": "gbuffer",
+			"depth": "yes",
+			"render_textures": [ { "name": "diffuse",    "type": "f16x4",  "scale": 1.0 },
+                                 { "name": "position",   "type": "f16x4",  "scale": 1.0 },
+    	                         { "name": "normal",     "type": "f16x4",  "scale": 1.0 },
+    	                         { "name": "color",      "type": "f16x4",  "scale": 1.0 }
+                               ]
+        },
+        { "name": "resolve",
+          "depth": "no",
+          "render_textures": [ { "name": "color",      "type": "u8x4",   "scale": 1.0 }
+							 ]
+        }
+	],
+	"passes": [
+		{ "name": "clear-gbuffer",
+	 	    "type": { "run": "PostProcess", "draw": "none" },
+	 	    "depth": { "clear_buffer": "yes" },
+		    "outputs": { "buffer": "gbuffer",
+			             "clear_buffer": "yes",
+		                 "render_textures": [ "diffuse", "position", "normal", "color" ] } },
+
+		{ "name": "geometry",
+	 	    "type": { "run": "PostProcess", "draw": "opaque-geometry" },
+	 	    "depth": { "test": "less",
+			           "write": "yes",
+					   "clear_buffer": "no"},
+		    "outputs": { "buffer": "gbuffer",
+		                 "render_textures": [ "diffuse", "position", "normal" ] } },
+
+		{ "name": "sky",
+	 	    "type": { "run": "PostProcess", "draw": "quad" },
+		    "depth" : { "test": "never", "write": "no", "clear_buffer": "no" },
+	        "shader": { "vertex_shader_path":   "$(ASSET_ROOT)/pipelines/deferred-fxaa/sky-vsh.glsl",
+               	        "fragment_shader_path": "$(ASSET_ROOT)/pipelines/deferred-fxaa/sky-fsh.glsl",
+	                    "uniforms": [ { "name": "u_skyMatrix",    "type": "mat4",             "auto": "sky_matrix" },
+	                                  { "name": "skyCube",        "type": "samplerCube" } ],
+	                    "varyings": [ { "name": "v_eyeDirection", "type": "vec3" } ] },
+		    "outputs": { "buffer": "resolve",
+		                 "render_textures": [ "color" ] } },
+
+		{ "name": "illuminate",
+	 	    "type": { "run": "PostProcess", "draw": "quad" },
+		    "depth" : { "test": "never",
+			            "write": "no",
+						"clear_buffer": "no" },
+	        "shader": { "vertex_shader_path":   "$(ASSET_ROOT)/pipelines/deferred-fxaa/illuminate-pass-vsh.glsl",
+               	        "fragment_shader_path": "$(ASSET_ROOT)/pipelines/deferred-fxaa/illuminate-pass-fsh.glsl",
+	                    "uniforms": [ { "name": "u_normalTexture",    "type": "sampler2d" },
+                                      { "name": "u_diffuseTexture",   "type": "sampler2d" } ],
+	                    "varyings": [ { "name": "v_texCoord",         "type": "vec2" } ] },
+		    "inputs": [ { "buffer": "gbuffer",
+		                  "render_textures": ["diffuse", "position", "normal"] } ],
+		    "outputs": { "buffer": "resolve",
+		                 "render_textures": [ "color" ] } },
+
+		{ "name": "fxaa",
+	 	    "type": { "run": "PostProcess", "draw": "quad" },
+		    "depth" : { "test": "never",
+			            "write": "no",
+						"clear_buffer": "no" },
+	        "shader": { "vertex_shader_path":   "$(ASSET_ROOT)/pipelines/deferred-fxaa/full-screen-quad-vsh.glsl",
+               	        "fragment_shader_path": "$(ASSET_ROOT)/pipelines/deferred-fxaa/fxaa-fsh-2.glsl",
+	                    "uniforms": [ { "name": "u_colorTexture", "type": "sampler2d" },
+	                                  { "name": "u_resolution",   "type": "vec2",         "auto": "resolution" } ],
+	                    "varyings": [ { "name": "v_texCoord",     "type": "vec2" } ] },
+		    "inputs": [ { "buffer": "resolve",
+		                  "render_textures": ["color"] } ],
+		    "outputs": { "buffer": "gbuffer",
+		                 "render_textures": [ "color" ] } }
+
+	]
+}

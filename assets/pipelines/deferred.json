@@ -1,0 +1,59 @@
+{
+	"name": "Deferred Example",
+	"version": "1.0",
+	"buffers": [
+		{ "name": "gbuffer",
+			"depth": "yes",
+			"render_textures": [ { "name": "diffuse",    "type": "u8x4",   "scale": 1.0 },
+                                 { "name": "position",   "type": "f32x4",  "scale": 1.0 },
+    	                         { "name": "normal",     "type": "f16x4",  "scale": 1.0 } ] },
+		{ "name": "lighting",
+			"depth": "no",
+			"render_textures": [ { "name": "irradiance", "type": "u8x4",   "scale": 1.0 } ] },
+		{ "name": "resolve",
+			"depth": "no",
+			"render_textures": [ { "name": "color",      "type": "f16x4", "scale": 1.0 } ] },
+		{ "name": "visible" }
+	],
+	"passes": [
+		{ "name": "clear-framebuffer",
+	 	    "type": { "run": "PostProcess", "draw": "none" },
+	 	    "depth": { "clear_buffer": "yes" },
+		    "outputs": { "buffer": "visible",  "clear_buffer": "yes" } },
+
+		{ "name": "clear-gbuffer",
+	 	    "type": { "run": "PostProcess", "draw": "none" },
+	 	    "depth": { "clear_buffer": "yes" },
+		    "outputs": { "buffer": "gbuffer",
+		                 "clear_buffer": "yes",
+		                 "render_textures": [ "diffuse", "position", "normal" ] } },
+
+		{ "name": "geometry",
+	 	    "type": { "run": "PostProcess", "draw": "opaque-geometry" },
+	 	    "depth": { "test": "less", "write": "yes", "clear_buffer": "no"},
+		    "outputs": { "buffer": "gbuffer",
+		                 "render_textures": [ "diffuse", "position", "normal" ]
+		  } },
+
+		{ "name": "sky",
+	 	    "type": { "run": "PostProcess", "draw": "quad" },
+		    "depth" : { "test": "equal", "write": "no", "clear_buffer": "no" },
+	        "shader": { "vertex_shader_path":   "$(ASSET_ROOT)/pipelines/deferred/sky-vsh.glsl",
+               	        "fragment_shader_path": "$(ASSET_ROOT)/pipelines/deferred/sky-fsh.glsl",
+	                    "uniforms": [ { "name": "u_skyMatrix",    "type": "mat4",             "auto": "sky_matrix" },
+	                                  { "name": "skyCube",        "type": "samplerCube" } ],
+	                    "varyings": [ { "name": "v_eyeDirection", "type": "vec3" } ] },
+		    "outputs": { "buffer": "visible" } },
+
+		{ "name": "PostProcessAndBlit",
+	 	    "type": { "run": "PostProcess", "draw": "quad" },
+		    "depth" : { "test": "always", "write": "no", "clear_buffer": "no" },
+	        "shader": { "vertex_shader_path":   "$(ASSET_ROOT)/pipelines/deferred/full-screen-quad-vsh.glsl",
+               	        "fragment_shader_path": "$(ASSET_ROOT)/pipelines/deferred/full-screen-deferred-blit-fsh.glsl",
+	                    "uniforms": [ { "name": "u_normalTexture", "type": "sampler2d" }],
+	                    "varyings": [ { "name": "v_texCoord",     "type": "vec2" } ] },
+		    "inputs": [ { "buffer": "gbuffer",
+		                  "render_textures": ["diffuse", "position", "normal"] } ],
+		    "outputs": { "buffer": "visible" } }
+	]
+}
