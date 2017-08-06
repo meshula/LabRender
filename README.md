@@ -1,6 +1,6 @@
 # LabRender
 
-A simple OpenGL based render engine. Its most interesting features is that it
+A simple OpenGL based render engine. Its most interesting feature is that it
 has a software configured pipeline architecture. See the assets/pipelines
 directory for some example pipeline configurations.
 
@@ -29,7 +29,7 @@ Currently, LabRender is tested on Windows 10, with VS2015 or greater.
 
 ## Copyright
 
-Copyright 1995-2015, Nick Porcino
+Copyright 2017, Nick Porcino
 
 ## License
 
