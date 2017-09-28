@@ -17,10 +17,11 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 # --z
-find_file(Z_BINARY_RELEASE
-    NAMES
-        zlib.dll
-    HINTS
-        "${LOCAL_ROOT}/bin"
-    DOC "The z library")
-
+if (WIN32)
+    find_file(Z_BINARY_RELEASE
+        NAMES
+            zlib.dll
+        HINTS
+            "${LOCAL_ROOT}/bin"
+        DOC "The z library")
+endif()
