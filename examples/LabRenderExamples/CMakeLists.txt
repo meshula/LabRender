@@ -1,6 +1,7 @@
 
 file(GLOB LABRENDEREXAMPLES_SRC "*.cpp")
 add_executable(LabRenderExample ${LABRENDEREXAMPLES_SRC})
+
 target_link_libraries(LabRenderExample LabRender)
 target_compile_definitions(LabRenderExample PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(LabRenderExample PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
@@ -14,6 +15,7 @@ target_sources(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/src/modelLoade
 target_sources(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/include/extras/modelLoader.h")
 target_sources(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/include/LabCmd/FFI.cpp")
 target_sources(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/include/LabCmd/FFI.h")
+
 target_link_libraries(LabRenderExample debug
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
@@ -25,21 +27,55 @@ target_link_libraries(LabRenderExample optimized
     ${Assimp_LIBRARY_RELEASE}
     LabRender)
 
-add_custom_command(TARGET LabRenderExample POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${PROJECT_BINARY_DIR}/src/$<CONFIGURATION>/LabRender.dll"
-        $<TARGET_FILE_DIR:LabRenderExample>)
-add_custom_command(TARGET LabRenderExample POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${Assimp_BINARY_RELEASE}"
-        $<TARGET_FILE_DIR:LabRenderExample>)
-add_custom_command(TARGET LabRenderExample POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${GLEW_BINARY_RELEASE}"
-        $<TARGET_FILE_DIR:LabRenderExample>)
-add_custom_command(TARGET LabRenderExample POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${Z_BINARY_RELEASE}"
-        $<TARGET_FILE_DIR:LabRenderExample>)
 
-install (TARGETS LabRenderExample DESTINATION bin)
+
+
+
+
+
+
+
+
+
+
+#set_target_properties(LabRenderExample
+#    PROPERTIES
+#    RUNTIME_OUTPUT_DIRECTORY "${LOCAL_ROOT}/bin"
+#)
+
+#set_target_properties( targets LABRENDER
+#    PROPERTIES
+#    ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/lib"
+#    LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/lib"
+#    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin"
+#)
+
+if (MSVC_IDE)
+    # hack to get around the "Debug" and "Release" directories cmake tries to add on Windows
+    #set_target_properties (LabRenderExample PROPERTIES PREFIX "../")
+    set_target_properties(LabRenderExample PROPERTIES IMPORT_PREFIX "../")
+endif()
+
+#add_custom_command(TARGET LabRenderExample POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#        "${PROJECT_BINARY_DIR}/src/$<CONFIGURATION>/LabRender.dll"
+#        $<TARGET_FILE_DIR:LabRenderExample>)
+#add_custom_command(TARGET LabRenderExample POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#        "${Assimp_BINARY_RELEASE}"
+#        $<TARGET_FILE_DIR:LabRenderExample>)
+#add_custom_command(TARGET LabRenderExample POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#        "${GLEW_BINARY_RELEASE}"
+#        $<TARGET_FILE_DIR:LabRenderExample>)
+#add_custom_command(TARGET LabRenderExample POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#        "${Z_BINARY_RELEASE}"
+#        $<TARGET_FILE_DIR:LabRenderExample>)
+
+
+message(INFO "------ ${LOCAL_ROOT}")
+
+install (TARGETS LabRenderExample RUNTIME DESTINATION "${LOCAL_ROOT}/bin")
+
+#install (TARGETS LabRenderExample DESTINATION bin)
