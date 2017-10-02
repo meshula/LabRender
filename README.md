@@ -10,10 +10,11 @@ See the examples directory for an example.
 
 ## Building
 
-LabRender has a few prerequisite libraries. The LabRender library itself
-requires GLEW.
+LabRender requires GLEW.
 
-The example program also requires GLFW and Assimp. Assimp in turn requires zlib.
+The LabModelLoader library requires GLEW and Assimp.
+
+The example program also requires GLFW, LabRender, and LabModelLoader.
 
 At the moment, the cmake scripts assume that they are installed in a directory
 named local, where local is a sister directory to the LabRender directory. That
