@@ -13,8 +13,7 @@ endif()
 target_include_directories(LabRender PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(LabRender PRIVATE "${LOCAL_ROOT}/include")
 target_compile_definitions(LabRender PRIVATE BUILDING_LABRENDER=1)
-target_compile_definitions(LabRender PUBLIC
-    PLATFORM_WINDOWS=1)
+target_compile_definitions(LabRender PUBLIC PLATFORM_WINDOWS=1)
 
 target_link_libraries(LabRender ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
 

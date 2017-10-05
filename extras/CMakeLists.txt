@@ -14,6 +14,7 @@ endif()
 target_include_directories(LabModelLoader PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(LabModelLoader PRIVATE "${LABRENDER_ROOT}/extras/include")
 target_include_directories(LabModelLoader PRIVATE "${LOCAL_ROOT}/include")
+target_include_directories(LabModelLoader PRIVATE "${GLEW_INCLUDE_DIR}")
 target_compile_definitions(LabModelLoader PUBLIC
     PLATFORM_WINDOWS=1
     LABRENDER_MODELLOADER_DLL)
