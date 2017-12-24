@@ -33,7 +33,8 @@ namespace lab {
         v3f _gamma;
     };
 
-    class Optics {
+    class Optics 
+    {
     public:
         Optics()
         : _focalLength(50)
@@ -51,7 +52,8 @@ namespace lab {
         float znear() const { return _znear; }
         float zfar() const { return _zfar; }
 
-        m44f perspective(float aspect) const {
+        m44f perspective(float aspect) const 
+        {
             if (fabs(aspect) < std::numeric_limits<float>::epsilon())
                 return m44f_identity;
 
@@ -78,7 +80,8 @@ namespace lab {
         }
 
     private:
-        void update() {
+        void update() 
+        {
             _verticalFOV = 2.f * atanf(sensor.apertureHeight() / (2.f * _focalLength));
         }
 
@@ -88,7 +91,8 @@ namespace lab {
         MM _focalLength;
     };
 
-    class Mount {
+    class Mount 
+    {
     public:
         Mount()
         : _viewTransform(m44f_identity) {}
@@ -128,7 +132,8 @@ namespace lab {
         m44f _viewTransform;
     };
 
-    class Camera {
+    class Camera 
+    {
     public:
         Mount mount;
         Optics optics;
@@ -141,7 +146,8 @@ namespace lab {
         // Creates a matrix suitable for an OpenGL style MVP matrix
         // invert the view transform for graphics engines that pre-multiply
         //
-        void updateViewTransform() {
+        void updateViewTransform() 
+        {
             mount.setViewTransform(Mount::lookat(position, focusPoint, worldUp));
         }
 
@@ -156,7 +162,8 @@ namespace lab {
     class CameraRig
     {
     public:
-        enum class Mode {
+        enum class Mode 
+        {
             Dolly, Crane, TurnTableOrbit, Fly
         };
 

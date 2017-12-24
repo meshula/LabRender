@@ -12,11 +12,9 @@ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     SET(CMAKE_INSTALL_PREFIX ${LOCAL_ROOT} CACHE PATH "Install set to local" FORCE)
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/defaults
-                      ${CMAKE_SOURCE_DIR}/cmake/modules
-                      ${CMAKE_SOURCE_DIR}/cmake/macros)
-
-
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/defaults
+                      ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules
+                      ${CMAKE_CURRENT_SOURCE_DIR}/cmake/macros)
 
 include(CXXDefaults)
 add_definitions(${_PXR_CXX_DEFINITIONS})

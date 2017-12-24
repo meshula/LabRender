@@ -71,9 +71,10 @@ namespace lab
             case Mode::Dolly: {
                 v3f camFwd = camera->mount.forward();
                 v3f camRight = camera->mount.right();
-                v3f dP = delta.y * camFwd * scale - delta.x * camRight * scale;
+                v3f deltaX = delta.x * camRight * scale;
+                v3f dP = delta.y * camFwd * scale - deltaX;
                 camera->position += dP;
-                camera->focusPoint += dP;
+                camera->focusPoint -= deltaX;
                 break;
             }
             case Mode::Crane: {

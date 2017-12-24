@@ -1,6 +1,7 @@
 
+file(GLOB LABRENDER_INC ${CMAKE_CURRENT_SOURCE_DIR}/../include/LabRender/*.h)
 file(GLOB LABRENDER_SRC "*.cpp")
-add_library(LabRender SHARED ${LABRENDER_SRC})
+add_library(LabRender SHARED ${LABRENDER_SRC} ${LABRENDER_INC})
 
 
 if (MSVC_IDE)
@@ -35,5 +36,4 @@ install (TARGETS LabRender
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin)
 
-file(GLOB LABRENDER_INC ${CMAKE_CURRENT_SOURCE_DIR}/../include/LabRender/*.h)
 install (FILES ${LABRENDER_INC} DESTINATION include/LabRender)
