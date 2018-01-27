@@ -3,13 +3,11 @@ file(GLOB LABRENDER_INC ${CMAKE_CURRENT_SOURCE_DIR}/../include/LabRender/*.h)
 file(GLOB LABRENDER_SRC "*.cpp")
 add_library(LabRender SHARED ${LABRENDER_SRC} ${LABRENDER_INC})
 
-
 if (MSVC_IDE)
     # hack to get around the "Debug" and "Release" directories cmake tries to add on Windows
     #set_target_properties(LabRender PROPERTIES PREFIX "../")
     set_target_properties(LabRender PROPERTIES IMPORT_PREFIX "../")
 endif()
-
 
 target_include_directories(LabRender PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(LabRender PRIVATE "${LOCAL_ROOT}/include")
@@ -31,9 +29,17 @@ set_target_properties(LabRender
 #    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin"
 #)
 
+set_target_properties(LabRender PROPERTIES OUTPUT_NAME_DEBUG LabRender_d)
+
 install (TARGETS LabRender
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin)
 
 install (FILES ${LABRENDER_INC} DESTINATION include/LabRender)
+
+install(
+    FILES
+        $<TARGET_PDB_FILE:LabRender>
+    DESTINATION
+        bin OPTIONAL)

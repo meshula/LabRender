@@ -39,17 +39,36 @@ foreach(LIB ${LABCMD_LIB_NAMES})
 
         if (LABCMD_${LIB}_LIB_RELEASE)
             list(APPEND LABCMD_LIBRARIES "${LABCMD_${LIB}_LIB_RELEASE}")
-            set(LABCMD_${LIB}_FOUND TRUE)
-            set(LABCMD_${LIB}_LIBRARY "${LABCMD_${LIB}_LIB_RELEASE}")
+            set(${LIB}_FOUND TRUE)
+            set(${LIB}_LIBRARY "${LABCMD_${LIB}_LIB_RELEASE}")
+            set(${LIB}_LIBRARY_RELEASE "${LABCMD_${LIB}_LIB_RELEASE}")
         else()
             set(LABCMD_${LIB}_FOUND FALSE)
         endif()
 
-        mark_as_advanced(LABCMD_${LIB}_LIB_RELEASE)
+    find_library(LABCMD_${LIB}_LIB_DEBUG ${LIB}_d
+        HINTS ${LABCMD_INCLUDE_DIR}/..
+
+        PATHS
+        ${LABCMD_LOCATION}
+        $ENV{LABCMD_DIR}
+        /usr
+        /usr/local
+        /sw
+        /opt/local
+
+        PATH_SUFFIXES
+        /lib
+        DOC "LABCMD library ${LIB}")
+
+        if (LABCMD_${LIB}_LIB_DEBUG)
+            set(${LIB}_DEBUG_FOUND TRUE)
+            set(${LIB}_LIBRARY_DEBUG "${LABCMD_${LIB}_LIB_DEBUG}")
+        else()
+            set(${LIB}_DEBUG_FOUND FALSE)
+        endif()
 endforeach()
 
 find_package_handle_standard_args(LABCMD
     REQUIRED_VARS LABCMD_LIBRARIES LABCMD_INCLUDE_DIR)
-
-mark_as_advanced(LABCMD_INCLUDE_DIR LABCMD_LIBRARIES)
 

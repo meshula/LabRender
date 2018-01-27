@@ -58,7 +58,7 @@ namespace lab
     // delta is the 2d motion of a mouse or gesture in the screen plane,
     // typically computed as scale * (currMousePos - prevMousePos);
     //
-    void CameraRig::interact(Camera * camera, v2f delta)
+    void CameraRig::interact(Camera* camera, v2f delta)
 	{
         if (!camera)
             return;

@@ -22,6 +22,6 @@ set(CMAKE_CXX_FLAGS "${_PXR_CXX_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 include(Packages)
 
-add_subdirectory(examples)
 add_subdirectory(src)
 add_subdirectory(extras)
+add_subdirectory(examples)

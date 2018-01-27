@@ -15,13 +15,13 @@ target_link_libraries(LabRenderExample debug
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
     ${Assimp_LIBRARY_RELEASE}
-    ${LABCMD_LIBRARIES}
+    ${LabCmd_LIBRARY_DEBUG}
     LabRender)
 target_link_libraries(LabRenderExample optimized
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
     ${Assimp_LIBRARY_RELEASE}
-    ${LABCMD_LIBRARIES}
+    ${LabCmd_LIBRARY_RELEASE}
     LabRender)
 
 #set_target_properties(LabRenderExample
