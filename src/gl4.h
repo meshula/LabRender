@@ -115,48 +115,4 @@ public:
 };
 
 
-#if defined(PLATFORM_WINDOWS)
-
-class CaptureGLContext {
-public:
-	CaptureGLContext() {
-		currentContext = wglGetCurrentContext();
-		currentHDC = wglGetCurrentDC();
-	}
-	~CaptureGLContext() {
-		wglMakeCurrent(currentHDC, currentContext);
-	}
-	HGLRC currentContext;
-	HDC currentHDC;
-};
-
-#elif TARGET_OS_IPHONE
-class CaptureGLContext {
-public:
-    CaptureGLContext() {
-        currentGLContext = [EAGLContext currentContext];
-    }
-    ~CaptureGLContext() {
-        [EAGLContext setCurrentContext:currentGLContext];
-    }
-    EAGLContext* currentGLContext;
-};
-#else
-// OSX
-class CaptureGLContext {
-public:
-    CaptureGLContext() {
-        currentGLContext = CGLGetCurrentContext();
-    }
-    ~CaptureGLContext() {
-        CGLSetCurrentContext(currentGLContext);
-    }
-    CGLContextObj currentGLContext;
-};
-#endif
-
-#ifdef _MSC_VER
-# undef small
-#endif
-
 #endif // GL4_H

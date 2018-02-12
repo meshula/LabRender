@@ -7,9 +7,10 @@
 
 #pragma once
 
-#include "LabRender/ErrorPolicy.h"
-#include "LabRender/Renderer.h"
-#include "LabRender/MathTypes.h"
+#include <LabRender/ErrorPolicy.h>
+#include <LabRender/MathTypes.h>
+#include <LabRender/Renderer.h>
+#include <LabRender/Uniform.h>
 
 namespace lab {
     

@@ -6,9 +6,10 @@
 //  Copyright (c) 2014 Nick Porcino. All rights reserved.
 //
 
-#include "LabRender/SemanticType.h"
 #include <LabRender/LabRender.h>
-#include "LabRender/gl4.h"
+#include <LabRender/SemanticType.h>
+#include <LabRender/Uniform.h>
+#include "gl4.h"
 
 
 #ifdef PLATFORM_WINDOWS
@@ -230,19 +231,6 @@ namespace lab {
 		case TextureType::s8x4:  return SemanticType::vec4_st;
 		default: return SemanticType::unknown_st;
 		}
-	}
-
-	DepthTest stringToDepthTest(const std::string & df)
-	{
-		if (df == "less")          return DepthTest::less;
-		else if (df == "lequal")   return DepthTest::lequal;
-		else if (df == "never")    return DepthTest::never;
-		else if (df == "equal")    return DepthTest::equal;
-		else if (df == "greater")  return DepthTest::greater;
-		else if (df == "notequal") return DepthTest::notequal;
-		else if (df == "gequal")   return DepthTest::equal;
-		else if (df == "always")   return DepthTest::always;
-		return DepthTest::less;
 	}
 
 } // lab

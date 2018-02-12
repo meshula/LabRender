@@ -35,7 +35,7 @@ namespace lab {
             glDeleteRenderbuffers(1, &renderbuffer);
     }
 
-    void FrameBuffer::create(const FrameBufferSpec & spec, int width, int height)
+    void FrameBuffer::createAttachments(const FrameBufferSpec& spec, int width, int height)
     {
         textures.clear();
         if (!spec.attachments.size()) {
@@ -137,11 +137,11 @@ namespace lab {
         }
     }
 
-    FrameBuffer & FrameBuffer::attachColor(char const*const base_name,
-                                           char const*const output_name,
-                                           char const*const uniform_name,
-                                           const lab::Texture &texture,
-                                           unsigned int attachment, unsigned int layer)
+    FrameBuffer& FrameBuffer::attachColor(char const*const base_name,
+                                          char const*const output_name,
+                                          char const*const uniform_name,
+                                          const lab::Texture &texture,
+                                          unsigned int attachment, unsigned int layer)
     {
         newViewport[2] = texture.width;
         newViewport[3] = texture.height;
@@ -180,7 +180,7 @@ namespace lab {
 		return *this;
     }
 
-    FrameBuffer & FrameBuffer::detachColor(unsigned int attachment)
+    FrameBuffer& FrameBuffer::detachColor(unsigned int attachment)
     {
 		glBindFramebuffer(GL_FRAMEBUFFER, id);
 
@@ -194,7 +194,7 @@ namespace lab {
 		return *this;
     }
 
-    FrameBuffer & FrameBuffer::checkFbo()
+    FrameBuffer& FrameBuffer::checkFbo()
     {
 		glBindFramebuffer(GL_FRAMEBUFFER, id);
 		if (autoDepth)
@@ -234,7 +234,7 @@ namespace lab {
         return i->second.second;
     }
 
-    void FramebufferSet::add_fbo(const std::string & name, const FrameBuffer::FrameBufferSpec & spec)
+    void FramebufferSet::addFbo(const std::string & name, const FrameBuffer::FrameBufferSpec & spec)
     {
         _fbos[name] = std::make_pair(spec, std::make_shared<FrameBuffer>());
     }
@@ -251,7 +251,7 @@ namespace lab {
         _height = height;
 
         for (auto i : _fbos) {
-            i.second.second->create(i.second.first, width, height);
+            i.second.second->createAttachments(i.second.first, width, height);
         }
 
         return true;

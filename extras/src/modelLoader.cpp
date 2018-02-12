@@ -1,7 +1,6 @@
 
 #include <LabRender/LabRender.h>
 #include <LabRender/Model.h>
-#include <LabRender/gl4.h>
 #include <LabRender/utils.h>
 
 #define BUILDING_LABRENDER_MODELLOADER
@@ -169,6 +168,8 @@ namespace lab
 
 				void                  build(std::string modelDir) {}
 
+                enum class ActiveFace { Front, Back, FrontBack };
+                enum class TexWrapMode { Clamp, Repeat };
 
 				struct textureStruct
 				{
@@ -177,7 +178,7 @@ namespace lab
 
 				struct materialStruct
 				{
-					GLenum face;
+                    ActiveFace face = { ActiveFace::Front };
 					glm::vec4 dcolor;
 					glm::vec4 scolor;
 					glm::vec4 acolor;
@@ -186,8 +187,8 @@ namespace lab
 
 				struct materialFormatStruct
 				{
-					GLenum wrapS;
-					GLenum wrapT;
+                    TexWrapMode wrapS;
+                    TexWrapMode wrapT;
 				};
 
 				string           mName;
@@ -392,11 +393,11 @@ namespace lab
 			int twoSided;
 			if ((AI_SUCCESS == mtl->Get(AI_MATKEY_TWOSIDED, twoSided)) && twoSided) {
 				meshFuRef->mTwoSided = true;
-				meshFuRef->mMaterialData.face = GL_FRONT_AND_BACK;
+				meshFuRef->mMaterialData.face = MeshFu::Geometry::ActiveFace::FrontBack;
 			}
 			else {
 				meshFuRef->mTwoSided = false;
-				meshFuRef->mMaterialData.face = GL_FRONT;
+				meshFuRef->mMaterialData.face = MeshFu::Geometry::ActiveFace::Front;
 			}
 
 			// shouldn't ecolor default to black?
@@ -444,64 +445,64 @@ namespace lab
 				meshFuRef->mTextureData.relativeTexPath = relTexLoc;
 
 				// texture wrap
-				meshFuRef->mMaterialFormatData.wrapS = GL_REPEAT;
+				meshFuRef->mMaterialFormatData.wrapS = MeshFu::Geometry::TexWrapMode::Repeat;
 				int uwrap;
 				if (AI_SUCCESS == mtl->Get(AI_MATKEY_MAPPINGMODE_U_DIFFUSE(0), uwrap))
 				{
 					switch (uwrap)
 					{
 					case aiTextureMapMode_Wrap:
-						meshFuRef->mMaterialFormatData.wrapS = GL_REPEAT;
+						meshFuRef->mMaterialFormatData.wrapS = MeshFu::Geometry::TexWrapMode::Repeat;
 						break;
 
 					case aiTextureMapMode_Clamp:
 						//format.setWrapS( GL_CLAMP );
-						meshFuRef->mMaterialFormatData.wrapS = GL_CLAMP_TO_EDGE;
+						meshFuRef->mMaterialFormatData.wrapS = MeshFu::Geometry::TexWrapMode::Clamp;
 						//iOS compatibility
 						break;
 
 					case aiTextureMapMode_Decal:
 						// If the texture coordinates for a pixel are outside [0...1]
 						// the texture is not applied to that pixel.
-						meshFuRef->mMaterialFormatData.wrapS = GL_CLAMP_TO_EDGE;
+						meshFuRef->mMaterialFormatData.wrapS = MeshFu::Geometry::TexWrapMode::Clamp;
 						break;
 
 					case aiTextureMapMode_Mirror:
 						// A texture coordinate u|v becomes u%1|v%1 if (u-(u%1))%2
 						// is zero and 1-(u%1)|1-(v%1) otherwise.
 						// TODO
-						meshFuRef->mMaterialFormatData.wrapS = GL_REPEAT;
+						meshFuRef->mMaterialFormatData.wrapS = MeshFu::Geometry::TexWrapMode::Repeat;
 						break;
 					}
 				}
 
 				int vwrap;
-				meshFuRef->mMaterialFormatData.wrapT = GL_REPEAT;
+				meshFuRef->mMaterialFormatData.wrapT = MeshFu::Geometry::TexWrapMode::Repeat;
 				if (AI_SUCCESS == mtl->Get(AI_MATKEY_MAPPINGMODE_V_DIFFUSE(0), vwrap))
 				{
 					switch (vwrap)
 					{
 					case aiTextureMapMode_Wrap:
-						meshFuRef->mMaterialFormatData.wrapT = GL_REPEAT;
+						meshFuRef->mMaterialFormatData.wrapT = MeshFu::Geometry::TexWrapMode::Repeat;
 						break;
 
 					case aiTextureMapMode_Clamp:
 						//format.setWrapT( GL_CLAMP );
 						//iOS compatibility
-						meshFuRef->mMaterialFormatData.wrapT = GL_CLAMP_TO_EDGE;
+						meshFuRef->mMaterialFormatData.wrapT = MeshFu::Geometry::TexWrapMode::Clamp;
 						break;
 
 					case aiTextureMapMode_Decal:
 						// If the texture coordinates for a pixel are outside [0...1]
 						// the texture is not applied to that pixel.
-						meshFuRef->mMaterialFormatData.wrapT = GL_CLAMP_TO_EDGE;
+						meshFuRef->mMaterialFormatData.wrapT = MeshFu::Geometry::TexWrapMode::Clamp;
 						break;
 
 					case aiTextureMapMode_Mirror:
 						// A texture coordinate u|v becomes u%1|v%1 if (u-(u%1))%2
 						// is zero and 1-(u%1)|1-(v%1) otherwise.
 						// TODO
-						meshFuRef->mMaterialFormatData.wrapT = GL_REPEAT;
+						meshFuRef->mMaterialFormatData.wrapT = MeshFu::Geometry::TexWrapMode::Repeat;
 						break;
 					}
 				}

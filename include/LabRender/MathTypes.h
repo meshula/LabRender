@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <LabRender/LabRender.h>
+#include <LabRender/Export.h>
 
 #ifdef __APPLE__
 #include <simd/simd.h>
@@ -303,6 +303,10 @@ namespace lab {
         m44f &frustum(float l, float r, float b, float t, float n, float f);
         m44f &perspective(float fov, float aspect, float near, float far);
         m44f &invert();
+
+        LR_API void decompose(v3f& t, v3f& r, v3f& s) const;
+        LR_API void recompose(const v3f& t, const v3f& r, const v3f& s);
+        LR_API void orthonormalize();
 
 		m44f & operator = (const m44f & a) {
 			if (&a != this) { memcpy(this, &a, sizeof(m44f)); }

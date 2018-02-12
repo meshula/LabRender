@@ -1,6 +1,10 @@
 #pragma once
 
 #include <LabRender/LabRender.h>
+#include <LabRender/DepthTest.h>
+#include <LabRender/TextureType.h>
+#include <LabRender/Uniform.h>
+#include <string>
 
 namespace lab
 {
@@ -15,7 +19,7 @@ namespace lab
 		{
 		public:
 			Texture() {}
-			Texture(const std::string & name, const std::string & filepath)
+			Texture(const std::string& name, const std::string & filepath)
 				: name(name), filepath(filepath) {}
 
 			std::string name;

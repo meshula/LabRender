@@ -140,7 +140,7 @@ public:
         drawList.view = camera.mount.viewTransform();
         drawList.proj = camera.optics.perspective(float(fbSize.x) / float(fbSize.y));
 
-        lab::PassRenderer::RenderLock rl(dr, renderTime(), mousePosition());
+        lab::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
 		v2i fbOffset = V2I(0, 0);
         renderStart(rl, renderTime(), fbOffset, fbSize);
 

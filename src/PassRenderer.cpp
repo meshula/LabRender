@@ -27,6 +27,23 @@ using namespace std;
 GLint depthTestToGL[] = {
     GL_LESS, GL_LEQUAL, GL_NEVER, GL_EQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, GL_ALWAYS };
 
+
+namespace lab
+{
+    DepthTest stringToDepthTest(const std::string & df)
+    {
+        if (df == "less")          return DepthTest::less;
+        else if (df == "lequal")   return DepthTest::lequal;
+        else if (df == "never")    return DepthTest::never;
+        else if (df == "equal")    return DepthTest::equal;
+        else if (df == "greater")  return DepthTest::greater;
+        else if (df == "notequal") return DepthTest::notequal;
+        else if (df == "gequal")   return DepthTest::equal;
+        else if (df == "always")   return DepthTest::always;
+        return DepthTest::less;
+    }
+}
+
 PassRenderer::Pass::Pass(const std::string& name, int passNumber)
 : _name(name), _passNumber(passNumber)
 , writeDepth(true), depthTest(DepthTest::less)
@@ -189,7 +206,7 @@ void PassRenderer::configure(const char *const path)
             spec.attachments.push_back(FrameBuffer::FrameBufferSpec::AttachmentSpec(name, outputName, uniformName, textureType));
         }
 
-        _detail->fbos.add_fbo(bufferName, spec);
+        _detail->fbos.addFbo(bufferName, spec);
     }
 
     printf("\nPasses:\n");

@@ -8,9 +8,10 @@
 
 #pragma once
 
-#include "LabRender/LabRender.h"
-#include "LabRender/InOut.h"
-#include "LabRender/SemanticType.h"
+#include <LabRender/LabRender.h>
+#include <LabRender/InOut.h>
+#include <LabRender/SemanticType.h>
+#include <LabRender/TextureType.h>
 
 #include <map>
 #include <vector>

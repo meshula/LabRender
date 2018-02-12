@@ -15,7 +15,8 @@
 #include <vector>
 #include <string>
 
-namespace lab {
+namespace lab 
+{
 
     // A framebuffer object that takes color attachments. Draw calls between
     // bind() and unbind() are drawn to the attached textures.
@@ -58,9 +59,11 @@ namespace lab {
         void bindForRead(const std::vector<std::string> & attachments);
 		void bindForWrite(const std::vector<std::string> & attachments);
 
-        class FrameBufferSpec {
+        class FrameBufferSpec 
+        {
         public:
-            class AttachmentSpec {
+            class AttachmentSpec 
+            {
             public:
                 AttachmentSpec() {}
 
@@ -87,7 +90,7 @@ namespace lab {
             std::vector<AttachmentSpec> attachments;
             bool hasDepth;
         };
-        void create(const FrameBufferSpec &, int width, int height);
+        void createAttachments(const FrameBufferSpec &, int width, int height);
 
         // Draw to texture 2D in the indicated attachment location (or a 2D layer of
         // a 3D texture).
@@ -102,12 +105,13 @@ namespace lab {
         FrameBuffer& checkFbo();
     };
 
-    class FramebufferSet {
+    class FramebufferSet 
+    {
     public:
         FramebufferSet();
         ~FramebufferSet() {}
 
-        void add_fbo(const std::string & name, const FrameBuffer::FrameBufferSpec &);
+        void addFbo(const std::string & name, const FrameBuffer::FrameBufferSpec &);
         std::shared_ptr<FrameBuffer> fbo(const std::string & named) const;
 
         bool setSize(int width, int height);

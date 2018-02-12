@@ -9,13 +9,14 @@
 #pragma once
 
 #include <LabRender/LabRender.h>
-#include "LabRender/DrawList.h"
-#include "LabRender/FrameBuffer.h"
-#include "LabRender/Model.h"
-#include "LabRender/Renderer.h"
-#include "LabRender/Shader.h"
-#include "LabRender/ShaderBuilder.h"
-#include "LabRender/Texture.h"
+#include <LabRender/DepthTest.h>
+#include <LabRender/DrawList.h>
+#include <LabRender/FrameBuffer.h>
+#include <LabRender/Model.h>
+#include <LabRender/Renderer.h>
+#include <LabRender/Shader.h>
+#include <LabRender/ShaderBuilder.h>
+#include <LabRender/Texture.h>
 
 #include <string>
 
@@ -33,6 +34,7 @@ namespace lab {
 			std::shared_ptr<Shader> _shader;
 
 		public:
+
             Pass(const std::string& name, int passNumber);
             virtual ~Pass() {}
 

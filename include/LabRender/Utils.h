@@ -10,6 +10,7 @@
 
 #include <LabRender/LabRender.h>
 #include <string>
+#include <vector>
 
 namespace lab {
 
@@ -20,5 +21,6 @@ namespace lab {
     
     LR_API std::string loadFile(char const*const path, bool errorIfNotFound = true);
     LR_API std::string expandPath(char const*const path);
-}
 
+
+} // lab

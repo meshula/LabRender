@@ -60,7 +60,7 @@ namespace lab {
         class RenderLock 
 		{
 			std::atomic<bool> _renderInProgress;
-			std::shared_ptr<Renderer> _dr;
+			Renderer* _dr;
 
 		public:
 			class RenderContext
@@ -79,7 +79,7 @@ namespace lab {
 			RenderContext context;
 	
 
-			RenderLock(std::shared_ptr<Renderer> dr, double renderTime, v2f mousePosition)
+			RenderLock(Renderer* dr, double renderTime, v2f mousePosition)
             : _renderInProgress(false)
             {
                 if (dr && dr->_renderLock.try_lock()) {
