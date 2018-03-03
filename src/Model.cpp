@@ -361,21 +361,6 @@ namespace lab {
     }
 
 
-    void Model::update(double time) {
-        for (auto p : _parts)
-            p->update(time);
-    }
-
-    void Model::draw() {
-        for (auto p : _parts)
-            p->draw();
-    }
-
-    void Model::draw(FrameBuffer& fbo, Renderer::RenderLock & rl) {
-        for (auto p : _parts)
-            p->draw(fbo, rl);
-    }
-
     Bounds Model::localBounds() const {
         Bounds bounds;
         bounds.first = {FLT_MAX, FLT_MAX, FLT_MAX};

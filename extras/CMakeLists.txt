@@ -51,8 +51,11 @@ install (TARGETS LabModelLoader
     RUNTIME DESTINATION bin)
 
 #-------------------------------------------------------------------------------
+# LabRenderBinder
 
-add_library(LabRenderBinder SHARED src/LabRenderBinder.cpp)
+add_library(LabRenderBinder SHARED 
+            include/extras/LabRenderBinder.h
+            src/LabRenderBinder.cpp)
 set_target_properties(LabRenderBinder PROPERTIES OUTPUT_NAME_DEBUG LabRenderBinder_d)
 
 if (MSVC_IDE)

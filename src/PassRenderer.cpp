@@ -122,14 +122,14 @@ void PassRenderer::Pass::run(RenderLock& rl, const FramebufferSet& fbos)
 	{
         std::shared_ptr<FrameBuffer> gbufferAOVs = fbos.fbo(writeBuffer);
 
-        for (auto model : rl.context.drawList->deferredMeshes) 
+        for (auto& model : rl.context.drawList->deferredMeshes) 
 		{
-            rl.context.viewMatrices.model = model->transform.transform();
+            rl.context.viewMatrices.model = model.first;
             rl.context.viewMatrices.mv = matrix_multiply(rl.context.drawList->view, rl.context.viewMatrices.model);
             rl.context.viewMatrices.mvp = matrix_multiply(rl.context.drawList->proj, rl.context.viewMatrices.mv);
             rl.context.viewMatrices.view = rl.context.drawList->view;
             rl.context.viewMatrices.projection = rl.context.drawList->proj;
-            model->draw(*gbufferAOVs.get(), rl);
+            model.second->draw(*gbufferAOVs.get(), rl);
         }
     }
 }

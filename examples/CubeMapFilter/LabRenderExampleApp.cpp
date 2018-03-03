@@ -10,6 +10,7 @@
 #include "extras/modelLoader.h"
 
 #include <LabRender/Camera.h>
+#include <LabRender/MathTypes.h>
 #include <LabRender/PassRenderer.h>
 #include <LabRender/UtilityModel.h>
 #include <LabRender/Utils.h>
@@ -45,13 +46,17 @@ public:
     : _renderer(renderer), _drawlist(drawlist)
     {
         run =
-            [this](const lab::Command & cmd, const string & path, const std::vector<Argument> & args, lab::Ack & ack) {
+            [this](const lab::Command & cmd, const string & path, const std::vector<Argument> & args, lab::Ack & ack) 
+            {
                 string filepath = args[0].stringArg;
-                _renderer->enqueCommand([this, filepath]() {
-                    shared_ptr<lab::ModelBase> model = lab::loadMesh(filepath);
-                    if (model) {
+                _renderer->enqueCommand([this, filepath]() 
+                {
+                    shared_ptr<lab::Model> model = lab::loadMesh(filepath);
+                    if (model) 
+                    {
                         _drawlist->deferredMeshes.clear();
-                        _drawlist->deferredMeshes.emplace_back(model);
+                        for (auto& i : model->parts())
+                            _drawlist->deferredMeshes.emplace_back(std::pair<lab::m44f, std::shared_ptr<lab::ModelBase>>( lab::m44f_identity, i ));
                     }
                 });
             };
@@ -103,19 +108,21 @@ public:
 
     void createScene()
 	{
-        std::vector<std::shared_ptr<lab::ModelBase>>& meshes = drawList.deferredMeshes;
+        auto& meshes = drawList.deferredMeshes;
+
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("$(ASSET_ROOT)/models/starfire.25.obj");
-        shared_ptr<lab::ModelBase> model = lab::loadMesh("$(ASSET_ROOT)/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
-        meshes.push_back(model);
+        shared_ptr<lab::Model> model = lab::loadMesh("$(ASSET_ROOT)/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
+        for (auto& i : model->parts())
+            meshes.push_back({ lab::m44f_identity, i });
 
 		shared_ptr<lab::UtilityModel> cube = make_shared<lab::UtilityModel>();
 		cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
-		meshes.push_back(cube);
+        meshes.push_back({ lab::m44f_identity, cube });
 
         static float foo = 0.f;
         camera.position = {foo, 0, -1000};
         lab::Bounds bounds = model->localBounds();
-        bounds = model->transform.transformBounds(bounds);
+        //bounds = model->transform.transformBounds(bounds);
         camera.frame(bounds);
 
         shared_ptr<lab::Command> command = make_shared<PingCommand>();
@@ -136,7 +143,7 @@ public:
 
         v2i fbSize = frameBufferDimensions();
 
-        drawList.jacobian = camera.mount.jacobian();
+        drawList.modl = camera.mount.jacobian();
         drawList.view = camera.mount.viewTransform();
         drawList.proj = camera.optics.perspective(float(fbSize.x) / float(fbSize.y));
 

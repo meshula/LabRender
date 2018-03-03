@@ -103,19 +103,24 @@ namespace lab {
         }
         rl.context.activeTextureUnit = activeTextureUnit;
         
-        for (auto a : automatics) {
-            if (a.automatic == AutomaticUniform::frameBufferResolution) {
+        for (auto a : automatics) 
+        {
+            if (a.automatic == AutomaticUniform::frameBufferResolution) 
+            {
                 uniform(a.name.c_str(), V2F(rl.context.framebufferSize.x, rl.context.framebufferSize.y));
             }
-            else if (a.automatic == AutomaticUniform::skyMatrix) {
+            else if (a.automatic == AutomaticUniform::skyMatrix) 
+            {
                 m44f projection = rl.context.drawList->proj;
-                m44f skyMatrix = matrix_invert(matrix_multiply(projection, rl.context.drawList->jacobian));
+                m44f skyMatrix = matrix_invert(matrix_multiply(projection, rl.context.drawList->modl));
                 uniform(a.name.c_str(), skyMatrix);
             }
-            else if (a.automatic == AutomaticUniform::renderTime) {
+            else if (a.automatic == AutomaticUniform::renderTime) 
+            {
                 uniformFloat(a.name.c_str(), (float) rl.context.renderTime);
             }
-            else if (a.automatic == AutomaticUniform::mousePosition) {
+            else if (a.automatic == AutomaticUniform::mousePosition) 
+            {
                 uniform(a.name.c_str(), rl.context.mousePosition);
             }
         }

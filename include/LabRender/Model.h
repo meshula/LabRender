@@ -60,6 +60,8 @@ namespace lab {
             return _localBounds;
         }
 
+        Transform transform;
+
     protected:
         ShaderType              _shaderType;
         std::shared_ptr<Shader> _shader;
@@ -67,17 +69,15 @@ namespace lab {
         Bounds                  _localBounds;
     };
 
-    class Model : public ModelBase {
+    class Model 
+    {
     public:
-		LR_API  virtual ~Model() {}
+		LR_API ~Model() {}
 
-		LR_API  virtual void update(double time) override;
-		LR_API  virtual void draw() override;
-		LR_API  virtual void draw(FrameBuffer & fbo, Renderer::RenderLock &) override;
-
-		LR_API  void addPart(std::shared_ptr<ModelBase> p) { _parts.push_back(p); }
-
-		LR_API  virtual Bounds localBounds() const override;
+		LR_API void addPart(std::shared_ptr<ModelBase> p) { _parts.push_back(p); }
+		LR_API Bounds localBounds() const;
+        LR_API void addToDrawList(DrawList&);
+        LR_API std::vector<std::shared_ptr<ModelBase>> parts() const { return _parts;}
 
     protected:
         std::vector<std::shared_ptr<ModelBase>> _parts;

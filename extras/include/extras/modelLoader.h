@@ -2,6 +2,7 @@
 #pragma once
 
 #include <LabRender/LabRender.h>
+#include <LabRender/Model.h>
 #include <memory>
 #include <string>
 
@@ -23,6 +24,5 @@
 
 namespace lab 
 {
-	class Model;
 	LRML_API std::shared_ptr<Model> loadMesh(const std::string& filename);
 }

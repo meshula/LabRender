@@ -21,15 +21,15 @@ namespace lab {
     public:
         DrawList()
         {
-            jacobian = m44f_identity;
+            modl = m44f_identity;
             view = m44f_identity;
             proj = m44f_identity;
         }
 
-        std::vector<std::shared_ptr<ModelBase>> deferredMeshes;
+        std::vector<std::pair<m44f, std::shared_ptr<ModelBase>>> deferredMeshes;
         std::vector<std::shared_ptr<Illuminant>> lights;
 
-        m44f jacobian;
+        m44f modl;
         m44f view;
         m44f proj;
     };

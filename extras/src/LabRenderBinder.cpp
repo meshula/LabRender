@@ -17,7 +17,9 @@ struct lab_render_mgr
 {
     vector<unique_ptr<PassRenderer>> renderers;
     vector<unique_ptr<Renderer::RenderLock>> renderlocks;
+    vector<shared_ptr<Model>> models;
     vector<shared_ptr<ModelBase>> meshes;
+    vector<shared_ptr<Texture>> textures;
     lab_renderer empty;
     v2i frame_buffer_size;
 
@@ -81,7 +83,7 @@ struct lab_render_mgr
             return;
 
         Renderer::RenderLock* rl = renderlocks[l.handle].get();
-        if (!rl->valid() || !rl->renderInProgress())
+        if (!rl->valid() || rl->renderInProgress())
             return;
 
         //const double globalTime = 0;
@@ -98,7 +100,7 @@ struct lab_render_mgr
             return;
 
         Renderer::RenderLock* rl = renderlocks[l.handle].get();
-        if (!rl->valid() || rl->renderInProgress())
+        if (!rl->valid() || !rl->renderInProgress())
             return;
 
         if (!renderers[l.lr.handle])
@@ -115,7 +117,7 @@ struct lab_render_mgr
 
     void render_context_set_camera(const lab_render_lock& l, const m44f& model, const m44f& view, const m44f& proj)
     {
-        drawList.jacobian = model;
+        drawList.modl = model;
         drawList.view = view;
         drawList.proj = proj;
     }
@@ -126,25 +128,38 @@ struct lab_render_mgr
             return;
 
         Renderer::RenderLock* rl = renderlocks[l.handle].get();
-        if (!rl->valid() || rl->renderInProgress())
+        if (!rl->valid() || !rl->renderInProgress())
             return;
 
         if (!meshes[m.handle])
             return;
 
-        v3f t, r, s;
-        tx.decompose(t, r, s);
-        meshes[m.handle]->transform.setTRS(t, r, s);
-
-        drawList.deferredMeshes.push_back(meshes[m.handle]);
+        drawList.deferredMeshes.push_back({ tx, meshes[m.handle] });
     }
 
-    lab_mesh mesh_load(const char* path)
+    void render_draw_model(const lab_render_lock& l, const lab_model& m, const m44f& tx)
     {
-        shared_ptr<lab::ModelBase> model = lab::loadMesh(path);
-        meshes.push_back(model);
-        lab_mesh r;
-        r.handle = (int)(meshes.size() - 1);
+        if (!renderlocks[l.handle])
+            return;
+
+        Renderer::RenderLock* rl = renderlocks[l.handle].get();
+        if (!rl->valid() || !rl->renderInProgress())
+            return;
+
+        auto model = models[m.handle].get();
+        if (!model)
+            return;
+
+        for (auto& part : model->parts())
+            drawList.deferredMeshes.push_back({ tx, part });
+    }
+
+    lab_model model_load(const char* path)
+    {
+        shared_ptr<lab::Model> model = lab::loadMesh(path);
+        models.push_back(model);
+        lab_model r;
+        r.handle = (int)(models.size() - 1);
         return r;
     }
 
@@ -167,19 +182,39 @@ struct lab_render_mgr
         if (index == fb->baseNames.size())
             return {};
 
+        auto tx = fb->textures[index];
+        int idx = 0;
+        for (auto& i : textures)
+        {
+            if (i == tx)
+            {
+                lab_texture r;
+                r.handle = idx;
+                r.platform_handle = tx->id;
+                return r;
+            }
+        }
+
+        textures.push_back(tx);
         lab_texture r;
-        r.handle = fb->textures[index]->id; /// @TEMP, until there is a texture manager in this wrapper
+        r.handle = (int)(textures.size() - 1);
+        r.platform_handle = tx->id;
         return r;
     }
 
     int texture_GL_handle(const lab_texture& t)
     {
-        return t.handle;
+        return t.platform_handle;
     }
 
     void texture_save(const lab_texture& t, const char* path)
     {
-        // @TODO no texture manager yet
+        if (t.handle >= textures.size())
+            return;
+        if (!textures[t.handle])
+            return;
+
+        textures[t.handle]->save(path);
     }
 
 
@@ -214,8 +249,10 @@ void            lab_render_context_set_camera(const lab_render_lock& l, const m4
                     { mgr.render_context_set_camera(l, model, view, proj); }
 void            lab_render_draw_mesh(const lab_render_lock& l, const lab_mesh& m, const m44f& t)   
                     { mgr.render_draw_mesh(l, m, t); }
-lab_mesh        lab_render_mesh_load(const char* path) 
-                    { return mgr.mesh_load(path); }
+void            lab_render_draw_model(const lab_render_lock& l, const lab_model& m, const m44f& t)   
+                    { mgr.render_draw_model(l, m, t); }
+lab_model       lab_render_model_load(const char* path) 
+                    { return mgr.model_load(path); }
 lab_texture     lab_render_framebuffer_channel(const lab_renderer& lr, const char* name, const char* channel) 
                     { return mgr.framebuffer_channel(lr, name, channel); }
 int             lab_texture_GL_handle(const lab_texture& t) 

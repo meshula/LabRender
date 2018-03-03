@@ -24,7 +24,6 @@ namespace lab {
 
     class PassRenderer : public Renderer
 	{
-
     public:
 
         class Pass

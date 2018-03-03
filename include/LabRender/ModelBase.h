@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "LabRender/Transform.h"
 #include "LabRender/Renderer.h"
 #include <memory>
 
@@ -24,8 +23,6 @@ namespace lab {
         virtual void draw() = 0;
         virtual void draw(FrameBuffer & fbo, Renderer::RenderLock &) = 0;
         virtual Bounds localBounds() const = 0;
-        
-        Transform transform;
         
         std::shared_ptr<Material> material;
     };
