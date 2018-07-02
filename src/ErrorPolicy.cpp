@@ -7,7 +7,7 @@
 //
 
 #include "LabRender/ErrorPolicy.h"
-#include "LabRender/gl4.h"
+#include "gl4.h"
 
 namespace lab {
     

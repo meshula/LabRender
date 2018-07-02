@@ -2,7 +2,7 @@
 #pragma once
 
 #ifdef _MSC_VER
-# ifdef BUILDING_LABRENDER
+# ifdef BUILDING_LabRender
 #  define LR_CAPI extern "C" __declspec(dllexport)
 #  define LR_API __declspec(dllexport)
 #  define LR_CLASS __declspec(dllexport)

@@ -16,7 +16,7 @@
 #include "LabRender/Texture.h"
 #include "LabRender/Utils.h"
 #include "LabRender/UtilityModel.h"
-#include "LabRender/gl4.h"
+#include "gl4.h"
 #include "json/json.h"
 
 #include <fstream>
@@ -172,7 +172,7 @@ void PassRenderer::configure(const char *const path)
     printf("\nTextures:\n");
     for (Json::Value::iterator it = conf["textures"].begin(); it != conf["textures"].end(); ++it)
 	{
-        // { "id": "tex16", "path": "$(ASSET_ROOT)/textures/shadertoy/tex16.png" }
+        // { "id": "tex16", "path": "{ASSET_ROOT}/textures/shadertoy/tex16.png" }
         string id = (*it)["id"].asString();
         string path = (*it)["path"].asString();
         FileTextureProvider provider(path);

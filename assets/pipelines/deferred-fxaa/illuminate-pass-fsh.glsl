@@ -3,7 +3,7 @@ void main()
 {
     vec3 normal = texture(u_normalTexture, vert.v_texCoord).xyz;
     float i = dot(normal, normal);
-    if (i == 1.0) {
+    if (i < 0.0001) {
         discard;
     }
     else

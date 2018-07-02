@@ -7,7 +7,7 @@
 //
 
 #include "LabRender/Texture.h"
-#include "LabRender/gl4.h"
+#include "gl4.h"
 #include "LabRender/Utils.h"
 
 #define STB_IMAGE_IMPLEMENTATION

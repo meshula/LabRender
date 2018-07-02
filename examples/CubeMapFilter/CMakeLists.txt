@@ -41,7 +41,7 @@ target_link_libraries(CubeMapFilterLab optimized
 if (MSVC_IDE)
     # hack to get around the "Debug" and "Release" directories cmake tries to add on Windows
     #set_target_properties (CubeMapFilterLab PROPERTIES PREFIX "../")
-    set_target_properties(CubeMapFilterLab PROPERTIES IMPORT_PREFIX "../")
+    #set_target_properties(CubeMapFilterLab PROPERTIES IMPORT_PREFIX "../")
 endif()
 
 #add_custom_command(TARGET CubeMapFilterLab POST_BUILD

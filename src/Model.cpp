@@ -12,7 +12,7 @@
 
 #include "LabRender/Model.h"
 
-#include "LabRender/gl4.h"
+#include "gl4.h"
 #include "LabRender/FrameBuffer.h"
 #include "LabRender/Material.h"
 #include "LabRender/MathTypes.h"
@@ -277,9 +277,9 @@ namespace lab {
             if (_shaderType == ShaderType::skyShader) {
                 lab::m44f invMv = rl.context.viewMatrices.mv;
                 // remove translation
-                invMv.columns[3].x = 0;
-                invMv.columns[3].y = 0;
-                invMv.columns[3].z = 0;
+                invMv[3].x = 0;
+                invMv[3].y = 0;
+                invMv[3].z = 0;
                 _shader->uniform("u_modelView", invMv);
                 lab::m44f mvproj = matrix_multiply(rl.context.viewMatrices.projection, invMv);
                 _shader->uniform("u_modelViewProj", mvproj);
@@ -291,9 +291,9 @@ namespace lab {
             }
 
             lab::m44f jacobian = rl.context.viewMatrices.model;
-            jacobian.columns[3].x = 0;
-            jacobian.columns[3].y = 0;
-            jacobian.columns[3].z = 0;
+            jacobian[3].x = 0;
+            jacobian[3].y = 0;
+            jacobian[3].z = 0;
             jacobian = matrix_transpose(matrix_invert(jacobian));
             _shader->uniform("u_jacobian", jacobian);
 

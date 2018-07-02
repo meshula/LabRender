@@ -5,15 +5,15 @@
 		{ "name": "visible" }
 	],
 	"textures": [
-		{ "id": "tex16", "path": "$(ASSET_ROOT)/textures/shadertoy/tex16.png" }
+		{ "id": "tex16", "path": "{ASSET_ROOT}/textures/shadertoy/tex16.png" }
 	],
 	"passes": [
 		{ "name": "ShaderToy",
 	 	    "type": { "run": "PostProcess", "draw": "quad" },
 		    "depth" : { "test": "never", "write": "no", "clear_buffer": "no" },
-	        "shader": { "vertex_shader_path":   "$(ASSET_ROOT)/pipelines/shadertoy/full-screen-quad-vsh.glsl",
-               	        "fragment_shader_path": "$(ASSET_ROOT)/pipelines/shadertoy/4lB3D1-fsh.glsl",
-               	        "fragment_shader_postamble_path": "$(ASSET_ROOT)/pipelines/shadertoy/shadertoy-postamble-fsh.glsl",
+	        "shader": { "vertex_shader_path":   "{ASSET_ROOT}/pipelines/shadertoy/full-screen-quad-vsh.glsl",
+               	        "fragment_shader_path": "{ASSET_ROOT}/pipelines/shadertoy/4lB3D1-fsh.glsl",
+               	        "fragment_shader_postamble_path": "{ASSET_ROOT}/pipelines/shadertoy/shadertoy-postamble-fsh.glsl",
 	                    "uniforms": [ { "name": "iChannel0",    "type": "sampler2d",    "texture": "tex16" },
 	                                  { "name": "iGlobalTime",  "type": "float",        "auto":    "render_time" },
 	                                  { "name": "iResolution",  "type": "vec2",         "auto":    "resolution" },

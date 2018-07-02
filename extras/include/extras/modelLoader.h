@@ -7,7 +7,7 @@
 #include <string>
 
 #if defined(_MSC_VER) && defined(LABRENDER_MODELLOADER_DLL)
-# ifdef BUILDING_LABRENDER_MODELLOADER
+# ifdef BUILDING_LabModelLoader
 #  define LRML_CAPI extern "C" __declspec(dllexport)
 #  define LRML_API __declspec(dllexport)
 #  define LRML_CLASS __declspec(dllexport)

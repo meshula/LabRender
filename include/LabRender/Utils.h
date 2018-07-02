@@ -14,12 +14,12 @@
 
 namespace lab {
 
-    // expected: $(ASSET_ROOT) resolvedCwd/assets
+    // expected: {ASSET_ROOT} resolvedCwd/assets
     // add as many others as necessary
     //
     LR_API void addPathVariable(const std::string& var, const std::string& replacement);
     
-    LR_API std::string loadFile(char const*const path, bool errorIfNotFound = true);
+    LR_API std::vector<std::uint8_t> loadFile(char const*const path, bool errorIfNotFound = true);
     LR_API std::string expandPath(char const*const path);
 
 

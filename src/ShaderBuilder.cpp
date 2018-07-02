@@ -14,7 +14,7 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include "LabRender/gl4.h"
+#include "gl4.h"
 #include "LabRender/Utils.h"
 
 namespace lab {
@@ -178,13 +178,18 @@ namespace lab {
         return s.str();
     }
     
-    std::shared_ptr<Shader> ShaderBuilder::makeShader(const ShaderSpec & spec, const VAO & vao, bool printShader) {
-        string vrtx = loadFile(spec.vertexShaderPath.c_str());
-        string fgmt = loadFile(spec.fragmentShaderPath.c_str());
-        string fgmt_postAmble = loadFile(spec.fragmentShaderPostamblePath.c_str(), false);
-        fgmt += fgmt_postAmble;
+    std::shared_ptr<Shader> ShaderBuilder::makeShader(const ShaderSpec & spec, const VAO & vao, bool printShader) 
+    {
+        auto vrtx = loadFile(spec.vertexShaderPath.c_str());
+        auto fgmt_body = loadFile(spec.fragmentShaderPath.c_str());
+        auto fgmt_postAmble = loadFile(spec.fragmentShaderPostamblePath.c_str(), false);
         
-        auto shader = makeShader(spec.name, vrtx.c_str(), fgmt.c_str(), vao, printShader);
+        std::vector<std::uint8_t> fgmt;
+        fgmt.resize(fgmt_body.size() + fgmt_postAmble.size());
+        memcpy(&fgmt[0], &fgmt_body[0], fgmt_body.size() - 1);
+        memcpy(&fgmt[fgmt_body.size() - 1], &fgmt_postAmble[0], fgmt_postAmble.size()); 
+
+        auto shader = makeShader(spec.name, reinterpret_cast<const char*>(&vrtx[0]), reinterpret_cast<const char*>(&fgmt[0]), vao, printShader);
 
         for (auto u : spec.uniforms)
             if (u.automatic != AutomaticUniform::none)

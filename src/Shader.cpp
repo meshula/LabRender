@@ -8,7 +8,7 @@
 
 #include "LabRender/Shader.h"
 #include "LabRender/DrawList.h"
-#include "LabRender/gl4.h"
+#include "gl4.h"
 
 namespace lab {
     

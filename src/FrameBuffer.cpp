@@ -6,7 +6,7 @@
 //
 
 #include "LabRender/FrameBuffer.h"
-#include "LabRender/gl4.h"
+#include "gl4.h"
 #include "LabRender/Texture.h"
 #include <iostream>
 

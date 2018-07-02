@@ -1,4 +1,12 @@
 
-add_subdirectory (CubeMapFilter)
-add_subdirectory (ImGuiLab)
-add_subdirectory (LabRenderExample)
+set(SAMPLES
+    CubeMapFilter
+    ImGuiLab
+    Immediate
+    LabRenderExample
+)
+
+foreach(SAMPLE ${SAMPLES})
+    add_subdirectory(${SAMPLE})
+endforeach()
+

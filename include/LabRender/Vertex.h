@@ -182,9 +182,6 @@ namespace lab {
     // In the following structs, float[3] is used, not v3f, because v3f packs as v4f.
 
     struct VertP {
-        VertP(glm::vec3 pos_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-        }
         VertP(v3f pos_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
         }
@@ -197,9 +194,6 @@ namespace lab {
         float pos[3];
     };
     struct VertP2d {
-        VertP2d(glm::vec2 pos_) {
-            pos[0] = pos_.x; pos[1] = pos_.y;
-        }
         VertP2d(v2f pos_) {
             pos[0] = pos_.x; pos[1] = pos_.y;
         }
@@ -213,10 +207,6 @@ namespace lab {
         float pos[2];
     };
     struct VertPT {
-        VertPT(glm::vec3 pos_, glm::vec2 uv_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-            uv[0] = uv_.x; uv[1] = uv_.y;
-        }
         VertPT(v3f pos_, v2f uv_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
             uv[0] = uv_.x; uv[1] = uv_.y;
@@ -232,10 +222,6 @@ namespace lab {
         float uv[2];
     };
     struct VertPN {
-        VertPN(glm::vec3 pos_, glm::vec3 normal_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-            normal[0] = normal_.x; normal[1] = normal_.y; normal[2] = normal_.z;
-        }
         VertPN(v3f pos_, v3f normal_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
             normal[0] = normal_.x; normal[1] = normal_.y; normal[2] = normal_.z;
@@ -251,11 +237,6 @@ namespace lab {
         float normal[3];
     };
     struct VertPTN {
-        VertPTN(glm::vec3 pos_, glm::vec2 uv_, glm::vec3 normal_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-            normal[0] = normal_.x; normal[1] = normal_.y; normal[2] = normal_.z;
-            uv[0] = uv_.x; uv[1] = uv_.y;
-        }
         VertPTN(v3f pos_, v2f uv_, v3f normal_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
             normal[0] = normal_.x; normal[1] = normal_.y; normal[2] = normal_.z;
@@ -274,11 +255,6 @@ namespace lab {
         float uv[2];
     };
     struct VertPT3N {
-        VertPT3N(glm::vec3 pos_, glm::vec3 uvw_, glm::vec3 normal_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-            normal[0] = normal_.x; normal[1] = normal_.y; normal[2] = normal_.z;
-            uvw[0] = uvw_.x; uvw[1] = uvw_.y; uvw[2] = uvw_.z;
-        }
         VertPT3N(v3f pos_, v3f uvw_, v3f normal_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
             normal[0] = normal_.x; normal[1] = normal_.y; normal[2] = normal_.z;
@@ -297,10 +273,6 @@ namespace lab {
         float uvw[3];
     };
     struct VertPC {
-        VertPC(glm::vec3 pos_, glm::vec4 color_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-            color[0] = color_.x; color[1] = color_.y; color[2] = color_.z; color[3] = color_.w;
-        }
         VertPC(v3f pos_, v4f color_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
             color[0] = color_.x; color[1] = color_.y; color[2] = color_.z; color[3] = color_.w;
@@ -316,11 +288,6 @@ namespace lab {
         float color[4];
     };
     struct VertPTC {
-        VertPTC(glm::vec3 pos_, glm::vec2 uv_, glm::vec4 color_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-            uv[0] = uv_.x; uv[1] = uv_.y;
-            color[0] = color_.x; color[1] = color_.y; color[2] = color_.z; color[3] = color_.w;
-        }
         VertPTC(v3f pos_, v2f uv_, v4f color_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
             uv[0] = uv_.x; uv[1] = uv_.y;
@@ -339,12 +306,6 @@ namespace lab {
         float uv[2];
     };
     struct VertPTNC {
-        VertPTNC(glm::vec3 pos_, glm::vec2 uv_, glm::vec3 normal_, glm::vec4 color_) {
-            pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
-            uv[0] = uv_.x; uv[1] = uv_.y;
-            normal[0] = normal_.x; normal[1] = normal_.y; normal[2] = normal_.z;
-            color[0] = color_.x; color[1] = color_.y; color[2] = color_.z; color[3] = color_.w;
-        }
         VertPTNC(v3f pos_, v2f uv_, v3f normal_, v4f color_) {
             pos[0] = pos_.x; pos[1] = pos_.y; pos[2] = pos_.z;
             uv[0] = uv_.x; uv[1] = uv_.y;

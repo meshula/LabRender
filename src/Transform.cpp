@@ -17,13 +17,13 @@ namespace lab
     void Transform::updateTransformTRS()
 	{
 		m44f mat = m44f_identity;
-		mat.m30 = _translate.x;
-		mat.m31 = _translate.y;
-		mat.m32 = _translate.z;
-		mat.rotateX(_ypr.x);
-		mat.rotateY(_ypr.y);
-		mat.rotateZ(_ypr.z);
-		mat.scale(_scale);
+		mat[3].x = _translate.x;
+		mat[3].y = _translate.y;
+		mat[3].z = _translate.z;
+		rotateX(mat, _ypr.x);
+		rotateY(mat, _ypr.y);
+		rotateZ(mat, _ypr.z);
+		lab::scale(mat, _scale);
 		_transform = mat;
     }
 
@@ -48,9 +48,9 @@ namespace lab
 	{
 		Bounds result;
 		v4f p = {bounds.first.x, bounds.first.y, bounds.first.z, 1.f};
-		result.first = matrix_multiply(_transform, p).xyz;
+        result.first = v3f{matrix_multiply(_transform, p)};
 		p = {bounds.second.x, bounds.second.y, bounds.second.z, 1.f};
-		result.second = matrix_multiply(_transform, p).xyz;
+        result.second = v3f{matrix_multiply(_transform, p)};
 		return result;
 	}
 

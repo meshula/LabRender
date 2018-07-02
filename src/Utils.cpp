@@ -18,9 +18,11 @@ namespace {
     
     map<string, string> variables;
     
-    std::string cleanPath(const std::string& path) {
+    std::string cleanPath(const std::string& path) 
+    {
         string result = path;
-        for (auto i : variables) {
+        for (auto i : variables) 
+        {
             size_t pos = path.find(i.first);
             if (pos == string::npos)
                 continue;
@@ -29,7 +31,8 @@ namespace {
         }
         return result;
     }
-}
+
+} // anon
 
 namespace lab {
     
@@ -43,30 +46,29 @@ namespace lab {
         return cleanPath(path);
     }
     
-    std::string loadFile(char const*const path, bool errorIfNotFound) 
+    std::vector<std::uint8_t> loadFile(char const*const path, bool errorIfNotFound) 
 	{   
         string resolvedPath(path);
         resolvedPath = cleanPath(resolvedPath);
         
         FILE* f = fopen(resolvedPath.c_str(), "rb");
-        if (!f) {
+        if (!f) 
+        {
             if (errorIfNotFound)
                 cerr << "Could not open file " << resolvedPath << endl;
             
-            return "";
+            return {};
         }
         
-        std::string result;
+        std::vector<std::uint8_t> result;
         fseek(f, 0, SEEK_END);
         size_t l = ftell(f);
         fseek(f, 0, SEEK_SET);
-        uint8_t* data = new uint8_t[l+1];
-        fread(data, 1, l, f);
+        result.resize(l+1);
+        fread(&result[0], 1, l, f);
         fclose(f);
-        data[l] = '\0';
-        result.assign((char*)data);
-        delete[] data;
+        result[l] = '\0';
         return result;
     }
     
-}
+}  // lab

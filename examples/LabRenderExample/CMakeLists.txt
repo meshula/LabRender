@@ -39,7 +39,7 @@ target_link_libraries(LabRenderExample optimized
 if (MSVC_IDE)
     # hack to get around the "Debug" and "Release" directories cmake tries to add on Windows
     #set_target_properties (LabRenderExample PROPERTIES PREFIX "../")
-    set_target_properties(LabRenderExample PROPERTIES IMPORT_PREFIX "../")
+    #set_target_properties(LabRenderExample PROPERTIES IMPORT_PREFIX "../")
 endif()
 
 #add_custom_command(TARGET LabRenderExample POST_BUILD

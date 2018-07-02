@@ -35,7 +35,7 @@ namespace lab {
 		printf("\nTextures:\n");
 		for (Json::Value::iterator it = conf["textures"].begin(); it != conf["textures"].end(); ++it)
 		{
-			// { "id": "tex16", "path": "$(ASSET_ROOT)/textures/shadertoy/tex16.png" }
+			// { "id": "tex16", "path": "{ASSET_ROOT}/textures/shadertoy/tex16.png" }
 			string id = (*it)["id"].asString();
 			string path = (*it)["path"].asString();
 			textures.emplace_back(Texture(id, path));

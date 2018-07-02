@@ -94,13 +94,13 @@ public:
     {
 		const char * env = getenv("ASSET_ROOT");
 		if (env)
-			lab::addPathVariable("$(ASSET_ROOT)", env);
+			lab::addPathVariable("{ASSET_ROOT}", env);
 		else
-			lab::addPathVariable("$(ASSET_ROOT)", ASSET_ROOT);
+			lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
 
-		//std::string path = "$(ASSET_ROOT)/pipelines/deferred.json";
-		//std::string path = "$(ASSET_ROOT)/pipelines/shadertoy.json";
-		std::string path = "$(ASSET_ROOT)/pipelines/deferred_fxaa.json";
+		//std::string path = "{ASSET_ROOT}/pipelines/deferred.json";
+		//std::string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
+		std::string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
 		std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::PassRenderer>();
         dr->configure(path.c_str());
@@ -110,8 +110,8 @@ public:
 	{
         auto& meshes = drawList.deferredMeshes;
 
-        //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("$(ASSET_ROOT)/models/starfire.25.obj");
-        shared_ptr<lab::Model> model = lab::loadMesh("$(ASSET_ROOT)/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
+        //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
+        shared_ptr<lab::Model> model = lab::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
         for (auto& i : model->parts())
             meshes.push_back({ lab::m44f_identity, i });
 
@@ -186,7 +186,7 @@ public:
     }
 
     virtual void mouseUp(v2f windowSize, v2f pos) override {
-        if (vector_length(previousMousePosition - initialMousePosition) < 2) {
+        if (lab::vector_length(previousMousePosition - initialMousePosition) < 2) {
             // test for clicked object
             //
         }

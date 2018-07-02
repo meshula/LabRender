@@ -69,6 +69,14 @@ namespace lab {
 
             m44f result;
             memset(&result, 0, sizeof(m44f));
+            result[0].x = scalex * x / (right - left);
+            result[1].y = scaley * y / (top - bottom);
+            result[2].x = (right + left + dx) / (right - left);
+            result[2].y = (top + bottom + dy) / (top - bottom);
+            result[2].z = handedness * (_zfar + _znear) / (_zfar - _znear);
+            result[2].w = handedness;
+            result[3].z = handedness * 2.f * _zfar * _znear / (_zfar - _znear);
+#if 0
             result.columns[0].x = scalex * x / (right - left);
             result.columns[1].y = scaley * y / (top - bottom);
             result.columns[2].x = (right + left + dx) / (right - left);
@@ -76,6 +84,7 @@ namespace lab {
             result.columns[2].z = handedness * (_zfar + _znear) / (_zfar - _znear);
             result.columns[2].w = handedness;
             result.columns[3].z = handedness * 2.f * _zfar * _znear / (_zfar - _znear);
+#endif
             return result;
         }
 
@@ -102,15 +111,15 @@ namespace lab {
         }
         const m44f& viewTransform() const { return _viewTransform; }
 
-        v3f right()   const { return vector_normalize(V3F(_viewTransform.columns[0].x,
-                                                          _viewTransform.columns[1].x,
-                                                          _viewTransform.columns[2].x)); }
-        v3f up()      const { return vector_normalize(V3F(_viewTransform.columns[0].y,
-                                                          _viewTransform.columns[1].y,
-                                                          _viewTransform.columns[2].y)); }
-        v3f forward() const { return vector_normalize(V3F(_viewTransform.columns[0].z,
-                                                          _viewTransform.columns[1].z,
-                                                          _viewTransform.columns[2].z)); }
+        v3f right()   const { return vector_normalize(V3F(_viewTransform[0].x,
+                                                          _viewTransform[1].x,
+                                                          _viewTransform[2].x)); }
+        v3f up()      const { return vector_normalize(V3F(_viewTransform[0].y,
+                                                          _viewTransform[1].y,
+                                                          _viewTransform[2].y)); }
+        v3f forward() const { return vector_normalize(V3F(_viewTransform[0].z,
+                                                          _viewTransform[1].z,
+                                                          _viewTransform[2].z)); }
 
         static m44f lookat(v3f eye, v3f target, v3f up) {
             v3f zaxis = vector_normalize(eye - target);
@@ -123,9 +132,10 @@ namespace lab {
             return ret;
         }
 
-        m44f jacobian() const {
+        m44f jacobian() const 
+        {
             m44f j = _viewTransform;
-            j.columns[3] = {0,0,0,1};
+            j[3] = {0,0,0,1};
             return j;
         }
 

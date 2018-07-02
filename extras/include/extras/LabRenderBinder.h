@@ -5,7 +5,7 @@
 
 
 #if defined(_MSC_VER) && defined(LABRENDER_BINDER_DLL)
-# ifdef BUILDING_LABRENDER_MODELLOADER
+# ifdef BUILDING_LabRenderBinder
 #  define LRB_CAPI extern "C" __declspec(dllexport)
 #  define LRB_API __declspec(dllexport)
 #  define LRB_CLASS __declspec(dllexport)

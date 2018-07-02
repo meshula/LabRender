@@ -8,7 +8,7 @@
 //
 
 #include "LabRender/Vertex.h"
-#include "LabRender/gl4.h"
+#include "gl4.h"
 
 
 namespace lab {
