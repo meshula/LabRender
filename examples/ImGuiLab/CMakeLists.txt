@@ -1,11 +1,8 @@
 
 set(IMGUILAB_SRC
-    "${LABRENDER_ROOT}/examples/ImGuiLab/imgui_demo.cpp"
-    "${LABRENDER_ROOT}/examples/ImGuiLab/imgui_draw.cpp"
-    "${LABRENDER_ROOT}/examples/ImGuiLab/imgui.cpp"
-    "${LABRENDER_ROOT}/examples/ImGuiLab/ImGuiImplementation.cpp"
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderDemoApp.h"
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderExampleApp.cpp"
+    "${LABRENDER_ROOT}/examples/ImGuiLab/ImGuiIntegration.cpp"
 )
 
 add_executable(ImGuiLab ${IMGUILAB_SRC})
@@ -32,6 +29,7 @@ target_link_libraries(ImGuiLab
     LabCmd::Core
     LabRender::Core
     LabRender::Binder
+    LabRender::Imgui
     LabRender::ModelLoader)
 
 if (MSVC_IDE)

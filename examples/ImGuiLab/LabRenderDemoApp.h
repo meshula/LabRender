@@ -100,7 +100,7 @@ namespace lab {
     };
 
 
-    class ImGuiIntegration : public SupplementalGuiHandler
+    class ImGuiIntegrationx : public SupplementalGuiHandler
     {
         ImFont* default_font{};
         ImFont* regular_font{};
@@ -142,12 +142,21 @@ namespace lab {
         void ImGui_ImplGlfwGL3_NewFrame();
 
     public:
+        ImGuiIntegrationx(GLFWwindow* window);
+        ~ImGuiIntegrationx();
+
+        virtual void ui() override;
+    };
+
+
+    class ImGuiIntegration : public SupplementalGuiHandler
+    {
+    public:
         ImGuiIntegration(GLFWwindow* window);
         ~ImGuiIntegration();
 
         virtual void ui() override;
     };
-
 
 
     class GLFWAppBase : public AppBase

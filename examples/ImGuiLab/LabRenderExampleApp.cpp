@@ -213,6 +213,6 @@ int main(void)
         app->render();
         app->frameEnd();
     }
-
-    exit(EXIT_SUCCESS);
+    
+    return 1;
 }

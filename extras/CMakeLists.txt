@@ -1,8 +1,11 @@
 
+#-------------------------------------------------------------------------------
+# LabRenderBinder
+
 lab_library(LabModelLoader
-    TYPE
-        SHARED
-        
+    TYPE SHARED
+    ALIAS LabRender::ModelLoader
+
     LIBRARIES
         ${GLEW_LIBRARY}
         ${OPENGL_LIBRARIES}
@@ -23,16 +26,12 @@ lab_library(LabModelLoader
         src/modelLoader.cpp
 )
 
-add_library(LabRender::ModelLoader ALIAS LabModelLoader)
-
 #-------------------------------------------------------------------------------
 # LabRenderBinder
 
-
-
 lab_library(LabRenderBinder
-    TYPE
-        SHARED
+    TYPE SHARED
+    ALIAS LabRender::Binder
         
     LIBRARIES
         ${GLEW_LIBRARY}
@@ -43,6 +42,7 @@ lab_library(LabRenderBinder
     INCLUDE_DIRS
         ${LABRENDER_ROOT}/include
         ${LABRENDER_ROOT}/extras/include
+        ${LABRENDER_ROOT}/extras/imgui
         ${GLM_INCLUDE_DIR}
 
     PUBLIC_HEADERS
@@ -54,5 +54,43 @@ lab_library(LabRenderBinder
         src/LabRenderBinder.cpp
 )
 
-add_library(LabRender::Binder ALIAS LabRenderBinder)
+
+#-------------------------------------------------------------------------------
+# LabRenderImgui
+
+lab_library(LabRenderImgui
+    TYPE STATIC
+    ALIAS LabRender::Imgui
+        
+    LIBRARIES
+        ${GLEW_LIBRARY}
+        ${GLFW_LIBRARY_RELEASE}
+        ${OPENGL_LIBRARIES}
+
+    INCLUDE_DIRS
+        ${LABRENDER_ROOT}/include
+        ${LABRENDER_ROOT}/extras/include
+
+    PUBLIC_HEADERS
+        ${LABRENDER_ROOT}/extras/imgui/imconfig.h
+        ${LABRENDER_ROOT}/extras/imgui/imgui.h
+        ${LABRENDER_ROOT}/extras/imgui/imgui_internal.h
+        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.h
+        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.h
+
+    PRIVATE_HEADERS
+        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.h
+        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.h
+        ${LABRENDER_ROOT}/extras/imgui/stb_rect_pack.h
+        ${LABRENDER_ROOT}/extras/imgui/stb_textedit.h
+        ${LABRENDER_ROOT}/extras/imgui/stb_truetype.h
+  
+    CPPFILES
+        ${LABRENDER_ROOT}/extras/imgui/imgui.cpp
+        ${LABRENDER_ROOT}/extras/imgui/imgui_demo.cpp
+        ${LABRENDER_ROOT}/extras/imgui/imgui_draw.cpp
+        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.cpp
+        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.cpp
+)
+
 
