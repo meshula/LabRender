@@ -48,9 +48,9 @@ namespace lab
 	{
 		Bounds result;
 		v4f p = {bounds.first.x, bounds.first.y, bounds.first.z, 1.f};
-        result.first = v3f{matrix_multiply(_transform, p)};
+        result.first = v3f{matrix_multiply(_transform, p).xyz()};
 		p = {bounds.second.x, bounds.second.y, bounds.second.z, 1.f};
-        result.second = v3f{matrix_multiply(_transform, p)};
+        result.second = v3f{matrix_multiply(_transform, p).xyz()};
 		return result;
 	}
 

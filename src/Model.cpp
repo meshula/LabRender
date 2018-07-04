@@ -316,7 +316,7 @@ namespace lab {
                 }
                 shared_ptr<InOut> drIO = material->propertyInlet(ShaderMaterial::depthRangeName());
                 if (!!drIO) {
-                    glm::vec2 drange = drIO->value<glm::vec2>();
+                    v2f drange = drIO->value<v2f>();
                     glDepthRange(drange.x, drange.y);
                     depthRangeSet = true;
                 }

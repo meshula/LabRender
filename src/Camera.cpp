@@ -89,9 +89,9 @@ namespace lab
                 v3f camFwd = camera->mount.forward();
 				v3f worldUp = camera->worldUp;
                 v3f mUv = vector_normalize(vector_cross(worldUp, camFwd));
-				quatf yaw = glm::angleAxis(-0.25f * delta.x, glm::vec3(0,1.f,0));
-				quatf pitch = glm::angleAxis(0.25f * delta.y, mUv);
-				v3f rotatedVec = glm::rotate(yaw, glm::rotate(pitch, cameraToFocus));
+				quatf yaw = quatFromAxisAngle(v3f(0,1.f,0), -0.25f * delta.x);
+				quatf pitch = quatFromAxisAngle(mUv, 0.25f * delta.y);
+				v3f rotatedVec = quatRotateVector(yaw, quatRotateVector(pitch, cameraToFocus));
 				camera->position = camera->focusPoint + rotatedVec;
                 break;
             }

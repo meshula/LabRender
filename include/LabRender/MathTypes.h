@@ -12,8 +12,17 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+//#define HAVE_GLM
+#define HAVE_LINALG
+
+#ifdef HAVE_GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#endif
+#ifdef HAVE_LINALG
+#include <LabRender/linalg.h>
+#endif
+
 #include <utility>
 #include <ostream>
 
@@ -43,10 +52,19 @@ namespace lab {
         int32_t x, y, z, w;
     };
 
+#ifdef HAVE_GLM
     typedef glm::highp_vec2 v2f;
     typedef glm::highp_vec3 v3f;
     typedef glm::highp_vec4 v4f;
     typedef glm::highp_mat4x4 m44f;
+    typedef glm::fquat quatf;
+#elif defined(HAVE_LINALG)
+    typedef linalg::vec<float, 2> v2f;
+    typedef linalg::vec<float, 3> v3f;
+    typedef linalg::vec<float, 4> v4f;
+    typedef linalg::mat<float, 4, 4> m44f;
+    typedef linalg::vec<float, 4> quatf;
+#endif
 
     inline float length(const v2f &v) { return sqrtf(v.x * v.x + v.y * v.y); }
     inline float length(const v3f &v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }
@@ -145,7 +163,13 @@ namespace lab {
 	LR_CAPI m44f m44f_identity;
 
 	template <typename T> inline float vector_length(const T & a) { return length(a); }
+
+#ifdef HAVE_GLM
 	template <typename T> inline T vector_normalize(const T & a) { return glm::normalize(a); }
+#else
+	template <typename T> inline T vector_normalize(const T & a) { return normalize(a); }
+#endif
+
 	template <typename T> inline float vector_dot(const T & a, const T & b) { return dot(a, b); }
 
 	inline v3f vector_cross(const v3f & a, const v3f & b) { return cross(a, b); }
@@ -345,7 +369,6 @@ namespace lab {
         return slerp<T>(s0, s1, t).angle();
     }
 
-    typedef glm::fquat quatf;
 
     /*
 	    This function is based on equation 11 in
@@ -365,10 +388,45 @@ namespace lab {
 
         velquat = velquat * velquat * quatf(a.x, a.y, a.z, 1.0f) * (dt * 0.5f);
         result += velquat;
-
-        glm::normalize(result);
-        return result;
+        return normalize(result);
     }
+
+#ifdef HAVE_GLM
+    inline quatf quatFromAxisAngle(const v3f& a, float rad)
+    {
+        return glm::angleAxis(rad, a);
+    }
+
+    inline v3f quatRotateVector(quatf q, v3f v)
+    {
+        return glm::rotate(q, v);
+    }
+
+#elif defined(HAVE_LINALG)
+    inline quatf quatFromAxisAngle(const v3f& v, float a)
+    {
+		quatf Result;
+        float s = std::sin(a * 0.5f);
+		Result.w = std::cos(a * 0.5f);
+		Result.x = v.x * s;
+		Result.y = v.y * s;
+		Result.z = v.z * s;
+		return Result;
+    }
+
+    inline v3f quatRotateVector(quatf q, v3f v)
+    {
+        // https://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion
+        v3f u {q.x, q.y, q.z};
+        float s = q.w;
+
+        return     2.f * dot(u, v)  * u
+               +  (s*s - dot(u, u)) * v
+               + 2.0f * s * cross(u, v);
+    }
+    
+#endif
+
 }
 
 #define M44F(c1x, c1y, c1z, c1w, c2x, c2y, c2z, c2w, c3x, c3y, c3z, c3w, c4x, c4y, c4z, c4w) \

@@ -49,13 +49,13 @@ namespace lab {
                 float vy =         cosf(thetaStart + v * thetaLength );
                 float vz =         sinf(phiStart + u * phiLength ) * sinf(thetaStart + v * thetaLength );
                 if (uvw)
-                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(glm::vec3(radius * vx, radius * vy, radius * vz),
-                                                                           glm::vec3(vx, vy, vz),
-                                                                           glm::vec3(vx, vy, vz)));
+                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(v3f(radius * vx, radius * vy, radius * vz),
+                                                                           v3f(vx, vy, vz),
+                                                                           v3f(vx, vy, vz)));
                 else
-                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(radius * vx, radius * vy, radius * vz),
-                                                                         glm::vec2(u, 1.0f - v),
-                                                                         glm::vec3(vx, vy, vz)));
+                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(radius * vx, radius * vy, radius * vz),
+                                                                         v2f(u, 1.0f - v),
+                                                                         v3f(vx, vy, vz)));
             }
         }
 
@@ -101,16 +101,16 @@ namespace lab {
                 float u = (float)x / (float)xSegments_;
                 float v = (float)z / (float)zSegments_;
                 if (insideOut && !uvw)
-                    _verts->vertexData<VertPN>(true)->push_back(VertPN(glm::vec3(xHalf * (u*2.f-1.f), flip * yHalf, zHalf * (v*2.f-1.f)),
-                                                                       glm::vec3(0,1,0)));
+                    _verts->vertexData<VertPN>(true)->push_back(VertPN(v3f(xHalf * (u*2.f-1.f), flip * yHalf, zHalf * (v*2.f-1.f)),
+                                                                       v3f(0,1,0)));
                 else if (uvw)
-                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(glm::vec3(xHalf * (u*2.f-1.f), flip * yHalf, zHalf * (v*2.f-1.f)),
-                                                                           glm::vec3(u, -1.f, v),
-                                                                           glm::vec3(0,1,0)));
+                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(v3f(xHalf * (u*2.f-1.f), flip * yHalf, zHalf * (v*2.f-1.f)),
+                                                                           v3f(u, -1.f, v),
+                                                                           v3f(0,1,0)));
                 else
-                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(xHalf * (u*2.f-1.f), flip * yHalf, zHalf * (v*2.f-1.f)),
-                                                                         glm::vec2(u, v),
-                                                                         glm::vec3(0,1,0)));
+                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(xHalf * (u*2.f-1.f), flip * yHalf, zHalf * (v*2.f-1.f)),
+                                                                         v2f(u, v),
+                                                                         v3f(0,1,0)));
             }
         }
         for (int z = 0; z < zSegments; ++z) {
@@ -134,16 +134,16 @@ namespace lab {
                 float u = (float)x / (float)xSegments_;
                 float v = (float)z / (float)zSegments_;
                 if (insideOut && !uvw)
-                    _verts->vertexData<VertPN>(true)->push_back(VertPN(glm::vec3(xHalf * (u*2.f-1.f), flip * -yHalf, zHalf * (v*2.f-1.f)),
-                                                                       glm::vec3(0,-1,0)));
+                    _verts->vertexData<VertPN>(true)->push_back(VertPN(v3f(xHalf * (u*2.f-1.f), flip * -yHalf, zHalf * (v*2.f-1.f)),
+                                                                       v3f(0,-1,0)));
                 else if (uvw)
-                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(glm::vec3(xHalf * (u*2.f-1.f), flip * -yHalf, zHalf * (v*2.f-1.f)),
-                                                                           glm::vec3(u, 1.f, v),
-                                                                           glm::vec3(0,-1,0)));
+                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(v3f(xHalf * (u*2.f-1.f), flip * -yHalf, zHalf * (v*2.f-1.f)),
+                                                                           v3f(u, 1.f, v),
+                                                                           v3f(0,-1,0)));
                 else
-                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(xHalf * (u*2.f-1.f), flip * -yHalf, zHalf * (v*2.f-1.f)),
-                                                                         glm::vec2(u, v),
-                                                                         glm::vec3(0,-1,0)));
+                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(xHalf * (u*2.f-1.f), flip * -yHalf, zHalf * (v*2.f-1.f)),
+                                                                         v2f(u, v),
+                                                                         v3f(0,-1,0)));
             }
         }
         for (int z = 0; z < zSegments; ++z) {
@@ -167,16 +167,16 @@ namespace lab {
                 float u = (float)y / (float)ySegments_;
                 float v = (float)z / (float)zSegments_;
                 if (insideOut && !uvw)
-                    _verts->vertexData<VertPN>(true)->push_back(VertPN(glm::vec3(flip * xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
-                                                                       glm::vec3(1,0,0)));
+                    _verts->vertexData<VertPN>(true)->push_back(VertPN(v3f(flip * xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
+                                                                       v3f(1,0,0)));
                 else if (uvw)
-                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(glm::vec3(flip * xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
-                                                                           glm::vec3(1.f, u, v),
-                                                                           glm::vec3(1,0,0)));
+                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(v3f(flip * xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
+                                                                           v3f(1.f, u, v),
+                                                                           v3f(1,0,0)));
                 else
-                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(flip * xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
-                                                                         glm::vec2(u, v),
-                                                                         glm::vec3(1,0,0)));
+                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(flip * xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
+                                                                         v2f(u, v),
+                                                                         v3f(1,0,0)));
             }
         }
         for (int z = 0; z < zSegments; ++z) {
@@ -200,16 +200,16 @@ namespace lab {
                 float u = (float)y / (float)ySegments_;
                 float v = (float)z / (float)zSegments_;
                 if (insideOut && !uvw)
-                    _verts->vertexData<VertPN>(true)->push_back(VertPN(glm::vec3(flip * -xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
-                                                                       glm::vec3(-1,0,0)));
+                    _verts->vertexData<VertPN>(true)->push_back(VertPN(v3f(flip * -xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
+                                                                       v3f(-1,0,0)));
                 else if (uvw)
-                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(glm::vec3(flip * -xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
-                                                                           glm::vec3(-1.f, u, v),
-                                                                           glm::vec3(-1,0,0)));
+                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(v3f(flip * -xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
+                                                                           v3f(-1.f, u, v),
+                                                                           v3f(-1,0,0)));
                 else
-                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(flip * -xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
-                                                                         glm::vec2(u, v),
-                                                                         glm::vec3(-1,0,0)));
+                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(flip * -xHalf, yHalf * (u*2.f-1.f), zHalf * (v*2.f-1.f)),
+                                                                         v2f(u, v),
+                                                                         v3f(-1,0,0)));
             }
         }
         for (int z = 0; z < zSegments; ++z) {
@@ -233,16 +233,16 @@ namespace lab {
                 float u = (float)x / (float)xSegments_;
                 float v = (float)y / (float)ySegments_;
                 if (insideOut && !uvw)
-                    _verts->vertexData<VertPN>(true)->push_back(VertPN(glm::vec3(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * zHalf),
-                                                                       glm::vec3(0,0,1)));
+                    _verts->vertexData<VertPN>(true)->push_back(VertPN(v3f(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * zHalf),
+                                                                       v3f(0,0,1)));
                 else if (uvw)
-                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(glm::vec3(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * zHalf),
-                                                                           glm::vec3(u, v, 1.f),
-                                                                           glm::vec3(0,0,1)));
+                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(v3f(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * zHalf),
+                                                                           v3f(u, v, 1.f),
+                                                                           v3f(0,0,1)));
                 else
-                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * zHalf),
-                                                                         glm::vec2(u, v),
-                                                                         glm::vec3(0,0,1)));
+                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * zHalf),
+                                                                         v2f(u, v),
+                                                                         v3f(0,0,1)));
             }
         }
         for (int y = 0; y < ySegments; ++y) {
@@ -266,16 +266,16 @@ namespace lab {
                 float u = (float)x / (float)xSegments_;
                 float v = (float)y / (float)ySegments_;
                 if (insideOut && !uvw)
-                    _verts->vertexData<VertPN>(true)->push_back(VertPN(glm::vec3(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * -zHalf),
-                                                                       glm::vec3(0,0,-1)));
+                    _verts->vertexData<VertPN>(true)->push_back(VertPN(v3f(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * -zHalf),
+                                                                       v3f(0,0,-1)));
                 else if (uvw)
-                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(glm::vec3(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * -zHalf),
-                                                                           glm::vec3(u, v, -1.f),
-                                                                           glm::vec3(0,0,-1)));
+                    _verts->vertexData<VertPT3N>(true)->push_back(VertPT3N(v3f(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * -zHalf),
+                                                                           v3f(u, v, -1.f),
+                                                                           v3f(0,0,-1)));
                 else
-                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * -zHalf),
-                                                                         glm::vec2(u, v),
-                                                                         glm::vec3(0,0,-1)));
+                    _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(xHalf * (u*2.f-1.f), yHalf * (v*2.f-1.f), flip * -zHalf),
+                                                                         v2f(u, v),
+                                                                         v3f(0,0,-1)));
             }
         }
         for (int y = 0; y < ySegments; ++y) {
@@ -316,9 +316,9 @@ namespace lab {
             for (int x = 0; x <= xSegments_; ++x) {
                 float u = (float)x / (float)xSegments_;
                 float v = (float)y / (float)ySegments_;
-                _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(xHalf * (u*2.f-1.f), 0, yHalf * (v*2.f-1.f)),
-                                                                     glm::vec2(u, v),
-                                                                     glm::vec3(0,1,0)));
+                _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(xHalf * (u*2.f-1.f), 0, yHalf * (v*2.f-1.f)),
+                                                                     v2f(u, v),
+                                                                     v3f(0,1,0)));
             }
         }
         for (int y = 0; y < ySegments; ++y) {
@@ -357,10 +357,10 @@ namespace lab {
         
         for (int i = 0; i < 6; ++i) {
             int i2 = kFullscreenIndices[i];
-            _verts->vertexData<VertPT>(true)->push_back(VertPT(glm::vec3(kFullscreenVertices[i2].pos[0],
+            _verts->vertexData<VertPT>(true)->push_back(VertPT(v3f(kFullscreenVertices[i2].pos[0],
                                                                          kFullscreenVertices[i2].pos[1],
                                                                          kFullscreenVertices[i2].pos[2]),
-                                                               glm::vec2(kFullscreenVertices[i2].tex[0],
+                                                               v2f(kFullscreenVertices[i2].tex[0],
                                                                          kFullscreenVertices[i2].tex[1])));
         }
     }
@@ -379,9 +379,9 @@ namespace lab {
         };
 
         for (int i = 0; i < 12; i++)
-            _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(radius * vdata[i][0], radius * vdata[i][1], radius * vdata[i][2]),
-                                                                 glm::vec2(0, 0),    /// @TODO what are good UVs?
-                                                                 glm::vec3(vdata[i][0], vdata[i][1], vdata[i][2])));
+            _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(radius * vdata[i][0], radius * vdata[i][1], radius * vdata[i][2]),
+                                                                 v2f(0, 0),    /// @TODO what are good UVs?
+                                                                 v3f(vdata[i][0], vdata[i][1], vdata[i][2])));
 
         static uint32_t tindices[20][3] = {
             {0,4,1}, {0,9,4}, {9,5,4}, {4,5,8}, {4,8,1},
@@ -433,9 +433,9 @@ namespace lab {
                 float nl = 1.f / sqrtf(nx*nx + ny*ny + nz*nz);
                 nx *= nl; ny *= nl; nz *= nl;
 
-                _verts->vertexData<VertPTN>(true)->push_back(VertPTN(glm::vec3(radius * vx, vy, radius * vz),
-                                                                     glm::vec2(u, 1.f - v),
-                                                                     glm::vec3(nx, ny, nz)));
+                _verts->vertexData<VertPTN>(true)->push_back(VertPTN(v3f(radius * vx, vy, radius * vz),
+                                                                     v2f(u, 1.f - v),
+                                                                     v3f(nx, ny, nz)));
             }
         }
         for (int y = 0; y < heightSegments; ++y) {

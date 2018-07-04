@@ -57,7 +57,6 @@ ImGuiIntegration::~ImGuiIntegration()
 
 void ImGuiIntegration::ui()
 {
-
     // Start the ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

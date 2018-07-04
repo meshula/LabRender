@@ -35,12 +35,21 @@ namespace lab {
         return a * b;
     }
 
+#ifdef HAVE_GLM
     void orthonormalize(m44f& m)
     {
         m[0] = glm::normalize(m[0]); // right
         m[1] = glm::normalize(m[1]); // up
         m[2] = glm::normalize(m[2]); // dir
     }
+#else
+    void orthonormalize(m44f& m)
+    {
+        m[0] = normalize(m[0]); // right
+        m[1] = normalize(m[1]); // up
+        m[2] = normalize(m[2]); // dir
+    }
+#endif
 
     void decompose(m44f mat, v3f& translation, v3f& rotation, v3f& scale)
     {
@@ -88,7 +97,11 @@ namespace lab {
 
     void transpose(m44f& mat)
     {
+#ifdef HAVE_GLM
         mat = glm::transpose(mat);
+#else
+        mat = linalg::transpose(mat);
+#endif
     }
 
     void rotateX(m44f& mat, float degrees) 

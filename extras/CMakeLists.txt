@@ -69,7 +69,7 @@ lab_library(LabRenderImgui
 
     INCLUDE_DIRS
         ${LABRENDER_ROOT}/include
-        ${LABRENDER_ROOT}/extras/include
+        ${LABRENDER_ROOT}/extras/imgui
 
     PUBLIC_HEADERS
         ${LABRENDER_ROOT}/extras/imgui/imconfig.h
@@ -77,6 +77,9 @@ lab_library(LabRenderImgui
         ${LABRENDER_ROOT}/extras/imgui/imgui_internal.h
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.h
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.h
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/FontManager.h
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/materialIconDefinitions.h
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/meshula-icons.h
 
     PRIVATE_HEADERS
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.h
@@ -84,6 +87,8 @@ lab_library(LabRenderImgui
         ${LABRENDER_ROOT}/extras/imgui/stb_rect_pack.h
         ${LABRENDER_ROOT}/extras/imgui/stb_textedit.h
         ${LABRENDER_ROOT}/extras/imgui/stb_truetype.h
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/roboto_regular.ttf.h
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/robotomono_regular.ttf.h
   
     CPPFILES
         ${LABRENDER_ROOT}/extras/imgui/imgui.cpp
@@ -91,6 +96,5 @@ lab_library(LabRenderImgui
         ${LABRENDER_ROOT}/extras/imgui/imgui_draw.cpp
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.cpp
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.cpp
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/FontManager.cpp
 )
-
-

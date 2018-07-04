@@ -66,7 +66,7 @@ namespace lab
 					}
 				}
 
-				void getIndexAndWeights(glm::vec4 &index, glm::vec4 &weight)
+				void getIndexAndWeights(v4f &index, v4f &weight)
 				{
 					weights.resize(4, 0.0);
 					indices.resize(4, 0.0);
@@ -94,8 +94,8 @@ namespace lab
 				virtual void         read(igzstream& stream) {}
 
 				string               mName;
-				vector<glm::vec3>    mVertices;
-				vector<glm::vec3>    mNormals;
+				vector<v3f>    mVertices;
+				vector<v3f>    mNormals;
 			};
 
 			class MeshTri;
@@ -129,8 +129,8 @@ namespace lab
 				};
 
 				bool                     mHasTexture;
-				vector<glm::vec2>        mTextureCoords;
-				vector<glm::vec4>        mColors;
+				vector<v2f>        mTextureCoords;
+				vector<v4f>        mColors;
 
 
 				vector<Face>             mFaces;
@@ -151,7 +151,7 @@ namespace lab
 				string                mName;
 
 				//! Matrix that transforms from mesh space to bone space in bind pose
-				glm::mat4x4           mOffsetMatrix;
+				m44f           mOffsetMatrix;
 
 				virtual void          write(ogzstream& stream) {}
 				virtual void          read(igzstream& stream) {}
@@ -179,10 +179,10 @@ namespace lab
 				struct materialStruct
 				{
                     ActiveFace face = { ActiveFace::Front };
-					glm::vec4 dcolor;
-					glm::vec4 scolor;
-					glm::vec4 acolor;
-					glm::vec4 ecolor;
+					v4f dcolor;
+					v4f scolor;
+					v4f acolor;
+					v4f ecolor;
 				};
 
 				struct materialFormatStruct
@@ -202,8 +202,8 @@ namespace lab
 				bool                  mValidCache;
 				vector<shared_ptr<Bone>>  mBones;
 
-				vector<glm::vec4>        mBoneIndices;
-				vector<glm::vec4>        mBoneWeights;
+				vector<v4f>        mBoneIndices;
+				vector<v4f>        mBoneWeights;
 			};
 		} // MeshFu
 
@@ -407,28 +407,28 @@ namespace lab
 			}
 			//else
 			//     meshFuRef->mMaterialData.hasDcolor = false;
-			meshFuRef->mMaterialData.dcolor = glm::vec4(dcolor.r, dcolor.g, dcolor.b, dcolor.a);
+			meshFuRef->mMaterialData.dcolor = v4f(dcolor.r, dcolor.g, dcolor.b, dcolor.a);
 
 			if (AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_SPECULAR, scolor)) {
 				//     meshFuRef->mMaterialData.hasScolor = true;
 			}
 			//   else
 			//     meshFuRef->mMaterialData.hasScolor = false;
-			meshFuRef->mMaterialData.scolor = glm::vec4(scolor.r, scolor.g, scolor.b, scolor.a);
+			meshFuRef->mMaterialData.scolor = v4f(scolor.r, scolor.g, scolor.b, scolor.a);
 
 			if (AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_AMBIENT, acolor)) {
 				//     meshFuRef->mMaterialData.hasAcolor = true;
 			}
 			//   else
 			//     meshFuRef->mMaterialData.hasAcolor = false;
-			meshFuRef->mMaterialData.acolor = glm::vec4(acolor.r, acolor.g, acolor.b, acolor.a);
+			meshFuRef->mMaterialData.acolor = v4f(acolor.r, acolor.g, acolor.b, acolor.a);
 
 			if (AI_SUCCESS == mtl->Get(AI_MATKEY_COLOR_EMISSIVE, ecolor)) {
 				//     meshFuRef->mMaterialData.hasEcolor = false;
 			}
 			//   else
 			//     meshFuRef->mMaterialData.hasEcolor = false;
-			meshFuRef->mMaterialData.ecolor = glm::vec4(ecolor.r, ecolor.g, ecolor.b, ecolor.a);
+			meshFuRef->mMaterialData.ecolor = v4f(ecolor.r, ecolor.g, ecolor.b, ecolor.a);
 
 			// Load Textures
 			int texIndex = 0;
@@ -577,7 +577,7 @@ namespace lab
 					//boneRef->mWeights.push_back(fromAssimp(bone->mWeights[i]));
 				}
 
-				//boneRef->mOffsetMatrix = (glm::mat4x4)bone->mOffsetMatrix;
+				//boneRef->mOffsetMatrix = (m44f)bone->mOffsetMatrix;
 				memcpy(&boneRef->mOffsetMatrix, &bone->mOffsetMatrix, sizeof(float) * 16);
 				meshFuRef->mBones.push_back(boneRef);
 			}
