@@ -12,8 +12,8 @@
 #include <GL/glew.h>
 #endif
 
-#include <LabRender/MathTypes.h>
 #include <LabRender/PassRenderer.h>
+#include <LabMath/LabMath.h>
 
 #include <GLFW/glfw3.h>
 

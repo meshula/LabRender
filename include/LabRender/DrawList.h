@@ -9,8 +9,8 @@
 #pragma once
 
 #include "LabRender/Light.h"
-#include "LabRender/MathTypes.h"
 #include "LabRender/ModelBase.h"
+#include <LabMath/LabMath.h>
 #include <memory>
 #include <vector>
 

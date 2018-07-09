@@ -2,21 +2,51 @@
 // Copyright (c) 2013 Nick Porcino, All rights reserved.
 // License is MIT: http://opensource.org/licenses/MIT
 
-
 #include "LabRender/Camera.h"
-#include "LabRender/MathTypes.h"
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
+#include <LabMath/LabMath.h>
 
 namespace lab
 {
+    LR_API m44f perspective(const Sensor& sensor, const Optics& optics, float aspect)
+    {
+        if (fabs(aspect) < std::numeric_limits<float>::epsilon())
+            return m44f_identity;
 
+        const float handedness = sensor.handedness; // 1 for left hand coordinates
+        float left = -1.f, right = 1.f, bottom = -1.f, top = 1.f;
+        const float halfFovy = verticalFOV(sensor, optics) * 0.5f;
+        const float y = 1.f/tanf(halfFovy);
+        const float x = y / aspect;
+        const float scalex = 2.f * sensor.enlarge.x;
+        const float scaley = 2.f * sensor.enlarge.y;
+        const float dx = sensor.shift.x * 2.f * aspect / sensor.aperture.y; // 0.f is sensor shift x
+        const float dy = sensor.shift.y * 2.f / sensor.aperture.y;          // 0.f is sensor shift y
+
+        const float znear = optics.znear;
+        const float zfar = optics.zfar;
+
+        m44f result;
+        memset(&result, 0, sizeof(m44f));
+        result[0].x = scalex * x / (right - left);
+        result[1].y = scaley * y / (top - bottom);
+        result[2].x = (right + left + dx) / (right - left);
+        result[2].y = (top + bottom + dy) / (top - bottom);
+        result[2].z = handedness * (zfar + znear) / (zfar - znear);
+        result[2].w = handedness;
+        result[3].z = handedness * 2.f * zfar * znear / (zfar - znear);
+        return result;
+    }
+
+    LR_API m44f perspective(const Sensor& sensor, const Optics& optics) 
+    {
+        const float aspect = sensor.aperture.x / sensor.aperture.y;
+        return perspective(sensor, optics, aspect);
+    }
 
     void Camera::frame(std::pair<v3f, v3f> bounds)
 	{
         float r = 0.5f * vector_length(bounds.second - bounds.first);
-        float g = (1.1f * r) / sinf(optics.verticalFOV() * 0.5f);
+        float g = (1.1f * r) / sinf(verticalFOV(sensor, optics) * 0.5f);
         focusPoint = (bounds.second + bounds.first) * 0.5f;
         position = vector_normalize(position - focusPoint) * g;
         updateViewTransform();
@@ -51,52 +81,54 @@ namespace lab
         if (clipFar <= clipNear)
             clipFar = clipNear + 0.1f;
 
-        optics.setZclip(clipNear, clipFar);
+        optics.znear = clipNear;
+        optics.zfar = clipFar;
     }
 
 
     // delta is the 2d motion of a mouse or gesture in the screen plane,
     // typically computed as scale * (currMousePos - prevMousePos);
     //
-    void CameraRig::interact(Camera* camera, v2f delta)
+    void cameraRig_interact(Camera& camera, CameraRigMode mode, v2f delta)
 	{
-        if (!camera)
-            return;
-
-        v3f cameraToFocus = camera->position - camera->focusPoint;
+        v3f cameraToFocus = camera.position - camera.focusPoint;
         float distanceToFocus = vector_length(cameraToFocus);
         float scale = std::max(0.01f, logf(distanceToFocus) * 4.f);
 
-        switch (_mode) {
-            case Mode::Dolly: {
-                v3f camFwd = camera->mount.forward();
-                v3f camRight = camera->mount.right();
+        switch (mode) 
+        {
+            case CameraRigMode::Dolly: 
+            {
+                v3f camFwd = camera.mount.forward();
+                v3f camRight = camera.mount.right();
                 v3f deltaX = delta.x * camRight * scale;
                 v3f dP = delta.y * camFwd * scale - deltaX;
-                camera->position += dP;
-                camera->focusPoint -= deltaX;
+                camera.position += dP;
+                camera.focusPoint -= deltaX;
                 break;
             }
-            case Mode::Crane: {
-                v3f camUp = camera->mount.up();
-                v3f camRight = camera->mount.right();
+            case CameraRigMode::Crane: 
+            {
+                v3f camUp = camera.mount.up();
+                v3f camRight = camera.mount.right();
                 v3f dP = -delta.y * camUp * scale - delta.x * camRight * scale;
-                camera->position += dP;
-                camera->focusPoint += dP;
+                camera.position += dP;
+                camera.focusPoint += dP;
                 break;
             }
-            case Mode::TurnTableOrbit: {
-                v3f camFwd = camera->mount.forward();
-				v3f worldUp = camera->worldUp;
+            case CameraRigMode::TurnTableOrbit: 
+            {
+                v3f camFwd = camera.mount.forward();
+				v3f worldUp = camera.worldUp;
                 v3f mUv = vector_normalize(vector_cross(worldUp, camFwd));
-				quatf yaw = quatFromAxisAngle(v3f(0,1.f,0), -0.25f * delta.x);
-				quatf pitch = quatFromAxisAngle(mUv, 0.25f * delta.y);
-				v3f rotatedVec = quatRotateVector(yaw, quatRotateVector(pitch, cameraToFocus));
-				camera->position = camera->focusPoint + rotatedVec;
+				quatf yaw = quat_fromAxisAngle(v3f(0,1.f,0), -0.25f * delta.x);
+				quatf pitch = quat_fromAxisAngle(mUv, 0.25f * delta.y);
+				v3f rotatedVec = quat_rotateVector(yaw, quat_rotateVector(pitch, cameraToFocus));
+				camera.position = camera.focusPoint + rotatedVec;
                 break;
             }
         }
-        camera->updateViewTransform();
+        camera.updateViewTransform();
     }
 
 
@@ -138,7 +170,7 @@ namespace LabRender {
     }
 
     Camera::Camera()
-    : _sensorApertureHeight(24.5f)
+    : _sensoraperture.y(24.5f)
     , _focalLength(50.f)
     , _clip(0.1f, 1000.f)
     {
@@ -146,7 +178,7 @@ namespace LabRender {
     }
 
     void Camera::calcFovy() {
-        _fovyRad = 2.f * atanf(_sensorApertureHeight / (2.f * _focalLength));
+        _fovyRad = 2.f * atanf(_sensoraperture.y / (2.f * _focalLength));
     }
 
     glm::mat4x4 Camera::perspective(float w, float h) const
@@ -345,209 +377,4 @@ namespace LabRender {
     }
 
 } // Lab
-
-#if 0
-Camera::Camera(const std::string& name, std::ostream& console)
-: name(name)
-, console(console) {
-	mAspectRatio = 1.0f;
-	mFOVxDegrees = 30.0f;
-    mNow = 0;
-    mHomeButton = 0;
-
-	mEye = glm::vec3(0, 10, -30);
-	mLookat = glm::vec3(0, 0, 0);
-
-    mFOVJoystick = 0.5f;
-    mLookatJoystick = glm::vec3(0.5f, 0.5f, 0.5f);
-    std::string s;
-    s = name + "_ljx";
-    addReflector(s.c_str(), &mLookatJoystick.x);
-    s = name + "_ljy";
-    addReflector(s.c_str(), &mLookatJoystick.y);
-    s = name + "_ljz";
-    addReflector(s.c_str(), &mLookatJoystick.z);
-
-    mPositionJoystick = glm::vec3(0.5f, 0.5f, 0.5f);
-    s = name + "_pjx";
-    addReflector(s.c_str(), &mPositionJoystick.x);
-    s = name + "_pjy";
-    addReflector(s.c_str(), &mPositionJoystick.y);
-    s = name + "_pjz";
-    addReflector(s.c_str(), &mPositionJoystick.z);
-    s = name + "_fov";
-    addReflector(s.c_str(), &mFOVJoystick);
-
-    s = name + "_home";
-    addReflector(s.c_str(), &mHomeButton);
-}
-
-Camera::~Camera() {
-    std::string s;
-    s = name + "_ljx";
-    removeReflector(s.c_str());
-    s = name + "_ljy";
-    removeReflector(s.c_str());
-    s = name + "_ljz";
-    removeReflector(s.c_str());
-    s = name + "_pjx";
-    removeReflector(s.c_str());
-    s = name + "_pjy";
-    removeReflector(s.c_str());
-    s = name + "_pjz";
-    removeReflector(s.c_str());
-    s = name + "_fov";
-    removeReflector(s.c_str());
-    s = name + "_home";
-    removeReflector(s.c_str());
-}
-
-Camera& Camera::operator=(const Camera& rhs) {
-    mEye = rhs.mEye;
-    mLookat = rhs.mLookat;
-    mUp = rhs.mUp;
-	mAspectRatio = rhs.mAspectRatio;
-    mFOVxDegrees = rhs.mFOVxDegrees;
-    name = rhs.name;
-    mNow = rhs.mNow;
-    build();
-    return *this;
-}
-
-float Camera::joystickValue(float x) {
-    float dx = 2.0f * (x - 0.5f);
-    float sign = dx > 0 ? 1 : -1;
-    dx = fabsf(dx);
-    if (dx < 0.3f)
-        return 0;
-
-    if (dx > 0.6f) {
-        dx -= 0.6f;
-        dx *= 8.0f;
-        dx += 0.6f;
-    }
-    else if (dx > 0.5f) {
-        dx -= 0.5f;
-        dx *= 4.0f;
-        dx += 0.5f;
-    }
-    else {
-        dx -= 0.3f;
-    }
-    dx *= sign;
-    //console << dx << std::endl;
-    return dx;
-}
-
-float distanceScale = 50.0f;
-
-void Camera::build() {
-}
-
-void Camera::update(float windowAspect, float now) {
-    float dt = now - mNow;
-    if (dt > 0.1f)
-        dt = 0.1f;
-
-    float du, dv;
-    mNow = now;
-
-    glm::vec4 forward = _transform[0];
-    glm::vec3 mW(forward.x, forward.y, forward.z);
-    glm::vec3 mU = glm::normalize(glm::cross(glm::vec3(0,1,0), mW));
-    glm::vec3 mV = glm::normalize(glm::cross(mW, mU));
-
-    dv = joystickValue(mPositionJoystick.z);
-    if (fabsf(dv) > 0) {
-        mEye += mW * distanceScale * dv * dt;
-    }
-
-    dv = joystickValue(mLookatJoystick.z);
-    if (fabsf(dv) > 0) {
-        mLookat -= mW * distanceScale * dv * dt;
-    }
-
-    du = joystickValue(mPositionJoystick.x);
-    dv = joystickValue(mPositionJoystick.y);
-    if (fabsf(du) > 0 || fabsf(dv) > 0)
-        mEye += mU * (distanceScale * du * dt) + mV * (distanceScale * dv * dt);
-
-    du = joystickValue(mLookatJoystick.x);
-    dv = joystickValue(mLookatJoystick.y);
-    if (fabsf(du) > 0 || fabsf(dv) > 0)
-        mLookat += mU * (distanceScale * du * dt) + mV * (distanceScale * dv * dt);
-
-    // push lookat if we hit it
-    glm::vec3 test = mEye - mLookat;
-    if (length(test)) < 1)
-        mLookat = mEye - mW;
-
-    if (mHomeButton > 0)
-        mLookat = glm::vec3(0, 0, 0);
-
-/*
-    dv = joystickValue(mLookatJoystick.x);
-    mLookat.x += distanceScale * dv * dt;
-    dv = joystickValue(mLookatJoystick.y);
-    mLookat.y += distanceScale * dv * dt;
-    dv = joystickValue(mLookatJoystick.z);
-    mLookat.z += distanceScale * dv * dt;
-    dv = joystickValue(mPositionJoystick.x);
-    mEye.x += distanceScale * dv * dt;
-    dv = joystickValue(mPositionJoystick.y);
-    mEye.y += distanceScale * dv * dt;
-    dv = joystickValue(mPositionJoystick.z);
-    mEye.z += distanceScale * dv * dt;
-*/
-
-    dv = joystickValue(mFOVJoystick);
-    mFOVxDegrees += 10.0f * dv * dt;
-    if (mFOVxDegrees < 1.0f)
-        mFOVxDegrees = 1.0f;
-    if (mFOVxDegrees > 179.0f)
-        mFOVxDegrees = 179.0f;
-}
-
-void Camera::setEye(glm::vec3 v) {
-	mEye = v;
-}
-
-void Camera::setLookat(glm::vec3 v) {
-	mLookat = v;
-}
-
 #endif
-#endif
-
-/*
-http://www.geeks3d.com/20091216/geexlab-how-to-visualize-the-depth-buffer-in-glsl/
- [Vertex_Shader]
- void main(void)
- {
- gl_Position = ftransform();
- gl_TexCoord[0] = gl_MultiTexCoord0;
- }
- [Pixel_Shader]
- uniform sampler2D sceneSampler; // 0
- uniform sampler2D depthSampler; // 1
-
- float LinearizeDepth(vec2 uv)
- {
- float n = 1.0; // camera z near
- float f = 100.0; // camera z far
- float z = texture2D(depthSampler, uv).x;
- return (2.0 * n) / (f + n - z * (f - n));
- }
- void main()
- {
- vec2 uv = gl_TexCoord[0].xy;
- //vec4 sceneTexel = texture2D(sceneSampler, uv);
- float d;
- if (uv.x < 0.5) // left part
- d = LinearizeDepth(uv);
- else // right part
- d = texture2D(depthSampler, uv).x;
- gl_FragColor.rgb = vec4(d, d, d, 1.0);
- }
-
- */

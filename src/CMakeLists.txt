@@ -14,6 +14,7 @@ lab_library(LabRender
         ${GLEW_LIBRARY}
         ${OPENGL_LIBRARIES}
         LabCmd::Core
+        Lab::Math
         LabText::Core
 
     INCLUDE_DIRS
@@ -33,7 +34,6 @@ lab_library(LabRender
         ../include/LabRender/LabRender.h
         ../include/LabRender/Light.h
         ../include/LabRender/Material.h
-        ../include/LabRender/MathTypes.h
         ../include/LabRender/Model.h
         ../include/LabRender/ModelBase.h
         ../include/LabRender/PassRenderer.h
@@ -70,7 +70,6 @@ lab_library(LabRender
         LabRender.cpp
         Light.cpp
         Material.cpp
-        MathTypes.cpp
         Model.cpp
         PassRenderer.cpp
         RendererSpec.cpp

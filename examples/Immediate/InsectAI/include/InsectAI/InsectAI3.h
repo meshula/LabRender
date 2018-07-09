@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <LabRender/MathTypes.h>
+#include <LabMath/LabMath.h>
 #include <array>
 
 namespace InsectAI3 {

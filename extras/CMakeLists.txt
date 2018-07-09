@@ -11,6 +11,7 @@ lab_library(LabModelLoader
         ${OPENGL_LIBRARIES}
         ${Assimp_LIBRARY_RELEASE}
         LabRender::Core
+        Lab::Math
 
     INCLUDE_DIRS
         ${LABRENDER_ROOT}/include
@@ -18,7 +19,7 @@ lab_library(LabModelLoader
         ${GLM_INCLUDE_DIR}
 
     PUBLIC_HEADERS
-        include/extras/modelLoader.h
+        include/LabRenderModelLoader/modelLoader.h
 
     PRIVATE_HEADERS
 
@@ -38,6 +39,7 @@ lab_library(LabRenderBinder
         ${OPENGL_LIBRARIES}
         LabRender::Core
         LabRender::ModelLoader
+        Lab::Math
 
     INCLUDE_DIRS
         ${LABRENDER_ROOT}/include
@@ -46,7 +48,7 @@ lab_library(LabRenderBinder
         ${GLM_INCLUDE_DIR}
 
     PUBLIC_HEADERS
-        include/extras/LabRenderBinder.h
+        include/LabRenderBinder/LabRenderBinder.h
 
     PRIVATE_HEADERS
 
@@ -80,6 +82,7 @@ lab_library(LabRenderImgui
         ${LABRENDER_ROOT}/extras/imgui/LabImgui/FontManager.h
         ${LABRENDER_ROOT}/extras/imgui/LabImgui/materialIconDefinitions.h
         ${LABRENDER_ROOT}/extras/imgui/LabImgui/meshula-icons.h
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/Widgets.h
 
     PRIVATE_HEADERS
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.h
@@ -97,4 +100,5 @@ lab_library(LabRenderImgui
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.cpp
         ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.cpp
         ${LABRENDER_ROOT}/extras/imgui/LabImgui/FontManager.cpp
+        ${LABRENDER_ROOT}/extras/imgui/LabImgui/Widgets.cpp
 )

@@ -15,10 +15,10 @@
 #include "gl4.h"
 #include "LabRender/FrameBuffer.h"
 #include "LabRender/Material.h"
-#include "LabRender/MathTypes.h"
 #include "LabRender/ShaderBuilder.h"
 #include "LabRender/Utils.h"
 #include "LabRender/Vertex.h"
+#include <LabMath/LabMath.h>
 
 #include <iostream>
 #include <sstream>
@@ -134,7 +134,7 @@ namespace lab {
             { SemanticType::mat4_st,      "u_viewProj", AutomaticUniform::none, 5 },
             { SemanticType::sampler2D_st, "u_texture", AutomaticUniform::none, 6 },
             { SemanticType::float_st,     "u_offset", AutomaticUniform::none, 7 },
-            { SemanticType::mat4_st,      "u_jacobian", AutomaticUniform::none, 8 }
+            { SemanticType::mat4_st,      "u_rotationTransform", AutomaticUniform::none, 8 }
         };
 
         // substitute the cube sampler if necessary. It's okay for the sky shader
@@ -155,7 +155,7 @@ namespace lab {
         else {
             vsh = "void main() {\n" glsl(
                                          vec4 pos = vec4(a_position, 1.0);
-                                         vec4 n = u_jacobian * vec4(a_normal, 1.0);
+                                         vec4 n = u_rotationTransform * vec4(a_normal, 1.0);
                                          vec4 newPos = u_modelViewProj * pos;
                                          gl_Position = newPos;
                                          vert.v_pos = newPos;
@@ -290,12 +290,12 @@ namespace lab {
                 _shader->uniform("u_modelViewProj", rl.context.viewMatrices.mvp);
             }
 
-            lab::m44f jacobian = rl.context.viewMatrices.model;
-            jacobian[3].x = 0;
-            jacobian[3].y = 0;
-            jacobian[3].z = 0;
-            jacobian = matrix_transpose(matrix_invert(jacobian));
-            _shader->uniform("u_jacobian", jacobian);
+            lab::m44f rotationTransform = rl.context.viewMatrices.model;
+            rotationTransform[3].x = 0;
+            rotationTransform[3].y = 0;
+            rotationTransform[3].z = 0;
+            rotationTransform = matrix_transpose(matrix_invert(rotationTransform));
+            _shader->uniform("u_rotationTransform", rotationTransform);
 
             bool depthWriteSet = true;
             bool depthRangeSet = false;

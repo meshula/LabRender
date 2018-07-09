@@ -9,9 +9,9 @@
 
 #include <LabRender/LabRender.h>
 #include <LabRender/ErrorPolicy.h>
-#include <LabRender/MathTypes.h>
 #include <LabRender/Semantic.h>
 #include <LabRender/SemanticType.h>
+#include <LabMath/LabMath.h>
 
 #include <memory>
 #include <ostream>

@@ -1,12 +1,12 @@
 
 #define BUILDING_LABRENDER_MODELLOADER
 
-#include "extras/LabRenderBinder.h"
-#include "LabRender/MathTypes.h"
+#include "LabREnderBinder/LabRenderBinder.h"
 #include "LabRender/PassRenderer.h"
 #include "LabRender/Renderer.h"
-#include "LabRender/extras/modelLoader.h"
+#include "LabRenderModelLoader/modelLoader.h"
 #include "LabRender/UtilityModel.h"
+#include <LabMath/LabMath.h>
 
 #include <vector>
 

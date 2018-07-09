@@ -25,9 +25,8 @@ set(${TARGET_NAME}_SRC
     InsectAI/include/InsectAI/OpenSteerLibrary.h
     InsectAI/include/InsectAI/OpenSteerUtilities.h
     InsectAI/include/InsectAI/OpenSteerVec3.h
-    ${LABRENDER_ROOT}/extras/src/modelLoader.cpp
-    ${LABRENDER_ROOT}/extras/include/extras/modelLoader.h
 )
+
 add_executable(${TARGET_NAME} ${${TARGET_NAME}_SRC})
 set_cxx_version(${TARGET_NAME} 14)
 
@@ -40,17 +39,21 @@ target_include_directories(${TARGET_NAME} PRIVATE "${LABRENDER_ROOT}/extras/incl
 target_link_libraries(${TARGET_NAME} debug
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
-    ${FMT_LIBRARIES_DEBUG})
+    ${Assimp_LIBRARY_RELEASE})
+
 target_link_libraries(${TARGET_NAME} optimized
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
-    ${FMT_LIBRARIES})
+    ${Assimp_LIBRARY_RELEASE})
 
 target_link_libraries(${TARGET_NAME} 
-    LabCmd::Core LabRender::Core 
-    GLM::Core GLEW::Shared)
+    Lab::Math 
+    LabCmd::Core 
+    LabRender::Core 
+    LabRender::ModelLoader
+    Fmt::Format
+    GLM::Core 
+    GLEW::Shared)
 
 target_include_directories(${TARGET_NAME} PRIVATE InsectAI/include)
 #target_include_directories(${TARGET_NAME} PRIVATE ${EIGEN3_INCLUDE_DIR})

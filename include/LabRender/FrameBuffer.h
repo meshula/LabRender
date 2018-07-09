@@ -7,10 +7,10 @@
 //
 
 #pragma once
-#include "LabRender/MathTypes.h"
 #include "LabRender/ErrorPolicy.h"
 #include "LabRender/SemanticType.h"
 #include "LabRender/Texture.h"
+#include <LabMath/LabMath.h>
 #include <map>
 #include <vector>
 #include <string>

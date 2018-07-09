@@ -7,7 +7,7 @@
 //
 
 #include "LabRender/UtilityModel.h"
-#include "LabRender/MathTypes.h"
+#include <LabMath/LabMath.h>
 #include <algorithm>
 
 namespace lab {

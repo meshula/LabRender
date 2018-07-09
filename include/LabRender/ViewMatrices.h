@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "LabRender/MathTypes.h"
+#include <LabMath/LabMath.h>
 
 namespace lab {
     

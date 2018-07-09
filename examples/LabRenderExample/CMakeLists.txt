@@ -8,21 +8,22 @@ target_include_directories(LabRenderExample PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(LabRenderExample PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/include")
 target_include_directories(LabRenderExample PRIVATE "${GLEW_INCLUDE_DIR}")
-target_sources(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/src/modelLoader.cpp")
-target_sources(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/include/extras/modelLoader.h")
 
 target_link_libraries(LabRenderExample debug
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
-    ${LabCmd_LIBRARY_DEBUG}
-    LabRender)
+    ${Assimp_LIBRARY_RELEASE})
+
 target_link_libraries(LabRenderExample optimized
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
-    ${LabCmd_LIBRARY_RELEASE}
-    LabRender)
+    ${Assimp_LIBRARY_RELEASE})
+
+target_link_libraries(LabRenderExample
+    LabCmd::Core
+    LabRender::Core
+    LabRender::ModelLoader
+    Lab::Math)
 
 #set_target_properties(LabRenderExample
 #    PROPERTIES

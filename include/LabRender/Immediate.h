@@ -2,8 +2,8 @@
 #pragma once
 
 #include <LabRender/Export.h>
-#include <LabRender/MathTypes.h>
 #include <LabRender/PodVector.h>
+#include <LabMath/LabMath.h>
 
 #include <memory>
 

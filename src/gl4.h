@@ -24,6 +24,8 @@
 #elif defined(PLATFORM_WINDOWS)
 #  include <GL/glew.h>
 #  include <Windows.h>
+#  undef near
+#  undef far
 #else
 #  include <GL/gl.h>
 #endif
@@ -37,7 +39,7 @@
 #include "LabRender/ErrorPolicy.h"
 #include "LabRender/SemanticType.h"
 #include "LabRender/Texture.h"
-#include "LabRender/MathTypes.h"
+#include <LabMath/LabMath.h>
 
 // Definitions for new macros in case they aren't defined.
 #ifndef GL_R32F

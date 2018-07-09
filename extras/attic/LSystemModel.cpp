@@ -109,7 +109,7 @@ namespace LabRender {
                                                             uniform mat4 u_viewProj;
                                                             uniform mat4 u_modelView;
                                                             uniform mat4 u_modelViewProj;
-                                                            uniform mat4 u_jacobian;
+                                                            uniform mat4 u_rotationTransform;
                                                             layout(location=0) in vec3 a_position;
                                                             layout(location=1) in vec3 a_normal;
                                                             out vec4 v_pos;

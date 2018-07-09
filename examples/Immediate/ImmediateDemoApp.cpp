@@ -7,7 +7,6 @@
 //
 
 #include "ImmediateDemoApp.h"
-#include "extras/modelLoader.h"
 #include "InsectAI/InsectAI3.h"
 #include "InsectAI/InsectAI.h"
 #include "InsectAI/InsectAI_Actuator.h"
@@ -17,10 +16,11 @@
 
 #include <LabRender/Camera.h>
 #include <LabRender/Immediate.h>
-#include <LabRender/MathTypes.h>
+#include <LabMath/LabMath.h>
 #include <LabRender/PassRenderer.h>
 #include <LabRender/UtilityModel.h>
 #include <LabRender/Utils.h>
+#include <LabRenderModelLoader/modelLoader.h>
 
 #include <LabCmd/FFI.h>
 
@@ -124,7 +124,7 @@ public:
     shared_ptr<lab::PassRenderer> dr;
     lab::DrawList drawList;
     lab::Camera camera;
-	lab::CameraRig cameraRig;
+	lab::CameraRigMode cameraRigMode;
 
     lab::OSCServer oscServer;
     lab::WebSocketsServer wsServer;
@@ -264,9 +264,9 @@ public:
 
         v2i fbSize = frameBufferDimensions();
 
-        drawList.modl = camera.mount.jacobian();
+        drawList.modl = camera.mount.rotationTransform();
         drawList.view = camera.mount.viewTransform();
-        drawList.proj = camera.optics.perspective(float(fbSize.x) / float(fbSize.y));
+        drawList.proj = lab::perspective(camera.sensor, camera.optics, float(fbSize.x) / float(fbSize.y));
 
         lab::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
 		v2i fbOffset = V2I(0, 0);
@@ -307,10 +307,10 @@ public:
     virtual void keyPress(int key) override 
     {
         switch (key) {
-            case GLFW_KEY_C: cameraRig.set_mode(lab::CameraRig::Mode::Crane); break;
-            case GLFW_KEY_D: cameraRig.set_mode(lab::CameraRig::Mode::Dolly); break;
+            case GLFW_KEY_C: cameraRigMode = lab::CameraRigMode::Crane; break;
+            case GLFW_KEY_D: cameraRigMode = lab::CameraRigMode::Dolly; break;
             case GLFW_KEY_T:
-            case GLFW_KEY_O: cameraRig.set_mode(lab::CameraRig::Mode::TurnTableOrbit); break;
+            case GLFW_KEY_O: cameraRigMode = lab::CameraRigMode::TurnTableOrbit; break;
         }
     }
 
@@ -329,7 +329,7 @@ public:
 
 		//printf("%f %f\n", pos.x, pos.y);
 
-        cameraRig.interact(&camera, V2F(distanceX, distanceY));
+        lab::cameraRig_interact(camera, cameraRigMode, V2F(distanceX, distanceY));
     }
 
     virtual void mouseUp(v2f windowSize, v2f pos) override {

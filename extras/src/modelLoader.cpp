@@ -4,7 +4,7 @@
 #include <LabRender/utils.h>
 
 #define BUILDING_LABRENDER_MODELLOADER
-#include "extras/modelLoader.h"
+#include "LabRenderModelLoader/modelLoader.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/IOSystem.hpp>

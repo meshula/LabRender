@@ -8,7 +8,7 @@
 #pragma once
 
 #include "LabRender/LabRender.h"
-#include "LabRender/MathTypes.h"
+#include <LabMath/LabMath.h>
 #include <memory>
 
 namespace lab {

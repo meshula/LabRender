@@ -10,21 +10,26 @@ target_include_directories(CubeMapFilterLab PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(CubeMapFilterLab PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(CubeMapFilterLab PRIVATE "${LABRENDER_ROOT}/extras/include")
 target_include_directories(CubeMapFilterLab PRIVATE "${GLEW_INCLUDE_DIR}")
-target_sources(CubeMapFilterLab PRIVATE "${LABRENDER_ROOT}/extras/src/modelLoader.cpp")
-target_sources(CubeMapFilterLab PRIVATE "${LABRENDER_ROOT}/extras/include/extras/modelLoader.h")
 
 target_link_libraries(CubeMapFilterLab debug
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
-    ${LabCmd_LIBRARY_DEBUG}
-    LabRender)
+    ${Assimp_LIBRARY_RELEASE})
+
 target_link_libraries(CubeMapFilterLab optimized
     ${OPENGL_LIBRARIES}
     ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
-    ${LabCmd_LIBRARY_RELEASE}
-    LabRender)
+    ${Assimp_LIBRARY_RELEASE})
+
+target_link_libraries(CubeMapFilterLab
+    GLM::Core 
+    GLEW::Shared
+    LabCmd::Core
+    Lab::Math
+    LabRender::Core
+    LabRender::Binder
+    LabRender::Imgui
+    LabRender::ModelLoader)
 
 #set_target_properties(CubeMapFilterLab
 #    PROPERTIES

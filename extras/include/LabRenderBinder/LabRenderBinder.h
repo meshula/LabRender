@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <LabRender/MathTypes.h>
+#include <LabMath/LabMath.h>
 
 
 #if defined(_MSC_VER) && defined(LABRENDER_BINDER_DLL)

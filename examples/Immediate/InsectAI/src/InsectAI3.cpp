@@ -233,7 +233,7 @@ PhysicsBody& PhysicsBody::Integrate(float dt)
 		/// @todo if using full matrix for tensor,
         /// must do worldTensor = orientation * inverseinertiatensor * transpose(orientation) before multiplying
 		// R += t * angular velocity
-        state1.orientation = lab::inputAngularVelocity(state1.orientation, dt, state1.angular_velocity);
+        state1.orientation = lab::quat_inputAngularVelocity(state1.orientation, dt, state1.angular_velocity);
 	}
 
     // calculate springs here

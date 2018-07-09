@@ -8,9 +8,9 @@
 #pragma once
 
 #include <LabRender/ErrorPolicy.h>
-#include <LabRender/MathTypes.h>
 #include <LabRender/Renderer.h>
 #include <LabRender/Uniform.h>
+#include <LabMath/LabMath.h>
 
 namespace lab {
     
