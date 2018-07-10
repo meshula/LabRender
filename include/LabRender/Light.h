@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "LabRender/Transform.h"
+#include <LabMath/LabMath.h>
 
 namespace lab {
 
@@ -28,11 +28,13 @@ namespace lab {
     };
 
     struct Illuminant {
-        Illuminant(std::shared_ptr<Light> & light,
-                   std::shared_ptr<Transform> & transform) : light(light), transform(transform) {}
+        Illuminant(
+            std::shared_ptr<Light> & light,
+            lab::m44f transform)
+            : light(light), transform(transform) {}
         Illuminant(const Illuminant & rhs) : light(rhs.light), transform(rhs.transform) {}
         std::shared_ptr<Light> light;
-        std::shared_ptr<Transform> transform;
+        lab::m44f transform;
     };
 
 } // Lab

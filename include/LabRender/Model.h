@@ -12,7 +12,6 @@
 #include "LabRender/FrameBuffer.h"
 #include "LabRender/ModelBase.h"
 #include "LabRender/Shader.h"
-#include "LabRender/Transform.h"
 #include "LabRender/Vertex.h"
 #include "LabRender/ViewMatrices.h"
 #include <iostream>
@@ -59,8 +58,6 @@ namespace lab {
 		LR_API virtual Bounds localBounds() const override {
             return _localBounds;
         }
-
-        Transform transform;
 
     protected:
         ShaderType              _shaderType;

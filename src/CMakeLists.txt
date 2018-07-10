@@ -46,7 +46,6 @@ lab_library(LabRender
         ../include/LabRender/Texture.h
         ../include/LabRender/TextureLoader.h
         ../include/LabRender/TextureType.h
-        ../include/LabRender/Transform.h
         ../include/LabRender/Uniform.h
         ../include/LabRender/UtilityModel.h
         ../include/LabRender/Utils.h
@@ -78,7 +77,6 @@ lab_library(LabRender
         ShaderBuilder.cpp
         Texture.cpp
         tiny.c
-        Transform.cpp
         UtilityModel.cpp
         Utils.cpp
         Vertex.cpp
