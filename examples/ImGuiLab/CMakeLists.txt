@@ -33,37 +33,11 @@ target_link_libraries(ImGuiLab
     LabRender::Imgui
     LabRender::ModelLoader)
 
-if (MSVC_IDE)
-    # hack to get around the "Debug" and "Release" directories cmake tries to add on Windows
-    #set_target_properties (ImGuiLab PROPERTIES PREFIX "../")
-    #set_target_properties(ImGuiLab PROPERTIES IMPORT_PREFIX "../")
-endif()
-
-set_target_properties(ImGuiLab
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
 
 install (TARGETS ImGuiLab
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin)
 
-#add_custom_command(TARGET ImGuiLab POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#        "${PROJECT_BINARY_DIR}/src/$<CONFIGURATION>/LabRender.dll"
-#        $<TARGET_FILE_DIR:ImGuiLab>)
-#add_custom_command(TARGET ImGuiLab POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#        "${Assimp_BINARY_RELEASE}"
-#        $<TARGET_FILE_DIR:ImGuiLab>)
-#add_custom_command(TARGET ImGuiLab POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#        "${GLEW_BINARY_RELEASE}"
-#        $<TARGET_FILE_DIR:ImGuiLab>)
-#add_custom_command(TARGET ImGuiLab POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#        "${Z_BINARY_RELEASE}"
-#        $<TARGET_FILE_DIR:ImGuiLab>)
+set_property(TARGET ImGuiLab PROPERTY FOLDER "examples")
+

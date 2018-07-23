@@ -55,14 +55,9 @@ target_link_libraries(${TARGET_NAME}
     GLM::Core 
     GLEW::Shared)
 
-target_include_directories(${TARGET_NAME} PRIVATE InsectAI/include)
-#target_include_directories(${TARGET_NAME} PRIVATE ${EIGEN3_INCLUDE_DIR})
+set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "examples")
 
-if (MSVC_IDE)
-    # hack to get around the "Debug" and "Release" directories cmake tries to add on Windows
-    #set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "../")
-    #set_target_properties(${TARGET_NAME} PROPERTIES IMPORT_PREFIX "../")
-endif()
+target_include_directories(${TARGET_NAME} PRIVATE InsectAI/include)
 
 install (TARGETS ${TARGET_NAME} 
     RUNTIME DESTINATION "${LOCAL_ROOT}/bin")

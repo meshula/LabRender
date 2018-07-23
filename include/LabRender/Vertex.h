@@ -92,7 +92,7 @@ namespace lab {
         Buffer<T> &operator << (const T &t) { _data.push_back(t); return *this; }
     };
 
-    // An index buffer is a convenience subclass filled wit IntEls. These are
+    // An index buffer is a convenience subclass filled with IntEls. These are
     // analogous to the Vert structs below.
 
     struct IntEl {

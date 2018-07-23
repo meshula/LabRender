@@ -4,6 +4,7 @@ set(SAMPLES
     ImGuiLab
     Immediate
     LabRenderExample
+    Primitives
 )
 
 foreach(SAMPLE ${SAMPLES})

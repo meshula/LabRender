@@ -7,9 +7,9 @@
 #pragma once
 
 #include "LabRender/LabRender.h"
-#include "LabRender/ConcurrentQueue.h"
 #include "LabRender/Texture.h"
 #include "LabRender/ViewMatrices.h"
+#include <LabCmd/Queue.h>
 
 #include <atomic>
 #include <unordered_map>
@@ -35,7 +35,7 @@ namespace lab {
         std::mutex  _renderLock;
         std::string _renderLockerId;
 
-        concurrent_queue<std::function<void(void)>> _jobs;
+        Lab::mpmc_queue_blocking<std::function<void(void)>> _jobs;
 
     public:
         class RenderLock;
@@ -46,9 +46,9 @@ namespace lab {
         virtual std::shared_ptr<Texture> texture(const std::string & name) = 0;
         virtual void render(RenderLock & rl, v2i fbSize, DrawList &) = 0;
 
-        void enqueCommand(std::function<void(void)> c) 
+        void enqueCommand(std::function<void(void)> && c) 
 		{
-            _jobs.push(c);
+            _jobs.emplace_back(std::move(c));
         }
 
 
@@ -89,8 +89,15 @@ namespace lab {
 
                     // run any queued commands
                     std::function<void(void)> run;
-                    while (dr->_jobs.try_pop(run))
-                        run();
+                    do
+                    {
+                        auto run = dr->_jobs.pop_front();
+                        if (!run.first)
+                            break;
+
+                        run.second();
+                    }
+                    while (true);
                 }
             }
 

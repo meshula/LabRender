@@ -23,7 +23,6 @@ lab_library(LabRender
 
     PUBLIC_HEADERS
         ../include/LabRender/Camera.h
-        ../include/LabRender/ConcurrentQueue.h
         ../include/LabRender/DepthTest.h
         ../include/LabRender/DrawList.h
         ../include/LabRender/ErrorPolicy.h

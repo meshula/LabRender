@@ -181,13 +181,21 @@ namespace lab {
     std::shared_ptr<Shader> ShaderBuilder::makeShader(const ShaderSpec & spec, const VAO & vao, bool printShader) 
     {
         auto vrtx = loadFile(spec.vertexShaderPath.c_str());
+        if (vrtx.empty())
+            return {};
+
         auto fgmt_body = loadFile(spec.fragmentShaderPath.c_str());
+        if (fgmt_body.empty())
+            return {};
+
         auto fgmt_postAmble = loadFile(spec.fragmentShaderPostamblePath.c_str(), false);
         
         std::vector<std::uint8_t> fgmt;
         fgmt.resize(fgmt_body.size() + fgmt_postAmble.size());
         memcpy(&fgmt[0], &fgmt_body[0], fgmt_body.size() - 1);
-        memcpy(&fgmt[fgmt_body.size() - 1], &fgmt_postAmble[0], fgmt_postAmble.size()); 
+
+        if (!fgmt_postAmble.empty())
+            memcpy(&fgmt[fgmt_body.size() - 1], &fgmt_postAmble[0], fgmt_postAmble.size()); 
 
         auto shader = makeShader(spec.name, reinterpret_cast<const char*>(&vrtx[0]), reinterpret_cast<const char*>(&fgmt[0]), vao, printShader);
 
