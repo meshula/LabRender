@@ -28,7 +28,7 @@ namespace lab {
         };
     }
     
-    Shader & Shader::shader(const std::string & name, ProgramType type, bool autoPreamble, char const*const source) 
+    Shader & Shader::shader(const std::string& name, ProgramType type, bool autoPreamble, char const*const source) 
 	{
         // Compile shader
         int itype = static_cast< typename std::underlying_type<ProgramType>::type >(type);
@@ -36,7 +36,7 @@ namespace lab {
         
         std::string src;
         if (autoPreamble) {
-            src = "//" + name + "\n\n\
+            src = "//"  + name + "\n\n\
 #version 410\n\
 #extension GL_ARB_explicit_attrib_location : enable\n\
 #define texture2D texture\n";
@@ -133,9 +133,9 @@ namespace lab {
 
 
     unsigned int Shader::attribute(const char *name) const { return glGetAttribLocation(id, name); }
-    unsigned int Shader::uniform(const char *name) const { return glGetUniformLocation(id, name); }
+    unsigned int Shader::uniform(const char *name)   const { return glGetUniformLocation(id, name); }
     
-    void Shader::uniformInt(const char *name, int i) const { glUniform1i(uniform(name), i); }
+    void Shader::uniformInt(const char *name, int i)     const { glUniform1i(uniform(name), i); }
     void Shader::uniformFloat(const char *name, float f) const { glUniform1f(uniform(name), f); }
     void Shader::uniform(const char *name, const v2f &v) const { glUniform2fv(uniform(name), 1, (float*)&v); }
     void Shader::uniform(const char *name, const v3f &v) const { glUniform3fv(uniform(name), 1, (float*)&v); }

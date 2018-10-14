@@ -254,10 +254,38 @@ namespace lab {
         for (int i = 0; i < 6; ++i) {
             int i2 = kFullscreenIndices[i];
             _verts->vertexData<VertPT>(true)->push_back(VertPT(v3f(kFullscreenVertices[i2].pos[0],
-                                                                         kFullscreenVertices[i2].pos[1],
-                                                                         kFullscreenVertices[i2].pos[2]),
+                                                                   kFullscreenVertices[i2].pos[1],
+                                                                   kFullscreenVertices[i2].pos[2]),
                                                                v2f(kFullscreenVertices[i2].tex[0],
-                                                                         kFullscreenVertices[i2].tex[1])));
+                                                                   kFullscreenVertices[i2].tex[1])));
+        }
+    }
+
+    void UtilityModel::createFullScreenTri() 
+    {
+        static const struct {
+            float pos[3];
+            float tex[2];
+        } kFullscreenVertices[] = {
+            { { -1.0f,  2.0f, 0.0f }, { 0.0f, 2.0f } },
+            { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f } },
+            { {  2.0f, -1.0f, 0.0f }, { 2.0f, 0.0f } },
+        };
+        static const uint32_t kFullscreenIndices[] = {
+            0, 1, 2,
+        };
+        
+        setVAO(std::unique_ptr<VAO>(new VAO(
+                  std::make_shared<Buffer<VertPT>>(BufferBase::BufferType::VertexBuffer))),
+                  std::make_pair(V3F(-1.f,-1.f,0), V3F(2.f,2.f,0)));
+        
+        for (int i = 0; i < 3; ++i) {
+            int i2 = kFullscreenIndices[i];
+            _verts->vertexData<VertPT>(true)->push_back(VertPT(v3f(kFullscreenVertices[i2].pos[0],
+                                                                   kFullscreenVertices[i2].pos[1],
+                                                                   kFullscreenVertices[i2].pos[2]),
+                                                               v2f(kFullscreenVertices[i2].tex[0],
+                                                                   kFullscreenVertices[i2].tex[1])));
         }
     }
 

@@ -46,5 +46,5 @@ void main() {
         fragColor = rgbB;
     }
 
-    fragColor = vec4(texture( u_colorTexture, vert.v_texCoord ).xyz, 1. );
+    fragColor = vec4(pow(texture( u_colorTexture, vert.v_texCoord ).xyz, vec3(1.0/2.2)), 1. );
 }

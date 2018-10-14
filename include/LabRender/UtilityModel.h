@@ -18,6 +18,7 @@ public:
 	LR_API virtual ~UtilityModel() { }
 
 	LR_API void createFullScreenQuad();
+    LR_API void createFullScreenTri();
 	LR_API void createPlane(float xHalf, float yHalf, int xSegments, int ySegments);
 	LR_API void createCylinder(float radiusTop, float radiusBottom, float height,
                                int radialSegments, int heightSegments, bool openEnded);

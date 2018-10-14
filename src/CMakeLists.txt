@@ -58,6 +58,8 @@ lab_library(LabRender
         gl4.h
         json/json-forwards.h
         json/json.h
+        gal/gl/gl-procedural-sky.hpp
+        gal/gl/hosek_data_rgb.h
 
     CPPFILES
         Camera.cpp
@@ -79,5 +81,6 @@ lab_library(LabRender
         UtilityModel.cpp
         Utils.cpp
         Vertex.cpp
+        gal/gl/gl-procedural-sky.cpp
         ${DARWIN_SRC}
 )

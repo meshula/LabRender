@@ -42,7 +42,7 @@ ImFont* FontManager::GetFont(FontName font_name)
     //    (resource_path / "fonts" / "meshula-icons" / "meshula-icons.ttf").string().c_str(), 32, &iconFontCfg, iconFontRanges);
 
     fonts[(int) FontName::Icon] = io.Fonts->AddFontFromFileTTF(
-        (resource_path / "fonts" / "meshula-icons" / "meshula-icons.ttf").string().c_str(), 32, &iconFontCfg);
+        (resource_path / "fonts" / "meshula-icons.ttf").string().c_str(), 32, &iconFontCfg);
 
     uint8_t* data = nullptr;
     int32_t width = 0;

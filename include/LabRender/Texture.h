@@ -36,6 +36,7 @@ namespace lab {
 		bool depthTexture = false;
         int format; // TextureType, in gl terms, eg GL_RGBA8
         int type; // channel type, in gl terms, eg GL_FLOAT
+        int channels; // GL_RED, RG, RGB, or RGBA
 
         Texture();
         ~Texture();

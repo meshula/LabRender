@@ -115,18 +115,22 @@ namespace lab {
 	void FrameBuffer::bindForWrite(const std::vector<std::string> & attachments)
 	{
 		bindForWrite();
-
-		vector<GLenum> currentDrawBuffers;
-		for (auto a : attachments) {
-			for (int i = 0; i < baseNames.size(); ++i) {
-				if (a == baseNames[i]) {
-					currentDrawBuffers.push_back(drawBuffers[i]);
+        std::array<GLenum, 32> currentDrawBuffers;
+        GLsizei idx = 0;
+		for (auto a : attachments) 
+        {
+			for (int i = 0; i < baseNames.size(); ++i) 
+            {
+				if (a == baseNames[i]) 
+                {
+					currentDrawBuffers[idx] = drawBuffers[i];
+                    ++idx;
 					break;
 				}
 			}
 		}
-		if (currentDrawBuffers.size())
-			glDrawBuffers((GLsizei)drawBuffers.size(), &drawBuffers[0]);
+		if (idx > 0)
+			glDrawBuffers(idx, currentDrawBuffers.data());
 	}
 
     void FrameBuffer::unbind() 

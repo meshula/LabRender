@@ -54,15 +54,17 @@ PassRenderer::Pass::Pass(const std::string& name, int passNumber)
 
 void PassRenderer::Pass::bindInputTextures(RenderLock & rl, const FramebufferSet & fbos)
 {
-    for (const pair<string, vector<string>>& readBuffer : readAttachments) {
-        std::shared_ptr<FrameBuffer> gbufferAOVs = fbos.fbo(readBuffer.first);
+    for (const pair<string, vector<string>>& readBuffer : readAttachments) 
+    {
+        std::shared_ptr<FrameBuffer> textureInputs = fbos.fbo(readBuffer.first);
         int bindBase = rl.context.activeTextureUnit;
         for (const string& a : readBuffer.second) {
-            for (int i = 0; i < gbufferAOVs->drawBuffers.size(); ++i) {
-                if (gbufferAOVs->baseNames[i] == a) {
-                    gbufferAOVs->textures[i]->bind(bindBase);
+            for (int i = 0; i < textureInputs->drawBuffers.size(); ++i) {
+                if (textureInputs->baseNames[i] == a) 
+                {
+                    textureInputs->textures[i]->bind(bindBase);
                     if (_shader)
-                        _shader->uniformInt(gbufferAOVs->uniformNames[i].c_str(), bindBase);
+                        _shader->uniformInt(textureInputs->uniformNames[i].c_str(), bindBase);
                     ++bindBase;
                 }
             }
@@ -76,18 +78,20 @@ void PassRenderer::Pass::prepareFullScreenQuadAndShader(const FramebufferSet & f
     if (!isQuadPass)
         return;
 
-    if (!_fullScreenQuadMesh) {
+    if (!_fullScreenQuadMesh) 
+    {
         UtilityModel* quad = new UtilityModel();
         quad->createFullScreenQuad();
         _fullScreenQuadMesh.reset(quad);
     }
 
-    if (!_shader) {
+    if (!_shader) 
+    {
         std::shared_ptr<FrameBuffer> gbufferAOVs = fbos.fbo(writeBuffer);
 
         ShaderBuilder sb;
         if (gbufferAOVs)
-            sb.setGbuffer(*gbufferAOVs);
+            sb.setFrameBufferOutputs(*gbufferAOVs);
 
         _fullScreenQuadMesh->verts()->uploadVerts();
         sb.setAttributes(* _fullScreenQuadMesh.get());
@@ -106,10 +110,7 @@ void PassRenderer::Pass::prepareFullScreenQuadAndShader(const FramebufferSet & f
 void PassRenderer::Pass::run(RenderLock& rl, const FramebufferSet& fbos)
 {
 	checkError(ErrorPolicy::onErrorThrow,
-		TestConditions::exhaustive, "Pass::run");
-
-	checkError(ErrorPolicy::onErrorThrow,
-		TestConditions::exhaustive, "Pass::run bind input textures");
+               TestConditions::exhaustive, "Pass::run");
 
 	if (isQuadPass) 
 	{
@@ -117,7 +118,10 @@ void PassRenderer::Pass::run(RenderLock& rl, const FramebufferSet& fbos)
         _shader->bind(rl);
 		bindInputTextures(rl, fbos);	// binds the textures and the shader uniforms
 		_fullScreenQuadMesh->verts()->draw();
+        checkError(ErrorPolicy::onErrorThrow,
+                   TestConditions::exhaustive, "Pass::bind full screen pass");
     }
+
     if (drawOpaqueGeometry) 
 	{
         std::shared_ptr<FrameBuffer> gbufferAOVs = fbos.fbo(writeBuffer);
@@ -167,7 +171,15 @@ void PassRenderer::configure(const char *const path)
     string p = expandPath(path);
     std::ifstream in(p);
     Json::Value conf;
-    in >> conf;
+    try
+    {
+        in >> conf;
+    }
+    catch(std::exception& exc)
+    {
+        printf("%s\n", exc.what());
+        throw;
+    }
 
     printf("\nTextures:\n");
     for (Json::Value::iterator it = conf["textures"].begin(); it != conf["textures"].end(); ++it)
@@ -378,6 +390,7 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
     rl.context.rootFramebuffer = current_frame_buffer.currFramebuffer;
 
     string bound_frame_buffer = "*";
+    vector<string> bound_attachments;
 
     glClearColor(0, 0, 0, 0);
     glClearDepthf(1.0f);
@@ -395,7 +408,7 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
 	{
         checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "render, before pass");
 
-        if (true || (bound_frame_buffer != pass->writeBuffer))
+        if (bound_frame_buffer != pass->writeBuffer || bound_attachments != pass->writeAttachments)
         {
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // unbind previous framebuffer
 
@@ -404,9 +417,8 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
             else
                 _detail->fbos.fbo(pass->writeBuffer)->bindForWrite(pass->writeAttachments);
 
-            // because I need to take into account active writebuffers, I've
-            // commented out to force rebinding: 
 			bound_frame_buffer = pass->writeBuffer;
+            bound_attachments = pass->writeAttachments;
         }
 		checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "render, bind for write");
 

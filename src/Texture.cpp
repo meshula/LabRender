@@ -250,7 +250,8 @@ Texture& Texture::create(int w, int h, int d, TextureType type_, int filter, int
     depth = d;
     depthTexture = false;
     type = glType(datatype);
-    format = glColorChannels(type_);
+    channels = glColorChannels(type_);
+	format = glInternalFormat(type_);
     if (!id)
         glGenTextures(1, &id);
     bind();
@@ -263,14 +264,13 @@ Texture& Texture::create(int w, int h, int d, TextureType type_, int filter, int
     if (target == GL_TEXTURE_2D) 
 	{
         // NULL means don't load data
-		glTexImage2D(target, 0, glFormat(type_), w, h, 0, format, glType(datatype), NULL);
+		glTexImage2D(target, 0, glFormat(type_), w, h, 0, channels, glType(datatype), NULL);
     }
     else 
 	{
 		// NULL means don't load data
-		glTexImage3D(target, 0, glFormat(type_), w, h, d, 0, format, glType(datatype), data);
+		glTexImage3D(target, 0, glFormat(type_), w, h, d, 0, channels, glType(datatype), data);
     }
-	format = glInternalFormat(type_);
     unbind();
     return *this;
 }
@@ -376,7 +376,7 @@ vector<uint8_t> Texture::get()
 		return vector<uint8_t>();
 
     vector<uint8_t> data(sz);
-    glReadPixels(0, 0, width, height, format, type, &data[0]);
+    glReadPixels(0, 0, width, height, channels, GL_UNSIGNED_BYTE /* type*/, &data[0]);
     unbind();
     return data;
 }
@@ -387,7 +387,8 @@ void Texture::save(const char * path)
         return;
 
     vector<uint8_t> t = get();
-    stbi_write_png(path, width, height, glChannelCount(format), &t[0], glTypeByteSize(type) * glChannelCount(format) * width);
+    //stbi_write_png(path, width, height, glChannelCount(format), &t[0], glTypeByteSize(type) * glChannelCount(format) * width);
+    stbi_write_png(path, width, height, glChannelCount(format), &t[0], 1 * glChannelCount(format) * width);
 }
 
 

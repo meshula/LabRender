@@ -139,7 +139,7 @@ public:
     void render()
 	{
         lab::checkError(lab::ErrorPolicy::onErrorThrow,
-                              lab::TestConditions::exhaustive, "main loop start");
+                        lab::TestConditions::exhaustive, "main loop start");
 
         v2i fbSize = frameBufferDimensions();
 

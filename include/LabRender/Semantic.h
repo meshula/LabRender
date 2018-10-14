@@ -25,7 +25,8 @@ namespace lab
         Semantic(const Semantic& rhs)
             : type(rhs.type), name(rhs.name), automatic(rhs.automatic), location(rhs.location) {}
 
-        static std::set<Semantic*> makeSemantics(const std::vector<Uniform> & semantics) {
+        static std::set<Semantic*> makeSemantics(const std::vector<Uniform> & semantics) 
+        {
             std::set<Semantic*> result;
             int l = 0;
             for (auto i : semantics) {
@@ -34,7 +35,8 @@ namespace lab
             return result;
         }
 
-        static std::set<Semantic*> makeSemantics(const std::vector<std::pair<std::string, SemanticType>>& semantics) {
+        static std::set<Semantic*> makeSemantics(const std::vector<std::pair<std::string, SemanticType>> & semantics) 
+        {
             std::set<Semantic*> result;
             int l = 0;
             for (auto i : semantics) {
@@ -43,14 +45,15 @@ namespace lab
             return result;
         }
 
-
-        std::string uniformString() {
+        std::string uniformString() 
+        {
             std::string result = "uniform " + semanticTypeToString(type) + " ";
             result += name + ";";
             return result;
         }
 
-        std::string attributeString() {
+        std::string attributeString() 
+        {
             std::string result = "layout(location = ";
             char buff[32];
             snprintf(buff, 32, "%d", location);
@@ -60,7 +63,8 @@ namespace lab
             return result;
         }
 
-        std::string attachmentsString() {
+        std::string attachmentsString() 
+        {
             std::string result = "layout(location = ";
             char buff[32];
             snprintf(buff, 32, "%d", location);
@@ -70,19 +74,22 @@ namespace lab
             return result;
         }
 
-        std::string varyingsOutString() {
+        std::string varyingsOutString() 
+        {
             std::string result = "out " + semanticTypeToString(type) + " ";
             result += name + ";";
             return result;
         }
 
-        std::string varyingsInString() {
+        std::string varyingsInString() 
+        {
             std::string result = "in " + semanticTypeToString(type) + " ";
             result += name + ";";
             return result;
         }
 
-        std::string outputString() {
+        std::string outputString() 
+        {
             std::string result = "layout(location = ";
             char buff[32];
             snprintf(buff, 32, "%d", location);

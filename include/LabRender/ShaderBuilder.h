@@ -45,14 +45,14 @@ namespace lab {
 
         private:
             class Detail;
-            Detail* _detail;
+            std::unique_ptr<Detail> _detail;
         };
         static Cache* cache();
 
         ~ShaderBuilder();
 
         void clear();
-        void setGbuffer(const FrameBuffer& fbo);
+        void setFrameBufferOutputs(const FrameBuffer& fbo);
         void setAttributes(const ModelPart& mesh);
 
         void setUniforms(const ShaderSpec&);
@@ -66,10 +66,10 @@ namespace lab {
 
         std::shared_ptr<Shader> makeShader(const std::string& name,
                                            const char* vtxCode, const char* fgmtCode,
-                                           const VAO & vao,
+                                           const VAO& vao,
                                            bool printShader = false);
-        std::shared_ptr<Shader> makeShader(const ShaderSpec &,
-                                           const VAO & vao,
+        std::shared_ptr<Shader> makeShader(const ShaderSpec&,
+                                           const VAO& vao,
                                            bool printShader = false);
 
         std::set<Semantic*> uniforms;

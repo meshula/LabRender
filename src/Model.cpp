@@ -142,7 +142,7 @@ namespace lab {
         if (hasTextureCubeAttr || shaderType == ShaderType::skyShader) 
             uniforms[6].type = SemanticType::samplerCube_st;
 
-        sb.setGbuffer(fbo);
+        sb.setFrameBufferOutputs(fbo);
         sb.setAttributes(mesh);
         sb.setVaryings(varyings, hasVertexColorAttr? 4 : 3);
         sb.setUniforms(uniforms, sizeof(uniforms)/sizeof(Semantic));

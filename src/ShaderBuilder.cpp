@@ -37,19 +37,22 @@ namespace lab {
     };
     
     ShaderBuilder::Cache::Cache() : _detail(new Detail()) { }
-    ShaderBuilder::Cache::~Cache() { delete _detail; }
+    ShaderBuilder::Cache::~Cache() { delete _detail.get(); }
     
-    bool ShaderBuilder::Cache::hasShader(const std::string& shader) const {
+    bool ShaderBuilder::Cache::hasShader(const std::string& shader) const 
+    {
         Cache *cache = _cache();
         return cache->_detail->shaders.find(shader) != _detail->shaders.end();
     }
     
-    void ShaderBuilder::Cache::add(const std::string& name, std::shared_ptr<Shader> shader) {
+    void ShaderBuilder::Cache::add(const std::string& name, std::shared_ptr<Shader> shader) 
+    {
         Cache *cache = _cache();
         cache->_detail->shaders[name] = shader;
     }
     
-    std::shared_ptr<Shader> ShaderBuilder::Cache::shader(const std::string& name) const {
+    std::shared_ptr<Shader> ShaderBuilder::Cache::shader(const std::string& name) const 
+    {
         if (!hasShader(name))
             return std::shared_ptr<Shader>();
         
@@ -57,11 +60,13 @@ namespace lab {
         return cache->_detail->shaders.find(name)->second;
     }
     
-    ShaderBuilder::Cache* ShaderBuilder::cache() {
+    ShaderBuilder::Cache* ShaderBuilder::cache() 
+    {
         return _cache();
     }
     
-    const char* preamble() {
+    const char* preamble() 
+    {
         return "\
 #version 410\n\
 #extension GL_ARB_explicit_attrib_location: enable\n\
@@ -70,38 +75,39 @@ namespace lab {
     }
     
     
-    std::string generateFragment() {
+    std::string generateFragment() 
+    {
         std::stringstream s;
         s << preamble();
         return s.str();
     }
     
     
-    ShaderBuilder::~ShaderBuilder() {
+    ShaderBuilder::~ShaderBuilder() 
+    {
         clear();
     }
     
-    void ShaderBuilder::clear() {
-        for (auto i : uniforms) delete i;
-        for (auto i : attributes) delete i;
-        for (auto i : varyings) delete i;
-        for (auto i : outputs) delete i;
-        uniforms.clear();
-        attributes.clear();
-        varyings.clear();
-        outputs.clear();
+    void ShaderBuilder::clear() 
+    {
+        for (auto i : uniforms) delete i;   uniforms.clear();
+        for (auto i : attributes) delete i; attributes.clear();
+        for (auto i : varyings) delete i;   varyings.clear();
+        for (auto i : outputs) delete i;    outputs.clear();
     }
     
-    void ShaderBuilder::setGbuffer(const FrameBuffer& fbo) {
+    void ShaderBuilder::setFrameBufferOutputs(const FrameBuffer& fbo) 
+    {
         // if no draw buffers specified on the fbo, then the fbo is representing the default gl draw buffer
         if (fbo.drawBuffers.size() == 0)
-            outputs.insert(new Semantic(SemanticType::vec4_st, "o_color", 0));
+            outputs.insert(new Semantic(SemanticType::vec4_st, "color", 0));
         else
             for (int i = 0; i < fbo.drawBuffers.size(); ++i)
                 outputs.insert(new Semantic(fbo.samplerType[i], fbo.drawBufferNames[i].c_str(), fbo.drawBuffers[i] - GL_COLOR_ATTACHMENT0));
     }
     
-    void ShaderBuilder::setAttributes(const ModelPart& mesh) {
+    void ShaderBuilder::setAttributes(const ModelPart& mesh) 
+    {
         VAO* vao = mesh.verts();
         vao->uploadVerts();
         for (int i = 0; i < vao->attributes.size(); ++i) {
@@ -109,32 +115,37 @@ namespace lab {
         }
     }
     
-    void ShaderBuilder::setUniforms(const ShaderSpec& spec) {
+    void ShaderBuilder::setUniforms(const ShaderSpec& spec) 
+    {
         std::set<Semantic*> u = Semantic::makeSemantics(spec.uniforms);
         for (auto i : u) {
             uniforms.insert(i);
         }
     }
     
-    void ShaderBuilder::setVaryings(const ShaderSpec& spec) {
+    void ShaderBuilder::setVaryings(const ShaderSpec& spec) 
+    {
         std::set<Semantic*> u = Semantic::makeSemantics(spec.varyings);
         for (auto i : u) {
             varyings.insert(i);
         }
     }
     
-    void ShaderBuilder::setUniforms(Semantic const*const semantics, int count) {
+    void ShaderBuilder::setUniforms(Semantic const*const semantics, int count) 
+    {
         for (int i = 0; i < count; ++i)
             uniforms.insert(new Semantic(semantics[i]));
     }
     
-    void ShaderBuilder::setVaryings(Semantic const*const semantics, int count) {
+    void ShaderBuilder::setVaryings(Semantic const*const semantics, int count) 
+    {
         for (int i = 0; i < count; ++i)
             varyings.insert(new Semantic(semantics[i]));
     }
 
     
-    std::string ShaderBuilder::generateVertexShader(const char* body) {
+    std::string ShaderBuilder::generateVertexShader(const char* body) 
+    {
         std::stringstream s;
         s << preamble();
         
@@ -155,8 +166,9 @@ namespace lab {
         
         return s.str();
     }
-    std::string ShaderBuilder::generateFragmentShader(const char* body) {
-        
+
+    std::string ShaderBuilder::generateFragmentShader(const char* body) 
+    {        
         std::stringstream s;
         s << preamble();
         
@@ -208,20 +220,21 @@ namespace lab {
 
     
     std::shared_ptr<Shader> ShaderBuilder::makeShader(const std::string & name,
-                                                      const char* vtxCode, const char* fgmtCode,
+                                                      const char * vtxCode, const char* fgmtCode,
                                                       const VAO & vao,
-                                                      bool printShader) {
+                                                      bool printShader) 
+    {
         std::string vtx = generateVertexShader(vtxCode);
         std::string fgm = generateFragmentShader(fgmtCode);
 
         if (printShader) {
-            printf("Vertex Shader\n__________________________\n%s\n\n\n\n", vtx.c_str());
+            printf(  "Vertex Shader  \n__________________________\n%s\n\n\n\n", vtx.c_str());
             printf("\nFragment Shader\n__________________________\n%s\n\n\n\n", fgm.c_str());
         }
         
         vao.bindVAO();
         std::shared_ptr<Shader>shader = std::make_shared<Shader>();
-        shader->shader(name, Shader::ProgramType::Vertex, false, vtx.c_str()).
+        shader->shader(name, Shader::ProgramType::Vertex,   false, vtx.c_str()).
                 shader(name, Shader::ProgramType::Fragment, false, fgm.c_str()).link();
         vao.unbindVAO();
 
