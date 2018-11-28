@@ -15,7 +15,7 @@ lab_library(LabRender
         ${OPENGL_LIBRARIES}
         LabCmd::Core
         Lab::Math
-        LabText::Core
+        Lab::Text
 
     INCLUDE_DIRS
         ${LABRENDER_ROOT}/include

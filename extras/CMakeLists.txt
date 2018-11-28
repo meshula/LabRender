@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------------------------------
-# LabRenderBinder
+# LabModelLoader
 
 lab_library(LabModelLoader
     TYPE SHARED
@@ -33,7 +33,7 @@ lab_library(LabModelLoader
 lab_library(LabRenderBinder
     TYPE SHARED
     ALIAS LabRender::Binder
-        
+
     LIBRARIES
         ${GLEW_LIBRARY}
         ${OPENGL_LIBRARIES}
@@ -56,6 +56,45 @@ lab_library(LabRenderBinder
         src/LabRenderBinder.cpp
 )
 
+#-------------------------------------------------------------------------------
+# LabRenderGraph
+
+lab_library(LabRenderGraph
+    TYPE STATIC
+    ALIAS LabRender::LabRenderGraph
+
+    CPPFILES
+        RenderGraph/src/RenderGraph.cpp
+
+    PUBLIC_HEADERS
+        RenderGraph/include/LabRenderGraph/LabRenderGraph.h
+
+    INCLUDE_DIRS
+        ${LABRENDER_ROOT}/extras/RenderGraph/include
+
+    LIBRARIES
+        Lab::Text
+)
+
+
+set(IMGUILAB_SRC
+    "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderDemoApp.h"
+    "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderExampleApp.cpp"
+    "${LABRENDER_ROOT}/examples/ImGuiLab/ImGuiIntegration.cpp"
+)
+
+add_executable(RenderGraphTest RenderGraph/src/test.cpp)
+target_compile_definitions(RenderGraphTest PRIVATE PLATFORM_WINDOWS=1)
+target_compile_definitions(RenderGraphTest PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
+target_link_libraries(RenderGraphTest LabRender::LabRenderGraph)
+target_include_directories(RenderGraphTest PRIVATE "${LOCAL_ROOT}/include")
+
+install (TARGETS RenderGraphTest
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin)
+
+set_property(TARGET RenderGraphTest PROPERTY FOLDER "examples")
 
 #-------------------------------------------------------------------------------
 # LabRenderImgui
@@ -63,7 +102,7 @@ lab_library(LabRenderBinder
 lab_library(LabRenderImgui
     TYPE STATIC
     ALIAS LabRender::Imgui
-        
+
     LIBRARIES
         ${GLEW_LIBRARY}
         ${GLFW_LIBRARY_RELEASE}
@@ -92,7 +131,7 @@ lab_library(LabRenderImgui
         ${LABRENDER_ROOT}/extras/imgui/stb_truetype.h
         ${LABRENDER_ROOT}/extras/imgui/LabImgui/roboto_regular.ttf.h
         ${LABRENDER_ROOT}/extras/imgui/LabImgui/robotomono_regular.ttf.h
-  
+
     CPPFILES
         ${LABRENDER_ROOT}/extras/imgui/imgui.cpp
         ${LABRENDER_ROOT}/extras/imgui/imgui_demo.cpp

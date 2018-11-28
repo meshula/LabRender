@@ -1,0 +1,126 @@
+
+
+--- labfx version 1.0
+
+name: Deferred Example
+version: 1.0
+
+--------------------------------------------------------------------------------
+
+buffer: gbuffer
+  has depth: yes
+  textures:
+    [ diffusex, f16x4, scale: 1.0
+      position, f16x4, scale: 1.0
+      normal, f16x4, scale: 1.0 ]
+
+buffer: resolve
+  has depth: no
+  textures:
+    [ color, f16x4, scale: 1.0 ]
+
+--------------------------------------------------------------------------------
+
+pass: clear framebuffer
+  draw: no
+  clear depth: no
+  clear outputs: yes
+  outputs: [ resolve.color ]
+ 
+pass: clear gbuffer
+  draw: no
+  clear depth: no
+  clear outputs: yes
+  outputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
+
+pass: geometry
+  draw: opaque geometry
+  clear depth: no
+  depth test: less
+  write depth: yes
+  outputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
+
+pass: sky
+  draw: quad
+  clear depth: no
+  depth test: equal
+  write depth: no
+  use shader: sky
+  outputs: [ gbuffer.diffuse ]
+
+pass: post process and blit
+  draw: quad
+  depth test: never
+  write depth: no
+  clear depth: no
+  use shader: full-screen-deferred-quad
+  inputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
+  outputs: [ resolve.color ]
+
+--------------------------------------------------------------------------------
+shader: sky
+
+    vsh:
+        uniforms:
+        [ u_skyMatrix: mat4 <- auto-sky-matrix ]
+
+        source:
+        ```glsl
+            void main() {
+              vec4 pos = vec4(a_position, 1.0);
+              vert.v_eyeDirection = (u_skyMatrix * pos).xyz;
+              pos.z = 1.0; // maximum depth value as sentinel to enable writing
+              gl_Position = pos;
+            }
+        ```
+
+    varying:
+       [ v_eyeDirection: vec3 ]
+
+    fsh:
+        uniforms:
+           [ skyCube: samplerCube ]
+
+        source:
+        ```glsl
+            void main() {
+              //o_diffuseTexture = vec4(texture(skyCube, vert.v_eyeDirection).xyz, 1.0);
+              o_diffuseTexture = vec4(0.5 * clamp(1.0 - vert.v_eyeDirection.y, 0, 1), 0.5 * clamp(vert.v_eyeDirection.y, 0, 1), 0, 1);
+                o_diffuseTexture.x = 0;
+            }
+        ```
+--------------------------------------------------------------------------------
+shader: full-screen-deferred-quad
+
+    vsh:
+        source:
+        ```glsl
+            void main() {
+              vert.v_texCoord = a_uv;
+              gl_Position = vec4(a_position, 1.0);
+            }
+        ```
+    varying:
+       [ v_texCoord: vec2 ]
+
+    fsh:
+        uniforms:
+            [ u_normalTexture: sampler2d,
+             u_diffuseTexture: sampler2d ]
+
+        source:
+        ```glsl
+            void main()
+            {
+                vec3 normal = texture(u_normalTexture, vert.v_texCoord).xyz;
+                vec3 light = normalize(vec3(0.1, 0.4, 0.2));
+                float i = dot(normal, normal);
+                if (i > 0.0) {
+                    i = dot(normal, light);
+                    o_colorTexture = texture(u_diffuseTexture, vert.v_texCoord) * vec4(i,i,i, 1);
+                }
+                else {
+                    o_colorTexture = texture(u_diffuseTexture, vert.v_texCoord);
+                }
+            }
+        ```

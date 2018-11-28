@@ -38,7 +38,6 @@ namespace lab {
                                                   ModelPart::ShaderType shaderType,
                                                   char const*const vshSrc, char const*const fshSrc) 
 	{
-
         checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "ModelPart::makeShader begin");
         VAO* const vao = mesh.verts();
         vao->uploadVerts();
