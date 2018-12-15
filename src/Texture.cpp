@@ -18,7 +18,7 @@
 
 using namespace std;
 
-namespace lab {
+namespace lab { namespace Render {
 
 Texture::Texture()
 : id(0), target(GL_TEXTURE_2D), width(0), height(0), depth(1), depthTexture(false)
@@ -412,4 +412,4 @@ FileTextureProvider::FileTextureProvider(const string & path) {
 
 
 
-} // Lab
+}} // lab::Render

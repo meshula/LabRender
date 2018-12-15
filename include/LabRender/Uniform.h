@@ -4,9 +4,7 @@
 #include <LabRender/SemanticType.h>
 #include <string>
 
-namespace lab
-{
-
+namespace lab { namespace Render {
 
     enum class AutomaticUniform {
         none,
@@ -21,7 +19,7 @@ namespace lab
     class Uniform {
     public:
         Uniform(std::string name,
-            SemanticType type,
+            Render::SemanticType type,
             AutomaticUniform automatic,
             std::string texture)
             : name(name), type(type), automatic(automatic), texture(texture) {}
@@ -36,8 +34,8 @@ namespace lab
 
         std::string name;
         std::string texture;
-        SemanticType type = SemanticType::unknown_st;
+        Render::SemanticType type = Render::SemanticType::unknown_st;
         AutomaticUniform automatic = AutomaticUniform::none;
     };
 
-}
+}}

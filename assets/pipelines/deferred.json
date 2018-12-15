@@ -43,7 +43,8 @@
 	                    "uniforms": [ { "name": "u_skyMatrix",    "type": "mat4",             "auto": "sky_matrix" },
 	                                  { "name": "skyCube",        "type": "samplerCube" } ],
 	                    "varyings": [ { "name": "v_eyeDirection", "type": "vec3" } ] },
-		    "outputs": { "buffer": "visible" } },
+		    "outputs": { "buffer": "gbuffer",
+		                 "render_textures": [ "diffuse" ] } },
 
 		{ "name": "PostProcessAndBlit",
 	 	    "type": { "run": "PostProcess", "draw": "quad" },

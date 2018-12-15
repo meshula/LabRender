@@ -10,7 +10,7 @@
 #include "InOut.h"
 #include "Texture.h"
 
-namespace lab {
+namespace lab { namespace Render {
 
     class Material {
     public:
@@ -62,4 +62,4 @@ namespace lab {
         static char const*const clearCoatTintName() { return "clearCoatTint"; }
     };
 
-} // LabRender
+}} // lab::Render

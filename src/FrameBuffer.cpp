@@ -14,6 +14,8 @@ using namespace std;
 
 namespace lab {
 
+    using namespace Render;
+
     FrameBuffer::FrameBuffer(ErrorPolicy ep, bool autoDepth, bool resizeViewport)
     : id()
     , renderbuffer()

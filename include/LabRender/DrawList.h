@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 
-namespace lab {
+namespace lab { namespace Render {
 
     class DrawList 
 	{
@@ -34,4 +34,4 @@ namespace lab {
         m44f proj;
     };
 
-}
+}}

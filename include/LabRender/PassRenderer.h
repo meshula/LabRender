@@ -20,7 +20,7 @@
 
 #include <string>
 
-namespace lab {
+namespace lab { namespace Render {
 
     class PassRenderer : public Renderer
 	{
@@ -68,7 +68,7 @@ namespace lab {
 
         LR_API void configure(char const*const path);
 
-        LR_API virtual std::shared_ptr<Texture> texture(const std::string & name) override;
+        LR_API virtual std::shared_ptr<Render::Texture> texture(const std::string & name) override;
 
         LR_API std::shared_ptr<FrameBuffer> framebuffer(const std::string & name);
 
@@ -89,4 +89,4 @@ namespace lab {
         Detail *_detail;
     };
 
-}
+}} // lab::Render

@@ -26,7 +26,7 @@ using lab::v4f;
 class LoadMeshCommand : public lab::Command
 {
 public:
-    LoadMeshCommand(lab::Renderer * renderer, lab::DrawList * drawlist)
+    LoadMeshCommand(lab::Render::Renderer * renderer, lab::Render::DrawList * drawlist)
     : _renderer(renderer), _drawlist(drawlist)
     {
         run =
@@ -35,12 +35,12 @@ public:
                 string filepath = args[0].stringArg;
                 _renderer->enqueCommand([this, filepath]() 
                 {
-                    shared_ptr<lab::Model> model = lab::loadMesh(filepath);
+                    shared_ptr<lab::Render::Model> model = lab::Render::loadMesh(filepath);
                     if (model) 
                     {
                         _drawlist->deferredMeshes.clear();
                         for (auto& i : model->parts())
-                            _drawlist->deferredMeshes.emplace_back(std::pair<lab::m44f, std::shared_ptr<lab::ModelBase>>( lab::m44f_identity, i ));
+                            _drawlist->deferredMeshes.emplace_back(std::pair<lab::m44f, std::shared_ptr<lab::Render::ModelBase>>( lab::m44f_identity, i ));
                     }
                 });
             };
@@ -51,14 +51,14 @@ public:
     virtual ~LoadMeshCommand() {}
     virtual std::string name() const override { return "loadMesh"; }
 
-    lab::Renderer * _renderer;
-    lab::DrawList * _drawlist;
+    lab::Render::Renderer * _renderer;
+    lab::Render::DrawList * _drawlist;
 };
 
 class LabRenderExampleApp : public lab::GLFWAppBase {
 public:
-    shared_ptr<lab::PassRenderer> dr;
-    lab::DrawList drawList;
+    shared_ptr<lab::Render::PassRenderer> dr;
+    lab::Render::DrawList drawList;
     lab::Camera camera;
     lab::CameraRigMode cameraRigMode;
 
@@ -85,7 +85,7 @@ public:
         //std::string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
         std::string path = "{ASSET_ROOT}/pipelines/deferred-offscreen.json";
         std::cout << "Loading pipeline configuration " << path << std::endl;
-        dr = make_shared<lab::PassRenderer>();
+        dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());
         cameraRigMode = lab::CameraRigMode::TurnTableOrbit;
     }
@@ -95,22 +95,24 @@ public:
         auto& meshes = drawList.deferredMeshes;
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
-        shared_ptr<lab::Model> model = lab::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
+        shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
         for (auto& i : model->parts())
             meshes.push_back({ lab::m44f_identity, i });
 
+        const float pi = float(M_PI);
+
         for (int i = 0; i < 10; ++i)
         {
-            float th = float(i)/10.f * 2.f * M_PI;
+            float th = float(i)/10.f * 2.f * pi;
             float sx = cos(th);
             float sy = sin(th);
 
-            shared_ptr<lab::UtilityModel> mesh = make_shared<lab::UtilityModel>();
+            shared_ptr<lab::Render::UtilityModel> mesh = make_shared<lab::Render::UtilityModel>();
             switch (i % 5)
             {
             case 0: mesh->createBox(75, 75, 75, 2,3,4, false, false); break;
             case 1: mesh->createCylinder(75, 100, 200, 20, 1, false);  break;
-            case 2: mesh->createSphere(75, 32, 32, 0, 2.f*M_PI, -M_PI, 2.f*M_PI, false);   break;
+            case 2: mesh->createSphere(75, 32, 32, 0, 2.f*pi, -pi, 2.f*pi, false);   break;
             case 3: mesh->createIcosahedron(75);   break;
             case 4: mesh->createPlane(75, 75, 3, 3);   break;
             }
@@ -137,7 +139,7 @@ public:
         drawList.view = camera.mount.viewTransform();
         drawList.proj = lab::perspective(camera.sensor, camera.optics, float(fbSize.x) / float(fbSize.y));
 
-        lab::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
+        lab::Render::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
         v2i fbOffset = V2I(0, 0);
         renderStart(rl, renderTime(), fbOffset, fbSize);
 

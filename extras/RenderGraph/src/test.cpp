@@ -19,7 +19,9 @@ int main(int argc, char** argv)
     fread(&buff[0], 1, sz, f);
     fclose(f);
     
-    void* fx = parse_labfx(&buff[0], sz);
+    labfx_t* fx = parse_labfx(&buff[0], sz);
+    labfx_gen_t* sh = generate_shaders(fx);
+    free_labfx_gen(sh);
     free_labfx(fx);
     return 1;
 }

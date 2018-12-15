@@ -70,6 +70,7 @@ lab_library(LabRenderGraph
         RenderGraph/include/LabRenderGraph/LabRenderGraph.h
 
     INCLUDE_DIRS
+        ${LABRENDER_ROOT}/include
         ${LABRENDER_ROOT}/extras/RenderGraph/include
 
     LIBRARIES
@@ -111,6 +112,8 @@ lab_library(LabRenderImgui
     INCLUDE_DIRS
         ${LABRENDER_ROOT}/include
         ${LABRENDER_ROOT}/extras/imgui
+        ${GLEW_INCLUDE_DIR}
+        ${GLFW_INCLUDE_DIR}
 
     PUBLIC_HEADERS
         ${LABRENDER_ROOT}/extras/imgui/imconfig.h

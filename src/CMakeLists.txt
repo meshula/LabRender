@@ -6,6 +6,17 @@ if (APPLE)
     set(DARWIN_SRC TextureLoader.mm)
 endif()
 
+lab_library(LabRenderTypes
+    TYPE STATIC
+    ALIAS LabRender::Types
+
+    PUBLIC_HEADERS
+        ../include/LabRenderTypes/Texture.h
+
+    CPPFILES
+        odr.cpp
+)
+
 lab_library(LabRender
     TYPE SHARED
     ALIAS LabRender::Core
@@ -50,6 +61,7 @@ lab_library(LabRender
         ../include/LabRender/Utils.h
         ../include/LabRender/Vertex.h
         ../include/LabRender/ViewMatrices.h
+        ../include/LabRenderTypes/Texture.h
 
     PRIVATE_HEADERS
         tinyheaders/tinyalloc.h

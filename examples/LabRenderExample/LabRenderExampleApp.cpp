@@ -42,7 +42,7 @@ public:
 class LoadMeshCommand : public lab::Command
 {
 public:
-    LoadMeshCommand(lab::Renderer * renderer, lab::DrawList * drawlist)
+    LoadMeshCommand(lab::Render::Renderer * renderer, lab::Render::DrawList * drawlist)
     : _renderer(renderer), _drawlist(drawlist)
     {
         run =
@@ -51,12 +51,12 @@ public:
                 string filepath = args[0].stringArg;
                 _renderer->enqueCommand([this, filepath]() 
                 {
-                    shared_ptr<lab::Model> model = lab::loadMesh(filepath);
+                    shared_ptr<lab::Render::Model> model = lab::Render::loadMesh(filepath);
                     if (model) 
                     {
                         _drawlist->deferredMeshes.clear();
                         for (auto& i : model->parts())
-                            _drawlist->deferredMeshes.emplace_back(std::pair<lab::m44f, std::shared_ptr<lab::ModelBase>>( lab::m44f_identity, i ));
+                            _drawlist->deferredMeshes.emplace_back(std::pair<lab::m44f, std::shared_ptr<lab::Render::ModelBase>>( lab::m44f_identity, i ));
                     }
                 });
             };
@@ -67,8 +67,8 @@ public:
     virtual ~LoadMeshCommand() {}
     virtual std::string name() const override { return "loadMesh"; }
 
-    lab::Renderer * _renderer;
-    lab::DrawList * _drawlist;
+    lab::Render::Renderer * _renderer;
+    lab::Render::DrawList * _drawlist;
 };
 
 
@@ -76,8 +76,8 @@ public:
 
 class LabRenderExampleApp : public lab::GLFWAppBase {
 public:
-    shared_ptr<lab::PassRenderer> dr;
-    lab::DrawList drawList;
+    shared_ptr<lab::Render::PassRenderer> dr;
+    lab::Render::DrawList drawList;
     lab::Camera camera;
 	lab::CameraRigMode cameraRigMode;
 
@@ -98,11 +98,11 @@ public:
 		else
 			lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
 
-		//std::string path = "{ASSET_ROOT}/pipelines/deferred.json";
+		std::string path = "{ASSET_ROOT}/pipelines/deferred.json";
 		//std::string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
-		std::string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
+		//std::string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
 		std::cout << "Loading pipeline configuration " << path << std::endl;
-        dr = make_shared<lab::PassRenderer>();
+        dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());
     }
 
@@ -111,11 +111,11 @@ public:
         auto& meshes = drawList.deferredMeshes;
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
-        shared_ptr<lab::Model> model = lab::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
+        shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
         for (auto& i : model->parts())
             meshes.push_back({ lab::m44f_identity, i });
 
-		shared_ptr<lab::UtilityModel> cube = make_shared<lab::UtilityModel>();
+		shared_ptr<lab::Render::UtilityModel> cube = make_shared<lab::Render::UtilityModel>();
 		cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
         meshes.push_back({ lab::m44f_identity, cube });
 
@@ -147,7 +147,7 @@ public:
         drawList.view = camera.mount.viewTransform();
         drawList.proj = lab::perspective(camera.sensor, camera.optics, float(fbSize.x) / float(fbSize.y));
 
-        lab::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
+        lab::Render::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
 		v2i fbOffset = V2I(0, 0);
         renderStart(rl, renderTime(), fbOffset, fbSize);
 
@@ -156,7 +156,7 @@ public:
         renderEnd(rl);
 
         lab::checkError(lab::ErrorPolicy::onErrorThrow,
-                              lab::TestConditions::exhaustive, "main loop end");
+                        lab::TestConditions::exhaustive, "main loop end");
     }
 
     virtual void keyPress(int key) override {

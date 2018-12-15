@@ -32,11 +32,13 @@ using std::unique_ptr;
 using std::vector;
 using std::string;
 
-namespace lab {
+namespace lab { namespace Render {
 
-    std::shared_ptr<Shader> ModelPart::makeShader(FrameBuffer& fbo, ModelPart& mesh,
-                                                  ModelPart::ShaderType shaderType,
-                                                  char const*const vshSrc, char const*const fshSrc) 
+    std::shared_ptr<Shader> ModelPart::makeShader(
+        const FrameBuffer& fbo, const std::vector<std::string>& output_attachments,
+        ModelPart& mesh,
+        ModelPart::ShaderType shaderType,
+        char const*const vshSrc, char const*const fshSrc)
 	{
         checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "ModelPart::makeShader begin");
         VAO* const vao = mesh.verts();
@@ -141,25 +143,35 @@ namespace lab {
         if (hasTextureCubeAttr || shaderType == ShaderType::skyShader) 
             uniforms[6].type = SemanticType::samplerCube_st;
 
-        sb.setFrameBufferOutputs(fbo);
+        std::vector<Semantic> samplers;
+        for (auto i : output_attachments)
+        {
+            std::string n = "u_" + i + "Texture";
+            samplers.push_back({SemanticType::sampler2D_st, n, AutomaticUniform::none, 0});
+        }
+
+        sb.setFrameBufferOutputs(fbo, output_attachments);
         sb.setAttributes(mesh);
         sb.setVaryings(varyings, hasVertexColorAttr? 4 : 3);
         sb.setUniforms(uniforms, sizeof(uniforms)/sizeof(Semantic));
+        if (samplers.size() > 0)
+            sb.setSamplers(&samplers[0], samplers.size());
         std::shared_ptr<Shader> shader = std::make_shared<Shader>();
 
         // vertex shader
         string vsh;
         if (vshSrc)
             vsh.assign(vshSrc);
-        else {
+        else 
+        {
             vsh = "void main() {\n" glsl(
-                                         vec4 pos = vec4(a_position, 1.0);
-                                         vec4 n = u_rotationTransform * vec4(a_normal, 1.0);
-                                         vec4 newPos = u_modelViewProj * pos;
-                                         gl_Position = newPos;
-                                         vert.v_pos = newPos;
-                                         vert.v_normal = n.xyz;
-                                         );
+                        vec4 pos = vec4(a_position, 1.0);
+                        vec4 n = u_rotationTransform * vec4(a_normal, 1.0);
+                        vec4 newPos = u_modelViewProj * pos;
+                        gl_Position = newPos;
+                        vert.v_pos = newPos;
+                        vert.v_normal = n.xyz;
+                        );
 
             if (shaderType == ShaderType::skyShader) vsh += "\n vert.v_uvw = normalize(a_position.xyz); \n";
             else if (hasTextureCubeAttr)             vsh += "\n vert.v_uvw = a_uvw; \n";
@@ -173,9 +185,11 @@ namespace lab {
         string fsh;
         if (fshSrc)
             fsh.assign(fshSrc);
-        else {
+        else 
+        {
             fsh = "void main() { \n";
-            if (deferred) {
+            if (deferred) 
+            {
                 fsh += glsl( o_normalTexture = vec4(vert.v_normal, 1.0);
                              o_positionTexture = vert.v_pos; );
                 if (hasTexture && hasVertexColorAttr)
@@ -189,7 +203,8 @@ namespace lab {
                 else
                     fsh += glsl( o_diffuseTexture = vec4(1.0,1.0,1.0,1.0); );
             }
-            else {
+            else 
+            {
                 // forward shaded
                 if (shaderType == ShaderType::skyShader)
                     fsh += glsl(float ndotl = 1.0;);        // emissive
@@ -219,16 +234,22 @@ namespace lab {
 
 
 
-    void ModelPart::draw(FrameBuffer& fbo, Renderer::RenderLock& rl) {
-        if (_verts && !_shader) {
+    void ModelPart::draw(
+        const FrameBuffer& fbo, const std::vector<std::string>& output_attachments,
+        Renderer::RenderLock& rl) 
+    {
+        if (_verts && !_shader) 
+        {
             string vsh;
             string fsh;
 
-            if (!!material) {
+            if (!!material) 
+            {
                 shared_ptr<InOut> vsIO = material->propertyInlet(ShaderMaterial::vertexShaderFileName());
                 shared_ptr<InOut> fsIO = material->propertyInlet(ShaderMaterial::fragmentShaderFileName());
 
-                if (!!vsIO && !!fsIO) {
+                if (!!vsIO && !!fsIO) 
+                {
                     string vs = vsIO->value<string>();
                     string fs = fsIO->value<string>();
                     //const OutletData<string>* vs = vsIO->out<string>();
@@ -237,7 +258,8 @@ namespace lab {
                     //const char* n = vs->value().c_str();
                     //FILE* f = fopen(n, "rb");
                     FILE* f = fopen(vs.c_str(), "rb");
-                    if (f) {
+                    if (f) 
+                    {
                         fseek(f, 0, SEEK_END);
                         size_t l = ftell(f);
                         fseek(f, 0, SEEK_SET);
@@ -250,7 +272,8 @@ namespace lab {
                     //n = fs->value().c_str();
                     //f = fopen(n, "rb");
                     f = fopen(fs.c_str(), "rb");
-                    if (f) {
+                    if (f) 
+                    {
                         fseek(f, 0, SEEK_END);
                         size_t l = ftell(f);
                         fseek(f, 0, SEEK_SET);
@@ -263,17 +286,21 @@ namespace lab {
                 }
             }
 
-            if (!vsh.length() || !fsh.length()) {
+            if (!vsh.length() || !fsh.length()) 
+            {
                 // if a shader has not been externally supplied, assume a default mesh shader
-                _shader = makeShader(fbo, *this, _shaderType, 0, 0);
+                _shader = makeShader(fbo, output_attachments, *this, _shaderType, 0, 0);
             }
-            else {
-                _shader = makeShader(fbo, *this, _shaderType, vsh.c_str(), fsh.c_str());
+            else 
+            {
+                _shader = makeShader(fbo, output_attachments, *this, _shaderType, vsh.c_str(), fsh.c_str());
             }
         }
-        if (_verts && _shader) {
+        if (_verts && _shader) 
+        {
             _shader->bind(rl);
-            if (_shaderType == ShaderType::skyShader) {
+            if (_shaderType == ShaderType::skyShader) 
+            {
                 lab::m44f invMv = rl.context.viewMatrices.mv;
                 // remove translation
                 invMv[3].x = 0;
@@ -283,7 +310,8 @@ namespace lab {
                 lab::m44f mvproj = matrix_multiply(rl.context.viewMatrices.projection, invMv);
                 _shader->uniform("u_modelViewProj", mvproj);
             }
-            else {
+            else 
+            {
                 _shader->uniform("u_view", rl.context.viewMatrices.view);
                 _shader->uniform("u_modelView", rl.context.viewMatrices.mv);
                 _shader->uniform("u_modelViewProj", rl.context.viewMatrices.mvp);
@@ -299,9 +327,11 @@ namespace lab {
             bool depthWriteSet = true;
             bool depthRangeSet = false;
             bool depthFuncSet = false;
-            if (!!material) {
+            if (!!material) 
+            {
                 shared_ptr<InOut> baseColorInOut = material->propertyInlet(ShaderMaterial::baseColorName());
-                if (!!baseColorInOut) {
+                if (!!baseColorInOut) 
+                {
                     shared_ptr<Texture> texture = baseColorInOut->value<shared_ptr<Texture>>();
                     int unit = rl.context.activeTextureUnit;
                     texture->bind(unit);
@@ -309,18 +339,21 @@ namespace lab {
                     rl.context.activeTextureUnit++;
                 }
                 shared_ptr<InOut> dwInOut = material->propertyInlet(ShaderMaterial::depthWriteName());
-                if (!!dwInOut) {
+                if (!!dwInOut) 
+                {
                     depthWriteSet = dwInOut->value<float>() > 0;
                     glDepthMask(depthWriteSet? GL_TRUE : GL_FALSE);
                 }
                 shared_ptr<InOut> drIO = material->propertyInlet(ShaderMaterial::depthRangeName());
-                if (!!drIO) {
+                if (!!drIO) 
+                {
                     v2f drange = drIO->value<v2f>();
                     glDepthRange(drange.x, drange.y);
                     depthRangeSet = true;
                 }
                 shared_ptr<InOut> dfIO = material->propertyInlet(ShaderMaterial::depthFuncName());
-                if (!!dfIO) {
+                if (!!dfIO) 
+                {
                     depthFuncSet = true;
                     int dfunc = GL_LESS;
                     string df = dfIO->value<string>();
@@ -341,32 +374,35 @@ namespace lab {
             //
             _verts->draw();
             
-            if (!depthWriteSet) {
+            if (!depthWriteSet)
                 glDepthMask(GL_TRUE);
-            }
-            if (!depthRangeSet) {
+
+            if (!depthRangeSet)
                 glDepthRange(0, 1);
-            }
-            if (!depthFuncSet) {
+
+            if (!depthFuncSet)
                 glDepthFunc(GL_LESS);
-            }
+
             _shader->unbind();
         }
     }
 
-    void ModelPart::setVAO(std::unique_ptr<VAO> vao, Bounds localBounds) {
+    void ModelPart::setVAO(std::unique_ptr<VAO> vao, Bounds localBounds) 
+    {
         _verts = std::move(vao);
         _localBounds = localBounds;
     }
 
 
-    Bounds Model::localBounds() const {
+    Bounds Model::localBounds() const 
+    {
         Bounds bounds;
         bounds.first = {FLT_MAX, FLT_MAX, FLT_MAX};
         bounds.second = {-FLT_MAX, -FLT_MAX, -FLT_MAX};
         for (auto p : _parts)
             bounds = extendBounds(bounds, p->localBounds());
+
         return bounds;
     }
 
-}
+}} // lab::Render

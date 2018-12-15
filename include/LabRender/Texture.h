@@ -16,7 +16,7 @@
 #include <map>
 #include <vector>
 
-namespace lab {
+namespace lab { namespace Render {
 
     struct Texture
     {
@@ -44,20 +44,24 @@ namespace lab {
         void bind(int unit = 0) const;
         void unbind(int unit = 0) const;
 
-        Texture & create(int w, int h, TextureType, int filter, int wrap);
+        Texture & create(int w, int h, Render::TextureType, int filter, int wrap);
 
-        Texture & create(int w, int h, TextureType resultType, int filter, int wrap, TextureType srcDataType, void *data);
-        Texture & create(int w, int h, int depth, TextureType resultType, int filter, int wrap, TextureType srcDataType, void *data);
+        Texture & create(int w, int h, Render::TextureType resultType, int filter, int wrap, 
+                         Render::TextureType srcDataType, void *data);
+        Texture & create(int w, int h, int depth, Render::TextureType resultType, int filter, int wrap, 
+                         Render::TextureType srcDataType, void *data);
 
         // create a depth texture
         Texture & createDepth(int w, int h);
 
         // cube from faces
-        Texture & createCube(int w, int h, TextureType resultType, int filter, int wrap, TextureType srcDataType,
+        Texture & createCube(int w, int h, Render::TextureType resultType, int filter, int wrap, 
+                             Render::TextureType srcDataType,
                              void* px, void* nx, void* py, void* ny, void* pz, void* nz);
 
         enum class CubeImageDataType { vstrip };
-        Texture & createCube(int w, int h, TextureType resultType, int filter, int wrap, TextureType srcDataType,
+        Texture & createCube(int w, int h, Render::TextureType resultType, int filter, int wrap, 
+                             Render::TextureType srcDataType,
                              CubeImageDataType cubeType, void* image);
 
         // offset is the texel offset in the texture where the data will be copied
@@ -112,4 +116,4 @@ namespace lab {
     SemanticType glFormatToSemanticType(int f);
     SemanticType textureTypeToSemanticType(TextureType type);
 
-} // Lab
+}} // lab::Render

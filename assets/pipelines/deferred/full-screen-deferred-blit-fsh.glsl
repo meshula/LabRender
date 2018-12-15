@@ -6,9 +6,9 @@ void main()
     float i = dot(normal, normal);
     if (i > 0.0) {
         i = dot(normal, light);
-        o_colorTexture = texture(u_diffuseTexture, vert.v_texCoord) * vec4(i,i,i, 1);
+        color = texture(u_diffuseTexture, vert.v_texCoord) * vec4(i,i,i, 1);
     }
     else {
-        o_colorTexture = texture(u_diffuseTexture, vert.v_texCoord);
+        color = texture(u_diffuseTexture, vert.v_texCoord);
     }
 }

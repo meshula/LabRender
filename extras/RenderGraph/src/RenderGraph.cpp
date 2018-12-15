@@ -1,10 +1,13 @@
 
 #include <LabRenderGraph/LabRenderGraph.h>
+#include <LabRenderTypes/Texture.h>
 
 #include <LabText/TextScanner.h>
 
 #include <iostream>
 #include <string>
+#include <sstream>
+
 using namespace lab::Text;
 using namespace lab::Render;
 
@@ -190,7 +193,7 @@ SemanticTypeData semanticTypeData[] = {
 
 int semanticTypeElementCount(SemanticType t) 
 {
-    if (t > SemanticType::unknown_st)
+    if (t >= SemanticType::unknown_st)
         return 1;
 
     unsigned int index = static_cast<typename std::underlying_type<SemanticType>::type>(t);
@@ -199,7 +202,7 @@ int semanticTypeElementCount(SemanticType t)
 
 int semanticTypeStride(SemanticType t) 
 {
-    if (t > SemanticType::unknown_st)
+    if (t >= SemanticType::unknown_st)
         return sizeof(int);
 
     unsigned int index = static_cast<typename std::underlying_type<SemanticType>::type>(t);
@@ -208,7 +211,7 @@ int semanticTypeStride(SemanticType t)
 
 const char* semanticTypeName(SemanticType t) 
 {
-    if (t > SemanticType::unknown_st)
+    if (t >= SemanticType::unknown_st)
         return semanticTypeData[static_cast<typename std::underlying_type<SemanticType>::type>(SemanticType::unknown_st)].name;
 
     unsigned int index = static_cast<typename std::underlying_type<SemanticType>::type>(t);
@@ -264,41 +267,41 @@ pass_draw pass_draw_from_str(StrView str)
     return pass_draw::none;
 }
 
-texture_type texture_type_from_str(StrView str)
+TextureType TextureType_from_str(StrView str)
 {
     static StrView tok_f32x1{"f32x1", 5};
-    if (str == tok_f32x1) return texture_type::f32x1;
+    if (str == tok_f32x1) return TextureType::f32x1;
     static StrView tok_f32x2{"f32x2", 5};
-    if (str == tok_f32x2) return texture_type::f32x2;
+    if (str == tok_f32x2) return TextureType::f32x2;
     static StrView tok_f32x3{"f32x3", 5};
-    if (str == tok_f32x3) return texture_type::f32x3;
+    if (str == tok_f32x3) return TextureType::f32x3;
     static StrView tok_f32x4{"f32x4", 5};
-    if (str == tok_f32x4) return texture_type::f32x4;
+    if (str == tok_f32x4) return TextureType::f32x4;
     static StrView tok_f16x1{"f16x1", 5};
-    if (str == tok_f16x1) return texture_type::f16x1;
+    if (str == tok_f16x1) return TextureType::f16x1;
     static StrView tok_f16x2{"f16x2", 5};
-    if (str == tok_f16x2) return texture_type::f16x2;
+    if (str == tok_f16x2) return TextureType::f16x2;
     static StrView tok_f16x3{"f16x3", 5}; 
-    if (str == tok_f16x3) return texture_type::f16x3;
+    if (str == tok_f16x3) return TextureType::f16x3;
     static StrView tok_f16x4{"f16x4", 5};
-    if (str == tok_f16x4) return texture_type::f16x4;
+    if (str == tok_f16x4) return TextureType::f16x4;
     static StrView tok_u8x1{"u8x1", 4};
-    if (str == tok_u8x1) return texture_type::u8x1;
+    if (str == tok_u8x1) return TextureType::u8x1;
     static StrView tok_u8x2{"u8x2", 4};
-    if (str == tok_u8x2) return texture_type::u8x2;
+    if (str == tok_u8x2) return TextureType::u8x2;
     static StrView tok_u8x3{"u8x3", 4};
-    if (str == tok_u8x3) return texture_type::u8x3;
+    if (str == tok_u8x3) return TextureType::u8x3;
     static StrView tok_u8x4{"u8x4", 4};
-    if (str == tok_u8x4) return texture_type::u8x4;
+    if (str == tok_u8x4) return TextureType::u8x4;
     static StrView tok_s8x1{"s8x1", 4};
-    if (str == tok_s8x1) return texture_type::s8x1;
+    if (str == tok_s8x1) return TextureType::s8x1;
     static StrView tok_s8x2{"s8x2", 4};
-    if (str == tok_s8x2) return texture_type::s8x2;
+    if (str == tok_s8x2) return TextureType::s8x2;
     static StrView tok_s8x3{"s8x3", 4};  
-    if (str == tok_s8x3) return texture_type::s8x3;
+    if (str == tok_s8x3) return TextureType::s8x3;
     static StrView tok_s8x4{"s8x4", 4};
-    if (str == tok_s8x4) return texture_type::s8x4;
-    return texture_type::none;
+    if (str == tok_s8x4) return TextureType::s8x4;
+    return TextureType::none;
 }
 
 StrView parse_uniforms(StrView curr, std::vector<uniform>& uniforms)
@@ -359,6 +362,7 @@ StrView parse_shader(StrView curr, program& prg)
 
         static StrView tok_source{ "source", 6 };
         static StrView tok_uniforms{ "uniforms", 8 };
+        static StrView tok_attributes{ "attributes", 10 };
 
         StrView str_token;
         StrView next = ScanForNonWhiteSpace(GetToken(curr, ':', str_token));
@@ -390,6 +394,10 @@ StrView parse_shader(StrView curr, program& prg)
         {
             next = parse_uniforms(next, prg.uniforms);
         }
+        else if (str_token == tok_attributes)
+        {
+            next = parse_uniforms(next, prg.attributes);
+        }
         else
             return curr;
 
@@ -405,7 +413,7 @@ StrView parse_pass(StrView start, labfx& fx)
     StrView curr = ScanForEndOfLine(start, str_token);
     str_token = ScanForNonWhiteSpace(str_token);
     str_token = Expect(str_token, StrView{":", 1});
-    str_token = ScanForNonWhiteSpace(str_token);
+    str_token = Strip(ScanForNonWhiteSpace(str_token));
     fx.passes.back().name = std::string(str_token.curr, str_token.sz);
 
     bool in_pass = true;
@@ -437,7 +445,7 @@ StrView parse_pass(StrView start, labfx& fx)
             curr = ScanForEndOfLine(curr, str_token);
             str_token = ScanForNonWhiteSpace(str_token);
             str_token = Expect(str_token, StrView{":", 1});
-            str_token = ScanForNonWhiteSpace(str_token);
+            str_token = Strip(ScanForNonWhiteSpace(str_token));
             fx.passes.back().shader = std::string(str_token.curr, str_token.sz);
             break;
 
@@ -445,7 +453,7 @@ StrView parse_pass(StrView start, labfx& fx)
             curr = ScanForEndOfLine(curr, str_token);
             str_token = ScanForNonWhiteSpace(str_token);
             str_token = Expect(str_token, StrView{":", 1});
-            str_token = ScanForNonWhiteSpace(str_token);
+            str_token = Strip(ScanForNonWhiteSpace(str_token));
             fx.passes.back().draw = pass_draw_from_str(str_token);
             break;
 
@@ -453,7 +461,7 @@ StrView parse_pass(StrView start, labfx& fx)
             curr = ScanForEndOfLine(curr, str_token);
             str_token = ScanForNonWhiteSpace(str_token);
             str_token = Expect(str_token, StrView{":", 1});
-            str_token = ScanForNonWhiteSpace(str_token);
+            str_token = Strip(ScanForNonWhiteSpace(str_token));
             fx.passes.back().clear_depth = str_token == tok_yes || str_token == tok_true;
             break;
 
@@ -461,7 +469,7 @@ StrView parse_pass(StrView start, labfx& fx)
             curr = ScanForEndOfLine(curr, str_token);
             str_token = ScanForNonWhiteSpace(str_token);
             str_token = Expect(str_token, StrView{":", 1});
-            str_token = ScanForNonWhiteSpace(str_token);
+            str_token = Strip(ScanForNonWhiteSpace(str_token));
             fx.passes.back().write_depth = str_token == tok_yes || str_token == tok_true;
             break;
 
@@ -469,7 +477,7 @@ StrView parse_pass(StrView start, labfx& fx)
             curr = ScanForEndOfLine(curr, str_token);
             str_token = ScanForNonWhiteSpace(str_token);
             str_token = Expect(str_token, StrView{":", 1});
-            str_token = ScanForNonWhiteSpace(str_token);
+            str_token = Strip(ScanForNonWhiteSpace(str_token));
             fx.passes.back().clear_outputs = str_token == tok_yes || str_token == tok_true;
             break;
 
@@ -477,7 +485,7 @@ StrView parse_pass(StrView start, labfx& fx)
             curr = ScanForEndOfLine(curr, str_token);
             str_token = ScanForNonWhiteSpace(str_token);
             str_token = Expect(str_token, StrView{":", 1});
-            str_token = ScanForNonWhiteSpace(str_token);
+            str_token = Strip(ScanForNonWhiteSpace(str_token));
             fx.passes.back().test = depth_test_from_str(str_token);
             break;
 
@@ -564,7 +572,7 @@ void Report(char const*const msg, StrView detail)
 } // anon
 
 
-LRG_API void* parse_labfx(char const*const input, size_t length)
+LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
 {
     labfx* fx_ptr = new labfx;
     labfx& fx = *fx_ptr;
@@ -726,8 +734,8 @@ LRG_API void* parse_labfx(char const*const input, size_t length)
 
                         for (size_t i = 1; i < crumbs.size(); ++i)
                         {
-                            texture_type tx_t = texture_type_from_str(crumbs[i]);
-                            if (tx_t != texture_type::none)
+                            TextureType tx_t = TextureType_from_str(crumbs[i]);
+                            if (tx_t != TextureType::none)
                                 curr_texture.format = tx_t;
                             else
                             {
@@ -767,11 +775,66 @@ LRG_API void* parse_labfx(char const*const input, size_t length)
         delete fx_ptr;
         return nullptr;
     }
-    return reinterpret_cast<void*>(fx_ptr);
+    return reinterpret_cast<labfx_t*>(fx_ptr);
 }
 
-void free_labfx(void* fx)
+void free_labfx(labfx_t* fx)
 {
     labfx* fx_ptr = reinterpret_cast<labfx*>(fx);
     delete fx_ptr;
+}
+
+static std::string compile(const program& prg, const std::vector<uniform>& varyings)
+{
+    std::stringstream ss;
+    ss << "\
+#version 410\n\
+#extension GL_ARB_explicit_attrib_location: enable\n\
+#extension GL_ARB_separate_shader_objects: enable\n\
+#define texture2D texture\n";
+
+    int loc = 0;
+    for (auto a : prg.attributes)
+    {
+        ss << "layout(location = " << loc++ << ") in ";
+        ss << semanticTypeToString(a.type) << " " << a.name << ";\n";
+    }
+
+    for (auto a : prg.uniforms)
+        ss << "uniform " << semanticTypeToString(a.type) << " " << a.name << ";\n";
+
+    if (varyings.size() > 0) 
+    {
+        if (prg.type == program_type::vsh)
+            ss << "out ";
+        else
+            ss << "in ";
+        ss << "Var {\n";
+        for (auto a : varyings)
+            ss << "   " << semanticTypeToString(a.type) << " " << a.name << ";" << std::endl;
+        ss << "} var;\n";
+    }
+    ss << prg.source << std::endl;
+    return ss.str();
+}
+
+labfx_gen_t* generate_shaders(labfx_t* fx)
+{
+    labfx* fx_ptr = reinterpret_cast<labfx*>(fx);
+    if (!fx_ptr)
+        return nullptr;
+
+    generated_shaders* gen = new generated_shaders();
+    for (const auto& sh : fx_ptr->shaders)
+    {
+        gen->vsh.push_back(compile(sh.vsh, sh.varyings));
+        gen->fsh.push_back(compile(sh.fsh, sh.varyings));
+    }
+    return reinterpret_cast<labfx_gen_t*>(gen);
+}
+
+void free_labfx_gen(labfx_gen_t* t)
+{
+    generated_shaders* gen = reinterpret_cast<generated_shaders*>(t);;
+    delete gen;
 }

@@ -12,7 +12,7 @@
 #include <LabRender/Uniform.h>
 #include <LabMath/LabMath.h>
 
-namespace lab {
+namespace lab { namespace Render {
     
     // Use this macro to pass raw GLSL to Shader::shader()
     #define glsl(x) #x
@@ -53,4 +53,4 @@ namespace lab {
         void uniform(const char *name, const m44f &m, bool transpose = false) const;
     };
     
-}
+}}

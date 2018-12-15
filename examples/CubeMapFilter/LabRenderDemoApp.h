@@ -53,7 +53,7 @@ namespace lab {
             return false;
         }
 
-        virtual void renderStart(PassRenderer::RenderLock & rl, double globalTime, v2i offset, v2i size) {
+        virtual void renderStart(Render::PassRenderer::RenderLock & rl, double globalTime, v2i offset, v2i size) {
             if (!rl.valid() || rl.renderInProgress())
                 return;
 
@@ -61,16 +61,16 @@ namespace lab {
             rl.context.renderTime = globalTime;
             doRenderStart(rl, offset, size);
         }
-        virtual void doRenderStart(PassRenderer::RenderLock &, v2i offset, v2i size) = 0;
+        virtual void doRenderStart(Render::PassRenderer::RenderLock &, v2i offset, v2i size) = 0;
 
-        virtual void renderEnd(PassRenderer::RenderLock& rl) {
+        virtual void renderEnd(Render::PassRenderer::RenderLock& rl) {
             if (!rl.valid() || !rl.renderInProgress())
                 return;
 
             doRenderEnd(rl);
             rl.setRenderInProgress(false);
         }
-        virtual void doRenderEnd(PassRenderer::RenderLock &) = 0;
+        virtual void doRenderEnd(Render::PassRenderer::RenderLock &) = 0;
 
         virtual double renderTime() const = 0;
 
@@ -242,7 +242,7 @@ namespace lab {
         }
 
     protected:
-        virtual void doRenderStart(PassRenderer::RenderLock & rl, v2i offset, v2i size) override {
+        virtual void doRenderStart(Render::PassRenderer::RenderLock & rl, v2i offset, v2i size) override {
             if (!rl.valid())
                 return;
 
@@ -251,7 +251,7 @@ namespace lab {
             glClear(GL_COLOR_BUFFER_BIT);
         }
 
-        virtual void doRenderEnd(PassRenderer::RenderLock & rl) override {
+        virtual void doRenderEnd(Render::PassRenderer::RenderLock & rl) override {
             if (!rl.valid())
                 return;
 

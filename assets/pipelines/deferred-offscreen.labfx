@@ -38,6 +38,7 @@ pass: geometry
   clear depth: no
   depth test: less
   write depth: yes
+  use shader: mesh
   outputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
 
 pass: sky
@@ -58,9 +59,12 @@ pass: post process and blit
   outputs: [ resolve.color ]
 
 --------------------------------------------------------------------------------
-shader: sky
+shader: mesh
 
     vsh:
+        attributes:
+        [ a_position: vec3 <- position ]
+
         uniforms:
         [ u_skyMatrix: mat4 <- auto-sky-matrix ]
 
@@ -68,14 +72,16 @@ shader: sky
         ```glsl
             void main() {
               vec4 pos = vec4(a_position, 1.0);
-              vert.v_eyeDirection = (u_skyMatrix * pos).xyz;
+              var.eyeDirection = (u_skyMatrix * pos).xyz;
               pos.z = 1.0; // maximum depth value as sentinel to enable writing
               gl_Position = pos;
+              @color@
             }
         ```
 
     varying:
-       [ v_eyeDirection: vec3 ]
+       [ eyeDirection: vec3,
+         normal: vec3 ]
 
     fsh:
         uniforms:
@@ -84,8 +90,42 @@ shader: sky
         source:
         ```glsl
             void main() {
-              //o_diffuseTexture = vec4(texture(skyCube, vert.v_eyeDirection).xyz, 1.0);
-              o_diffuseTexture = vec4(0.5 * clamp(1.0 - vert.v_eyeDirection.y, 0, 1), 0.5 * clamp(vert.v_eyeDirection.y, 0, 1), 0, 1);
+              @color@
+            }
+        ```
+
+--------------------------------------------------------------------------------
+shader: sky
+
+    vsh:
+        attributes:
+        [ a_position: vec3 <- position ]
+
+        uniforms:
+        [ u_skyMatrix: mat4 <- auto-sky-matrix ]
+
+        source:
+        ```glsl
+            void main() {
+              vec4 pos = vec4(a_position, 1.0);
+              var.eyeDirection = (u_skyMatrix * pos).xyz;
+              pos.z = 1.0; // maximum depth value as sentinel to enable writing
+              gl_Position = pos;
+            }
+        ```
+
+    varying:
+       [ eyeDirection: vec3 ]
+
+    fsh:
+        uniforms:
+           [ skyCube: samplerCube ]
+
+        source:
+        ```glsl
+            void main() {
+                //o_diffuseTexture = vec4(texture(skyCube, var.eyeDirection).xyz, 1.0);
+                o_diffuseTexture = vec4(0.5 * clamp(1.0 - var.eyeDirection.y, 0, 1), 0.5 * clamp(var.eyeDirection.y, 0, 1), 0, 1);
                 o_diffuseTexture.x = 0;
             }
         ```
@@ -93,10 +133,14 @@ shader: sky
 shader: full-screen-deferred-quad
 
     vsh:
+        attributes:
+        [ a_position: vec3 <- position,
+          a_uv: vec2 <- texcoord ]
+
         source:
         ```glsl
             void main() {
-              vert.v_texCoord = a_uv;
+              var.v_texCoord = a_uv;
               gl_Position = vec4(a_position, 1.0);
             }
         ```
@@ -106,21 +150,21 @@ shader: full-screen-deferred-quad
     fsh:
         uniforms:
             [ u_normalTexture: sampler2d,
-             u_diffuseTexture: sampler2d ]
+              u_diffuseTexture: sampler2d ]
 
         source:
         ```glsl
             void main()
             {
-                vec3 normal = texture(u_normalTexture, vert.v_texCoord).xyz;
+                vec3 normal = texture(u_normalTexture, var.v_texCoord).xyz;
                 vec3 light = normalize(vec3(0.1, 0.4, 0.2));
                 float i = dot(normal, normal);
                 if (i > 0.0) {
                     i = dot(normal, light);
-                    o_colorTexture = texture(u_diffuseTexture, vert.v_texCoord) * vec4(i,i,i, 1);
+                    o_colorTexture = texture(u_diffuseTexture, var.v_texCoord) * vec4(i,i,i, 1);
                 }
                 else {
-                    o_colorTexture = texture(u_diffuseTexture, vert.v_texCoord);
+                    o_colorTexture = texture(u_diffuseTexture, var.v_texCoord);
                 }
             }
         ```

@@ -1,7 +1,6 @@
 
 #pragma once
 
-
 #if defined(_MSC_VER) && defined(LABRENDER_RENDERGRAPH_DLL)
 # ifdef BUILDING_LabRenderGraph
 #  define LRG_CAPI extern "C" __declspec(dllexport)
@@ -18,32 +17,26 @@
 # define LRG_CLASS
 #endif
 
+// can be reinterpret casted to labfx
+struct labfx_t {};
 
-LRG_API void* parse_labfx(char const*const input, size_t length);
-LRG_API void free_labfx(void*);
+// can be reinterpret casted to generated_shaders
+struct labfx_gen_t {};
+
+LRG_API labfx_t* parse_labfx(char const*const input, size_t length);
+LRG_API void free_labfx(labfx_t*);
+LRG_API labfx_gen_t* generate_shaders(labfx_t*);
+LRG_API void free_labfx_gen(labfx_gen_t*);
 
 #ifdef __cplusplus
+
+#include <LabRenderTypes/Texture.h>
 
 #include <string>
 #include <vector>
 
 namespace lab { namespace Render {
 
-enum class texture_type
-{
-    none,
-    f32x1, f32x2, f32x3, f32x4,
-    f16x1, f16x2, f16x3, f16x4,
-    u8x1,  u8x2,  u8x3,  u8x4,
-    s8x1,  s8x2,  s8x3,  s8x4
-};
-
-struct texture
-{
-    std::string name;
-    texture_type format { texture_type::none };
-    float scale {1.f};
-};
 
 struct buffer
 {
@@ -76,7 +69,8 @@ struct pass
 };
 
 
-enum class SemanticType : unsigned int {
+enum class SemanticType : unsigned int 
+{
     bool_st = 0, bvec2_st, bvec3_st, bvec4_st,
     int_st, ivec2_st, ivec3_st, ivec4_st,
     uint_st, uvec2_st, uvec3_st, uvec4_st,
@@ -128,8 +122,15 @@ enum class program_type
 struct program
 {
     program_type type {program_type::none};
+    std::vector<uniform> attributes;
     std::vector<uniform> uniforms;
     std::string source;
+};
+
+struct generated_shaders
+{
+    std::vector<std::string> vsh;
+    std::vector<std::string> fsh;
 };
 
 struct shader
@@ -145,7 +146,7 @@ struct labfx
     std::string name;
     std::string version;
     std::vector<buffer> buffers;
-    std::vector<pass> passes;
+    std::vector<pass>   passes;
     std::vector<shader> shaders;
 };
 

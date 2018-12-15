@@ -13,8 +13,7 @@
 #include <string>
 #include <vector>
 
-namespace lab {
-
+namespace lab { namespace Render {
 
     // https://www.opengl.org/wiki/Data_Type_(GLSL)
     // https://www.opengl.org/wiki/Sampler_(GLSL)
@@ -54,8 +53,7 @@ namespace lab {
         unknown_st
     };
 
-
-
+    bool semanticTypeIsSampler(SemanticType t);
 	int semanticTypeToOpenGLElementType(SemanticType t);
 	int semanticTypeElementCount(SemanticType t);
 	int semanticTypeStride(SemanticType t);
@@ -64,4 +62,4 @@ namespace lab {
 	std::string semanticTypeToString(SemanticType st);
 
 
-} //lab
+}} //lab::Render

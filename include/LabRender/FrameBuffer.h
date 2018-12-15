@@ -15,8 +15,7 @@
 #include <vector>
 #include <string>
 
-namespace lab 
-{
+namespace lab { namespace Render {
 
     // A framebuffer object that takes color attachments. Draw calls between
     // bind() and unbind() are drawn to the attached textures.
@@ -43,8 +42,8 @@ namespace lab
         std::vector<std::string> baseNames;
         std::vector<std::string> drawBufferNames;
         std::vector<std::string> uniformNames;
-        std::vector<SemanticType> samplerType;
-        std::vector<std::shared_ptr<Texture>> textures;
+        std::vector<Render::SemanticType> samplerType;
+        std::vector<std::shared_ptr<Render::Texture>> textures;
 
         FrameBuffer(ErrorPolicy ep = ErrorPolicy::onErrorLogThrow, bool autoDepth = true, bool resizeViewport = true);
         ~FrameBuffer();
@@ -67,7 +66,7 @@ namespace lab
             public:
                 AttachmentSpec() {}
 
-                AttachmentSpec(const std::string & b, const std::string & o, const std::string & u, TextureType t)
+                AttachmentSpec(const std::string & b, const std::string & o, const std::string & u, Render::TextureType t)
                 : base_name(b), output_name(o), uniform_name(u), type(t) {}
 
                 AttachmentSpec(const AttachmentSpec & rh)
@@ -81,7 +80,7 @@ namespace lab
                 std::string base_name;
                 std::string output_name;
                 std::string uniform_name;
-                TextureType type;
+                Render::TextureType type;
             };
 
             FrameBufferSpec() {}
@@ -96,7 +95,7 @@ namespace lab
         // a 3D texture).
         // Uniform name is the name the attachment is to take during post processing
         FrameBuffer& attachColor(char const*const base_name, char const*const drawbuffer_name, char const*const uniform_name,
-                         const Texture &texture, unsigned int attachment = 0, unsigned int layer = 0);
+                         const Render::Texture &texture, unsigned int attachment = 0, unsigned int layer = 0);
 
         // Stop drawing to the indicated color attachment
         FrameBuffer& detachColor(unsigned int attachment = 0);
@@ -121,4 +120,4 @@ namespace lab
         std::map<std::string, std::pair<FrameBuffer::FrameBufferSpec, std::shared_ptr<FrameBuffer>>> _fbos;
     };
 
-} // LabRender
+}} // lab::Render

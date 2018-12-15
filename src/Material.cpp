@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 using namespace std;
-namespace lab {
+namespace lab { namespace Render {
 
     class Material::Detail 
 	{
@@ -48,4 +48,4 @@ namespace lab {
         return find->second;
     }
 
-} // Lab
+}}

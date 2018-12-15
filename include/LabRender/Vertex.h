@@ -22,7 +22,8 @@
 #   undef check
 #endif
 
-namespace lab {
+namespace lab { namespace Render {
+
     class VAO;
 
     // BufferBase provides a vertex layout of attribute names, semantics, and a stride
@@ -327,4 +328,4 @@ namespace lab {
         float color[4];
     };
 
-} // Lab
+}} // Lab::Render

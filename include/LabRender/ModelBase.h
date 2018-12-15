@@ -11,7 +11,7 @@
 #include "LabRender/Renderer.h"
 #include <memory>
 
-namespace lab {
+namespace lab { namespace Render {
     
     struct FrameBuffer;
     class Material;
@@ -21,10 +21,12 @@ namespace lab {
 		LR_API virtual ~ModelBase() { }
         virtual void update(double time) = 0;
         virtual void draw() = 0;
-        virtual void draw(FrameBuffer & fbo, Renderer::RenderLock &) = 0;
+        virtual void draw(
+            const FrameBuffer& fbo, const std::vector<std::string>& output_attachments, 
+            Renderer::RenderLock &) = 0;
         virtual Bounds localBounds() const = 0;
         
         std::shared_ptr<Material> material;
     };
 
-}
+}}

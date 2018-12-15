@@ -1528,7 +1528,7 @@ namespace cmft
     {
         if (_rgbe[3])
         {
-            const float exp = ldexp(1.0f, _rgbe[3] - (128+8));
+            const float exp = static_cast<float>(ldexp(1.0, _rgbe[3] - (128+8)));
             _rgba32f[0] = float(_rgbe[0]) * exp;
             _rgba32f[1] = float(_rgbe[1]) * exp;
             _rgba32f[2] = float(_rgbe[2]) * exp;

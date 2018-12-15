@@ -4,8 +4,7 @@
 #include <LabRender/Uniform.h>
 #include <LabRender/SemanticType.h>
 
-namespace lab
-{
+namespace lab { namespace Render {
     
 
     class Semantic {
@@ -105,4 +104,4 @@ namespace lab
         int location = 0;
     };
 
-}
+}} // lab::Render

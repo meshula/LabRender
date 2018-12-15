@@ -12,6 +12,7 @@
 
 using namespace std;
 using namespace lab;
+using namespace lab::Render;
 
 struct lab_render_mgr
 {
@@ -23,7 +24,7 @@ struct lab_render_mgr
     lab_renderer empty;
     v2i frame_buffer_size;
 
-    lab::DrawList drawList;
+    lab::Render::DrawList drawList;
 
     lab_render_mgr()
     {
@@ -156,7 +157,7 @@ struct lab_render_mgr
 
     lab_model model_load(const char* path)
     {
-        shared_ptr<lab::Model> model = lab::loadMesh(path);
+        shared_ptr<lab::Render::Model> model = lab::Render::loadMesh(path);
         models.push_back(model);
         lab_model r;
         r.handle = (int)(models.size() - 1);
@@ -221,7 +222,7 @@ struct lab_render_mgr
     lab_mesh mesh_cylinder(float radiusTop, float radiusBottom, float height,
         int radialSegments, int heightSegments, bool openEnded)
     {
-        shared_ptr<lab::UtilityModel> model = make_shared<lab::UtilityModel>();
+        shared_ptr<lab::Render::UtilityModel> model = make_shared<lab::Render::UtilityModel>();
         model->createCylinder(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded);
         meshes.push_back(model);
         lab_mesh r;

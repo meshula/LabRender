@@ -16,7 +16,7 @@
 #include "LabRender/ViewMatrices.h"
 #include <iostream>
 
-namespace lab {
+namespace lab { namespace Render {
 
     struct FrameBuffer;
 
@@ -42,7 +42,9 @@ namespace lab {
                 _verts->draw(); 
 		}
 
-		LR_API virtual void draw(FrameBuffer & fbo, Renderer::RenderLock &) override;
+		LR_API virtual void draw(
+            const FrameBuffer& fbo, const std::vector<std::string>& output_attachments,
+            Renderer::RenderLock &) override;
 
 		LR_API VAO * verts() const { return _verts.get(); }
 
@@ -52,8 +54,10 @@ namespace lab {
 		LR_API static char const*const defaultShaderSourceId() { return "default"; }
 
         // passing in nullptr for vshSrc or fshSrc will cause the corresponding shader to be auto generated
-		LR_API static std::shared_ptr<Shader> makeShader(FrameBuffer & fbo, ModelPart & mesh, ShaderType shaderType,
-                                                  char const*const vshSrc = 0, char const*const fshSrc = 0);
+        LR_API static std::shared_ptr<Shader> makeShader(
+            const FrameBuffer& fbo, const std::vector<std::string>& output_attachments, 
+            ModelPart & mesh, ShaderType shaderType,
+            char const*const vshSrc = 0, char const*const fshSrc = 0);
 
 		LR_API virtual Bounds localBounds() const override {
             return _localBounds;
@@ -80,4 +84,4 @@ namespace lab {
         std::vector<std::shared_ptr<ModelBase>> _parts;
     };
 
-}
+}} // lab::Render

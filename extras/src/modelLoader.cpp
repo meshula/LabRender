@@ -15,9 +15,9 @@
 #include <sstream>
 
 
-namespace lab
-{
+namespace lab {
 	using namespace std;
+    using namespace Render;
 
 	namespace {
 
@@ -605,6 +605,8 @@ namespace lab
 
 	} // anon
 
+    namespace Render {
+
 	std::shared_ptr<Model> loadMesh(const std::string& srcFilename)
 	{
 		unsigned int flags =
@@ -656,6 +658,8 @@ namespace lab
 		}
 		return mesh;
 	}
+
+    } // Render
 
 }
 

@@ -16,7 +16,7 @@
 #define strncasecmp _strnicmp
 #endif
 
-namespace lab {
+namespace lab { namespace Render {
 
 	struct SemanticTypeData {
 		SemanticType type; const char* name; int count; int elementType; int stride;
@@ -126,7 +126,8 @@ namespace lab {
 		SemanticType::unknown_st, "unknown", 0, GL_INT, sizeof(int32_t),
 	};
 
-	int semanticTypeToOpenGLElementType(SemanticType t) {
+	int semanticTypeToOpenGLElementType(SemanticType t) 
+    {
 		if (t > SemanticType::unknown_st)
 			return GL_INT;
 
@@ -134,7 +135,8 @@ namespace lab {
 		return semanticTypeData[index].elementType;
 	}
 
-	int semanticTypeElementCount(SemanticType t) {
+	int semanticTypeElementCount(SemanticType t) 
+    {
 		if (t > SemanticType::unknown_st)
 			return 1;
 
@@ -142,7 +144,8 @@ namespace lab {
 		return semanticTypeData[index].count;
 	}
 
-	int semanticTypeStride(SemanticType t) {
+	int semanticTypeStride(SemanticType t) 
+    {
 		if (t > SemanticType::unknown_st)
 			return sizeof(int);
 
@@ -150,7 +153,8 @@ namespace lab {
 		return semanticTypeData[index].stride;
 	}
 
-	const char* semanticTypeName(SemanticType t) {
+	const char* semanticTypeName(SemanticType t) 
+    {
 		if (t > SemanticType::unknown_st)
 			return semanticTypeData[static_cast<typename std::underlying_type<SemanticType>::type>(SemanticType::unknown_st)].name;
 
@@ -158,12 +162,18 @@ namespace lab {
 		return semanticTypeData[index].name;
 	}
 
+    bool semanticTypeIsSampler(SemanticType t)
+    {
+        return t >= SemanticType::sampler1D_st && t <= SemanticType::usamplerCubeArrayShadow_st;
+    }
 
-	std::string semanticTypeToString(SemanticType st) {
+	std::string semanticTypeToString(SemanticType st) 
+    {
 		return std::string(semanticTypeName(st));
 	}
 
-	SemanticType semanticTypeNamed(const char* name) {
+	SemanticType semanticTypeNamed(const char* name) 
+    {
 		size_t l = strlen(name);
 		if (l > 32)
 			return SemanticType::unknown_st;
@@ -233,4 +243,4 @@ namespace lab {
 		}
 	}
 
-} // lab
+}} // lab::Render

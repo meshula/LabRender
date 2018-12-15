@@ -10,7 +10,7 @@
 #include <LabRender/LabRender.h>
 #include "LabRender/Model.h"
 
-namespace lab {
+namespace lab { namespace Render {
 
 class UtilityModel : public ModelPart {
 public:
@@ -38,4 +38,4 @@ protected:
     float thetaStart, thetaLength;
 };
 
-} // Lab
+}}

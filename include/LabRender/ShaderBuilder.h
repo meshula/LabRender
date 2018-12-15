@@ -14,7 +14,7 @@
 #include <set>
 #include <string>
 
-namespace lab {
+namespace lab { namespace Render {
 
     class ShaderBuilder 
 	{
@@ -29,8 +29,7 @@ namespace lab {
             std::string fragmentShaderPostamblePath;
 
             std::vector<Uniform> uniforms;
-
-            /// @TODO this should be a vector of Semantics
+            std::vector<Uniform> samplers;
             std::vector<std::pair<std::string, SemanticType>> varyings;
         };
 
@@ -52,14 +51,16 @@ namespace lab {
         ~ShaderBuilder();
 
         void clear();
-        void setFrameBufferOutputs(const FrameBuffer& fbo);
+        void setFrameBufferOutputs(const FrameBuffer& fbo, const std::vector<std::string>& output_attachments);
         void setAttributes(const ModelPart& mesh);
 
         void setUniforms(const ShaderSpec&);
         void setVaryings(const ShaderSpec&);
+        void setSamplers(const ShaderSpec&);
 
         void setUniforms(Semantic const*const semantics, int count);
         void setVaryings(Semantic const*const semantics, int count);
+        void setSamplers(Semantic const*const semantics, int count);
 
         std::string generateVertexShader(const char* body);
         std::string generateFragmentShader(const char* body);
@@ -73,9 +74,10 @@ namespace lab {
                                            bool printShader = false);
 
         std::set<Semantic*> uniforms;
+        std::set<Semantic*> samplers;
         std::set<Semantic*> attributes;
         std::set<Semantic*> varyings;
         std::set<Semantic*> outputs;
     };
 
-}
+}} // lab::Render

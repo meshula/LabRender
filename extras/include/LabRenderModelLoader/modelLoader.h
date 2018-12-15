@@ -22,7 +22,6 @@
 # define LRML_CLASS
 #endif
 
-namespace lab 
-{
+namespace lab { namespace Render {
 	LRML_API std::shared_ptr<Model> loadMesh(const std::string& filename);
-}
+}}
