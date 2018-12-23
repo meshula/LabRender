@@ -1,7 +1,7 @@
 
 set(IMGUILAB_SRC
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderDemoApp.h"
-    "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderExampleApp.cpp"
+    "${LABRENDER_ROOT}/examples/ImGuiLab/ImGuiLabApp.cpp"
     "${LABRENDER_ROOT}/examples/ImGuiLab/ImGuiIntegration.cpp"
 )
 
@@ -24,7 +24,7 @@ target_link_libraries(ImGuiLab optimized
     ${LabCmd_LIBRARY_RELEASE})
 
 target_link_libraries(ImGuiLab
-    GLM::Core 
+    GLM::Core
     GLEW::Shared
     LabCmd::Core
     Lab::Math

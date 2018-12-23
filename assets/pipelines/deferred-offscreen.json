@@ -61,8 +61,8 @@
 		    "inputs": [ { "buffer": "gbuffer",
 		                  "render_textures": ["diffuse", "position", "normal"] } ],
 		    "outputs": { "buffer": "resolve",
-                          "render_textures": ["color"] 
-                        } 
+                          "render_textures": ["color"]
+                        }
         }
 	]
 }
