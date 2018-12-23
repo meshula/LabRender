@@ -49,7 +49,9 @@ namespace lab { namespace Render {
 
             std::string writeBuffer;
             std::vector<std::string> writeAttachments;
-            std::vector<std::pair<std::string, std::vector<std::string>>> readAttachments;
+
+            // vector<fbo, texture>
+            std::vector<std::pair<std::string, std::string>> readAttachments;
 
             DepthTest depthTest = DepthTest::less;
             bool writeDepth = true;

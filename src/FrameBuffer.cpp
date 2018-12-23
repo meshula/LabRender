@@ -60,7 +60,7 @@ namespace lab {
                 textures.emplace_back(std::make_shared<Texture>());
                 textures[spec.attachments.size()]->createDepth(width, height);
 				int i = int(textures.size() - 1);
-				attachColor("_depth", "o__depthTexture", "u__depthTexture", *textures[i], i);
+				attachColor("_depth", "u__depthTexture", "u__depthTexture", *textures[i], i);
             }
             checkFbo();
         }
@@ -80,7 +80,7 @@ namespace lab {
         }
     }
 
-    void FrameBuffer::bindForRead() 
+    void FrameBuffer::bindForRead()
 	{
 		size_t c = textures.size();
 		for (size_t i = 0; i < c; ++i)
@@ -98,7 +98,7 @@ namespace lab {
 		}
 	}
 
-    void FrameBuffer::bindForRead(const std::vector<std::string> & attachments) 
+    void FrameBuffer::bindForRead(const std::vector<std::string> & attachments)
 	{
         bindForRead();
 #if 0
@@ -119,11 +119,11 @@ namespace lab {
 		bindForWrite();
         std::array<GLenum, 32> currentDrawBuffers;
         GLsizei idx = 0;
-		for (auto a : attachments) 
+		for (auto a : attachments)
         {
-			for (int i = 0; i < baseNames.size(); ++i) 
+			for (int i = 0; i < baseNames.size(); ++i)
             {
-				if (a == baseNames[i]) 
+				if (a == baseNames[i])
                 {
 					currentDrawBuffers[idx] = drawBuffers[i];
                     ++idx;
@@ -135,7 +135,7 @@ namespace lab {
 			glDrawBuffers(idx, currentDrawBuffers.data());
 	}
 
-    void FrameBuffer::unbind() 
+    void FrameBuffer::unbind()
 	{
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         if (resizeViewport) {
@@ -165,7 +165,7 @@ namespace lab {
             glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachment, texture.target, texture.id, 0, layer);
 
         // Need to call glDrawBuffers() for OpenGL to draw to multiple attachments
-        if (!texture.depthTexture) 
+        if (!texture.depthTexture)
 		{
             if (attachment >= drawBuffers.size()) {
                 drawBuffers.resize(attachment + 1, GL_NONE);
@@ -205,11 +205,11 @@ namespace lab {
 		glBindFramebuffer(GL_FRAMEBUFFER, id);
 		if (autoDepth)
 		{
-            if (!renderbuffer || renderbufferWidth != newViewport[2] || renderbufferHeight != newViewport[3]) 
+            if (!renderbuffer || renderbufferWidth != newViewport[2] || renderbufferHeight != newViewport[3])
 			{
                 renderbufferWidth = newViewport[2];
                 renderbufferHeight = newViewport[3];
-                if (!renderbuffer) 
+                if (!renderbuffer)
 					glGenRenderbuffers(1, &renderbuffer);
                 glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
                 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, renderbufferWidth, renderbufferHeight);
@@ -245,7 +245,7 @@ namespace lab {
         _fbos[name] = std::make_pair(spec, std::make_shared<FrameBuffer>());
     }
 
-    bool FramebufferSet::setSize(int width, int height) 
+    bool FramebufferSet::setSize(int width, int height)
 	{
         if (_width == width && _height == height) {
             return true;

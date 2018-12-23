@@ -16,6 +16,7 @@
 #include "LabRender/Texture.h"
 #include "LabRender/Utils.h"
 #include "LabRender/UtilityModel.h"
+#include "LabRenderGraph/LabRenderGraph.h"
 #include "gl4.h"
 #include "json/json.h"
 
@@ -28,20 +29,20 @@ GLint depthTestToGL[] = {
     GL_LESS, GL_LEQUAL, GL_NEVER, GL_EQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, GL_ALWAYS };
 
 
-namespace lab
+namespace lab {
+
+DepthTest stringToDepthTest(const std::string & df)
 {
-    DepthTest stringToDepthTest(const std::string & df)
-    {
-        if (df == "less")          return DepthTest::less;
-        else if (df == "lequal")   return DepthTest::lequal;
-        else if (df == "never")    return DepthTest::never;
-        else if (df == "equal")    return DepthTest::equal;
-        else if (df == "greater")  return DepthTest::greater;
-        else if (df == "notequal") return DepthTest::notequal;
-        else if (df == "gequal")   return DepthTest::equal;
-        else if (df == "always")   return DepthTest::always;
-        return DepthTest::less;
-    }
+    if (df == "less")          return DepthTest::less;
+    else if (df == "lequal")   return DepthTest::lequal;
+    else if (df == "never")    return DepthTest::never;
+    else if (df == "equal")    return DepthTest::equal;
+    else if (df == "greater")  return DepthTest::greater;
+    else if (df == "notequal") return DepthTest::notequal;
+    else if (df == "gequal")   return DepthTest::equal;
+    else if (df == "always")   return DepthTest::always;
+    return DepthTest::less;
+}
 
 PassRenderer::Pass::Pass(const std::string& name, int passNumber)
 : _name(name), _passNumber(passNumber)
@@ -51,24 +52,23 @@ PassRenderer::Pass::Pass(const std::string& name, int passNumber)
 {
 }
 
-void PassRenderer::Pass::bindInputTextures(RenderLock & rl, const FramebufferSet & fbos)
+void PassRenderer::Pass::bindInputTextures(RenderLock& rl, const FramebufferSet& fbos)
 {
-    for (const pair<string, vector<string>>& readBuffer : readAttachments) 
+    for (const pair<string, string>& readBuffer : readAttachments)
     {
         std::shared_ptr<FrameBuffer> textureInputs = fbos.fbo(readBuffer.first);
-        int bindBase = rl.context.activeTextureUnit;
-        for (const string& a : readBuffer.second) {
-            for (int i = 0; i < textureInputs->drawBuffers.size(); ++i) {
-                if (textureInputs->baseNames[i] == a) 
-                {
-                    textureInputs->textures[i]->bind(bindBase);
-                    if (_shader)
-                        _shader->uniformInt(textureInputs->uniformNames[i].c_str(), bindBase);
-                    ++bindBase;
-                }
+        int texture_unit = rl.context.activeTextureUnit;
+        for (int i = 0; i < textureInputs->drawBuffers.size(); ++i)
+        {
+            if (textureInputs->baseNames[i] == readBuffer.second)
+            {
+                textureInputs->textures[i]->bind(texture_unit);
+                if (_shader)
+                    _shader->uniformInt(textureInputs->uniformNames[i].c_str(), texture_unit);
+                ++texture_unit;
             }
         }
-        rl.context.activeTextureUnit = bindBase;
+        rl.context.activeTextureUnit = texture_unit;
     }
 }
 
@@ -77,14 +77,14 @@ void PassRenderer::Pass::prepareFullScreenQuadAndShader(const FramebufferSet & f
     if (!isQuadPass)
         return;
 
-    if (!_fullScreenQuadMesh) 
+    if (!_fullScreenQuadMesh)
     {
         UtilityModel* quad = new UtilityModel();
         quad->createFullScreenQuad();
         _fullScreenQuadMesh.reset(quad);
     }
 
-    if (!_shader) 
+    if (!_shader)
     {
         std::shared_ptr<FrameBuffer> gbufferAOVs = fbos.fbo(writeBuffer);
 
@@ -112,7 +112,7 @@ void PassRenderer::Pass::run(RenderLock& rl, const FramebufferSet& fbos)
 	checkError(ErrorPolicy::onErrorThrow,
                TestConditions::exhaustive, "Pass::run");
 
-	if (isQuadPass) 
+	if (isQuadPass)
 	{
         glViewport(0, 0, rl.context.framebufferSize.x, rl.context.framebufferSize.y);
         _shader->bind(rl);
@@ -122,11 +122,11 @@ void PassRenderer::Pass::run(RenderLock& rl, const FramebufferSet& fbos)
                    TestConditions::exhaustive, "Pass::bind full screen pass");
     }
 
-    if (drawOpaqueGeometry) 
+    if (drawOpaqueGeometry)
 	{
         std::shared_ptr<FrameBuffer> gbufferAOVs = fbos.fbo(writeBuffer);
 
-        for (auto& model : rl.context.drawList->deferredMeshes) 
+        for (auto& model : rl.context.drawList->deferredMeshes)
 		{
             rl.context.viewMatrices.model = model.first;
             rl.context.viewMatrices.mv = matrix_multiply(rl.context.drawList->view, rl.context.viewMatrices.model);
@@ -166,9 +166,130 @@ std::shared_ptr<FrameBuffer> PassRenderer::framebuffer(const std::string & name)
 }
 
 
-void PassRenderer::configure(const char *const path)
+void PassRenderer::configure(char const*const path)
 {
     string p = expandPath(path);
+#if 1
+    struct stat st;
+    if (stat(p.c_str(), &st) != 0)
+    {
+        return;
+    }
+    size_t sz = st.st_size;
+
+    FILE* f = fopen(p.c_str(), "rb");
+    std::vector<char> buff(sz);
+    fread(&buff[0], 1, sz, f);
+    fclose(f);
+
+    labfx_t* fx_ptr = parse_labfx(&buff[0], sz);
+    labfx_gen_t* sh_ptr = generate_shaders(fx_ptr);
+
+    auto fx = reinterpret_cast<lab::fx::labfx*>(fx_ptr);
+    auto sh = reinterpret_cast<lab::fx::shader*>(sh_ptr);
+
+    for (const auto& tx : fx->textures)
+	{
+        Render::FileTextureProvider provider(tx.path);
+        _detail->textures.add_texture(tx.name, provider.texture());
+    }
+
+    for (const auto& bf : fx->buffers)
+	{
+        FrameBuffer::FrameBufferSpec spec;
+        spec.hasDepth = bf.has_depth;
+        for (const auto& tx: bf.textures)
+        {
+            string name = tx.name;
+            string outputName = "o_" + name + "_texture";
+            string uniformName = "u_" + name + "_texture";
+            spec.attachments.push_back(FrameBuffer::FrameBufferSpec::AttachmentSpec(name, outputName, uniformName, tx.format));
+        }
+
+        _detail->fbos.addFbo(bf.name, spec);
+    }
+
+    int passNumber = 0;
+    for (const auto& ps : fx->passes)
+	{
+//        Json::Value passVal = (*it)["type"];
+//        string passType = passVal["run"].asString();
+//        string passName = (*it)["name"].asCString();
+//        printf(" %s %s\n", passName.c_str(), passType.c_str());
+
+        std::shared_ptr<Pass> pass = addPass(std::make_shared<Pass>(ps.name, passNumber++));
+
+        lab::fx::shader const* shader = nullptr;
+        for (const auto& s : fx->shaders)
+            if (s.name == ps.shader)
+            {
+                shader = &s;
+                break;
+            }
+
+        if (shader)
+        {
+            pass->shaderSpec.vtx_src = shader->vsh_source;
+            pass->shaderSpec.fgmt_src = shader->fsh_source;
+            //pass->shaderSpec.fgmt_post_src = fragment_shader_postamble_path.asString();
+
+            for (const auto& uniform : shader->uniforms)
+            {
+                string texture;
+                AutomaticUniform automatic = AutomaticUniform::none;
+                if (uniform.automatic.length() > 0)
+				{
+                    if (uniform.automatic == "resolution")
+                        automatic = AutomaticUniform::frameBufferResolution;
+                    else if (uniform.automatic == "sky_matrix")
+                        automatic = AutomaticUniform::skyMatrix;
+                    else if (uniform.automatic == "render_time")
+                        automatic = AutomaticUniform::renderTime;
+                    else if (uniform.automatic == "mouse_position")
+                        automatic = AutomaticUniform::mousePosition;
+                    else
+                        texture = uniform.automatic;
+                }
+
+                if (semanticTypeIsSampler(uniform.type))
+                    pass->shaderSpec.samplers.push_back(Uniform(uniform.name, uniform.type, automatic, texture));
+                else
+                    pass->shaderSpec.uniforms.push_back(Uniform(uniform.name, uniform.type, automatic, texture));
+            }
+
+            for (const auto& varying : shader->varyings)
+            {
+                pass->shaderSpec.varyings.push_back(make_pair(varying.name, varying.type));
+            }
+        }
+
+        pass->isQuadPass = ps.draw == lab::fx::pass_draw::quad;
+        pass->drawOpaqueGeometry = ps.draw == lab::fx::pass_draw::opaque_geometry;
+        pass->writeDepth = ps.write_depth;
+        pass->depthTest = ps.test;
+        pass->clearDepthBuffer = ps.clear_depth;
+        pass->clearGbuffer = ps.clear_outputs;
+        pass->writeBuffer = ps.output_buffer;
+
+        for (const auto& tx : ps.output_textures)
+            pass->writeAttachments.push_back(tx);
+
+        for (const auto& tx: ps.input_textures)
+        {
+            pass->readAttachments.push_back({tx.name, tx.texture});
+            std::string sampler_name = "o_" + tx.texture;
+            pass->shaderSpec.samplers.push_back(Uniform(sampler_name,
+                                                SemanticType::sampler2D_st,
+                                                AutomaticUniform::none,
+                                                tx.name));
+        }
+    }
+
+    free_labfx_gen(sh_ptr);
+    free_labfx(fx_ptr);
+    return;
+#else
+
     std::ifstream in(p);
     Json::Value conf;
     try
@@ -186,6 +307,7 @@ void PassRenderer::configure(const char *const path)
 	{
         // { "id": "tex16", "path": "{ASSET_ROOT}/textures/shadertoy/tex16.png" }
         string id = (*it)["id"].asString();
+        printf(" %s\n", id.c_str());
         string path = (*it)["path"].asString();
         Render::FileTextureProvider provider(path);
         _detail->textures.add_texture(id, provider.texture());
@@ -207,8 +329,8 @@ void PassRenderer::configure(const char *const path)
 
             printf("  %s %s\n", name.c_str(), typeStr.c_str());
 
-            string outputName = "o_" + name + "Texture";
-            string uniformName = "u_" + name + "Texture";
+            string outputName = "o_" + name + "_texture";
+            string uniformName = "u_" + name + _tTexture";
 
 			Render::TextureType textureType = TextureType::u8x4;	// default to RGBA8
             if (typeStr == "u8x4") textureType = TextureType::u8x4;
@@ -246,9 +368,9 @@ void PassRenderer::configure(const char *const path)
                 pass->shaderSpec.fragmentShaderPostamblePath = fragment_shader_postamble_path.asString();
 
             Json::Value uniforms = shader["uniforms"];
-            if (uniforms.type() != Json::nullValue) 
+            if (uniforms.type() != Json::nullValue)
             {
-                for (Json::Value::iterator uniform = uniforms.begin(); uniform != uniforms.end(); ++uniform) 
+                for (Json::Value::iterator uniform = uniforms.begin(); uniform != uniforms.end(); ++uniform)
                 {
                     string name = (*uniform)["name"].asString();
                     string typeStr = (*uniform)["type"].asString();
@@ -271,7 +393,7 @@ void PassRenderer::configure(const char *const path)
                     }
 
                     Json::Value v = (*uniform)["texture"];
-                    if (v.type() != Json::nullValue) 
+                    if (v.type() != Json::nullValue)
                         texture = v.asString();
 
                     if (semanticTypeIsSampler(type))
@@ -281,9 +403,9 @@ void PassRenderer::configure(const char *const path)
                 }
             }
             Json::Value varyings = shader["varyings"];
-            if (varyings.type() != Json::nullValue ) 
+            if (varyings.type() != Json::nullValue )
             {
-                for (Json::Value::iterator varying = varyings.begin(); varying != varyings.end(); ++varying) 
+                for (Json::Value::iterator varying = varyings.begin(); varying != varyings.end(); ++varying)
                 {
                     string name = (*varying)["name"].asString();
                     string typeStr = (*varying)["type"].asString();
@@ -328,7 +450,7 @@ void PassRenderer::configure(const char *const path)
             string writeBufferName = writeBuffer["buffer"].asString();
             pass->writeBuffer = writeBufferName;
             for (Json::Value::iterator attachment = writeBuffer["render_textures"].begin();
-                                      attachment != writeBuffer["render_textures"].end(); ++attachment) 
+                                      attachment != writeBuffer["render_textures"].end(); ++attachment)
             {
                 pass->writeAttachments.push_back((*attachment).asString());
             }
@@ -347,7 +469,7 @@ void PassRenderer::configure(const char *const path)
                 string name = (*buffer)["buffer"].asString();
                 Json::Value attachments = (*buffer)["render_textures"];
                 vector<string> buffers;
-                for (Json::Value::iterator attachment = attachments.begin(); attachment != attachments.end(); ++attachment) 
+                for (Json::Value::iterator attachment = attachments.begin(); attachment != attachments.end(); ++attachment)
                 {
                     string a = (*attachment).asString();
                     buffers.push_back(a);
@@ -357,6 +479,7 @@ void PassRenderer::configure(const char *const path)
             }
         }
     }
+#endif
 }
 
 std::shared_ptr<PassRenderer::Pass> PassRenderer::addPass(std::shared_ptr<Pass> pass)
@@ -447,7 +570,7 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
 
         uint32_t clearbits = pass->clearDepthBuffer? GL_DEPTH_BUFFER_BIT : 0;
         clearbits |= pass->clearGbuffer? GL_COLOR_BUFFER_BIT : 0;
-        if (clearbits) 
+        if (clearbits)
 		{
             glDepthMask(GL_TRUE);
             glClear(clearbits);

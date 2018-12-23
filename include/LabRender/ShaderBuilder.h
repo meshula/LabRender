@@ -24,9 +24,8 @@ namespace lab { namespace Render {
 		{
         public:
             std::string name;
-            std::string vertexShaderPath;
-            std::string fragmentShaderPath;
-            std::string fragmentShaderPostamblePath;
+            std::string vtx_src,  fgmt_src,  fgmt_post_src;
+            std::string vtx_path, fgmt_path, fgmt_post_path;
 
             std::vector<Uniform> uniforms;
             std::vector<Uniform> samplers;
@@ -58,9 +57,9 @@ namespace lab { namespace Render {
         void setVaryings(const ShaderSpec&);
         void setSamplers(const ShaderSpec&);
 
-        void setUniforms(Semantic const*const semantics, int count);
-        void setVaryings(Semantic const*const semantics, int count);
-        void setSamplers(Semantic const*const semantics, int count);
+        void setUniforms(Semantic const*const semantics, size_t count);
+        void setVaryings(Semantic const*const semantics, size_t count);
+        void setSamplers(Semantic const*const semantics, size_t count);
 
         std::string generateVertexShader(const char* body);
         std::string generateFragmentShader(const char* body);

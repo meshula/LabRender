@@ -2,8 +2,6 @@
 #ifndef LABRENDERTYPES_TEXTURE
 #define LABRENDERTYPES_TEXTURE
 
-#include <string>
-
 namespace lab { namespace Render {
     
     enum class TextureType {
@@ -13,14 +11,6 @@ namespace lab { namespace Render {
         u8x1,  u8x2,  u8x3,  u8x4,
         s8x1,  s8x2,  s8x3,  s8x4
     };
-
-    struct texture
-    {
-        std::string name;
-        TextureType format { TextureType::none };
-        float scale {1.f};
-    };
-
 }}
 
 #endif

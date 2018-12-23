@@ -11,6 +11,8 @@ lab_library(LabRenderTypes
     ALIAS LabRender::Types
 
     PUBLIC_HEADERS
+        ../include/LabRenderTypes/DepthTest.h
+        ../include/LabRenderTypes/SemanticType.h
         ../include/LabRenderTypes/Texture.h
 
     CPPFILES
@@ -24,6 +26,7 @@ lab_library(LabRender
     LIBRARIES
         ${GLEW_LIBRARY}
         ${OPENGL_LIBRARIES}
+        LabRender::LabRenderGraph
         LabCmd::Core
         Lab::Math
         Lab::Text

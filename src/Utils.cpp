@@ -55,7 +55,7 @@ namespace lab {
         if (!f) 
         {
             if (errorIfNotFound)
-                cerr << "Could not open file " << resolvedPath << endl;
+                cerr << "Could not open file " << resolvedPath << "\n";
             
             return {};
         }

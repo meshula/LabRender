@@ -7,7 +7,7 @@ out vec4 fragColor;
 
 float saturatedDot( in vec3 a, in vec3 b )
 {
-    return max( dot( a, b ), 0.0 );   
+    return max( dot( a, b ), 0.0 );
 }
 
 vec3 YxyToXYZ( in vec3 Yxy )
@@ -102,13 +102,13 @@ vec3 calculateSkyLuminanceRGB( in vec3 s, in vec3 e, in float t )
 void main()
 {
     //vec2 uv = fragCoord.xy / iResolution.xy;
-    
+
     float turbidity     = 2.0;
     float azimuth       = 0.0;//iMouse.z > 0.0 ? iMouse.x / iResolution.x * PI       : iTime * 0.125;
     float inclination   = 0.25;//iMouse.z > 0.0 ? iMouse.y / iResolution.y * PI * 0.5 : iTime * 0.25;
     vec3 sunDir         = normalize( vec3( sin(inclination) * cos(azimuth), cos(inclination), sin(inclination) * sin(azimuth) ) );
-    vec3 viewDir        = vert.v_eyeDirection;// normalize( vec3( (uv * 2.0) - 1.0 , 1.0 ) );
+    vec3 viewDir        = var.v_eyeDirection;// normalize( vec3( (uv * 2.0) - 1.0 , 1.0 ) );
     vec3 skyLuminance   = calculateSkyLuminanceRGB( sunDir, viewDir, turbidity );
-    
+
     fragColor           = vec4(1.0)-exp(-vec4( skyLuminance * 0.05, 1.0 )*2.0);
 }

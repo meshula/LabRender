@@ -154,7 +154,8 @@ public:
 
 		//string path = "{ASSET_ROOT}/pipelines/deferred.json";
 		//string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
-		string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
+		//string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
+		string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
 		std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());

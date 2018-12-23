@@ -10,7 +10,7 @@ version: 1.0
 buffer: gbuffer
   has depth: yes
   textures:
-    [ diffusex, f16x4, scale: 1.0
+    [ diffuse, f16x4, scale: 1.0
       position, f16x4, scale: 1.0
       normal, f16x4, scale: 1.0 ]
 
@@ -21,17 +21,23 @@ buffer: resolve
 
 --------------------------------------------------------------------------------
 
+texture: tex16
+  path: {ASSET_ROOT}/textures/shadertoy/tex16.png
+
+
+--------------------------------------------------------------------------------
+
 pass: clear framebuffer
   draw: no
   clear depth: no
   clear outputs: yes
-  outputs: [ resolve.color ]
+  outputs: resolve [ color ]
  
 pass: clear gbuffer
   draw: no
   clear depth: no
   clear outputs: yes
-  outputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
+  outputs: gbuffer [diffuse, position, normal]
 
 pass: geometry
   draw: opaque geometry
@@ -39,7 +45,7 @@ pass: geometry
   depth test: less
   write depth: yes
   use shader: mesh
-  outputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
+  outputs: gbuffer [diffuse, position, normal]
 
 pass: sky
   draw: quad
@@ -47,7 +53,7 @@ pass: sky
   depth test: equal
   write depth: no
   use shader: sky
-  outputs: [ gbuffer.diffuse ]
+  outputs: gbuffer [diffuse]
 
 pass: post process and blit
   draw: quad
@@ -56,17 +62,18 @@ pass: post process and blit
   clear depth: no
   use shader: full-screen-deferred-quad
   inputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
-  outputs: [ resolve.color ]
+  outputs: resolve [ color ]
 
 --------------------------------------------------------------------------------
 shader: mesh
 
+    uniforms:
+        [ u_skyMatrix: mat4 <- auto-sky-matrix,
+          skyCube: samplerCube ]
+
     vsh:
         attributes:
         [ a_position: vec3 <- position ]
-
-        uniforms:
-        [ u_skyMatrix: mat4 <- auto-sky-matrix ]
 
         source:
         ```glsl
@@ -84,8 +91,6 @@ shader: mesh
          normal: vec3 ]
 
     fsh:
-        uniforms:
-           [ skyCube: samplerCube ]
 
         source:
         ```glsl
@@ -97,12 +102,14 @@ shader: mesh
 --------------------------------------------------------------------------------
 shader: sky
 
+    uniforms:
+        [ u_skyMatrix: mat4 <- auto-sky-matrix,
+          skyCube: samplerCube ]
+
     vsh:
         attributes:
         [ a_position: vec3 <- position ]
 
-        uniforms:
-        [ u_skyMatrix: mat4 <- auto-sky-matrix ]
 
         source:
         ```glsl
@@ -118,8 +125,6 @@ shader: sky
        [ eyeDirection: vec3 ]
 
     fsh:
-        uniforms:
-           [ skyCube: samplerCube ]
 
         source:
         ```glsl
@@ -131,6 +136,13 @@ shader: sky
         ```
 --------------------------------------------------------------------------------
 shader: full-screen-deferred-quad
+
+    uniforms:
+        [ u_normalTexture: sampler2d,
+          u_diffuseTexture: sampler2d ]
+
+    varying:
+       [ v_texCoord: vec2 ]
 
     vsh:
         attributes:
@@ -144,13 +156,7 @@ shader: full-screen-deferred-quad
               gl_Position = vec4(a_position, 1.0);
             }
         ```
-    varying:
-       [ v_texCoord: vec2 ]
-
     fsh:
-        uniforms:
-            [ u_normalTexture: sampler2d,
-              u_diffuseTexture: sampler2d ]
 
         source:
         ```glsl

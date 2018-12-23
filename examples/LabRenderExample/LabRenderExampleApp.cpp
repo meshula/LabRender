@@ -99,6 +99,7 @@ public:
 			lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
 
 		std::string path = "{ASSET_ROOT}/pipelines/deferred.json";
+		//std::string path = "{ASSET_ROOT}/pipelines/deferred.json";
 		//std::string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
 		//std::string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
 		std::cout << "Loading pipeline configuration " << path << std::endl;

@@ -83,7 +83,7 @@ vec4 sky_color_main()
 
 	vec3 u_light_direction = normalize(vec3(0, -0.5, 0.5)); // should be passed in
 
-	vec3 eye_dir = normalize(vert.v_eyeDirection.xyz);
+	vec3 eye_dir = normalize(var.v_eyeDirection.xyz);
 	vec3 eye_pos = vec3(0.0f, u_surface_height, 0.0f);
 
 	float alpha = clamp(dot(eye_dir, -u_light_direction.xyz), 0, 1);
@@ -123,12 +123,12 @@ vec4 sky_color_main()
 
 vec4 sample_skycube_main()
 {
-	return vec4(texture(skyCube, vert.v_eyeDirection).xyz, 1.0);
+	return vec4(texture(skyCube, var.v_eyeDirection).xyz, 1.0);
 }
 
 vec4 direction_color_main()
 {
-	return vec4(0.5 * clamp(1.0 - vert.v_eyeDirection.y, 0, 1), 0.5 * clamp(vert.v_eyeDirection.y, 0, 1), 0, 1);
+	return vec4(0.5 * clamp(1.0 - var.v_eyeDirection.y, 0, 1), 0.5 * clamp(var.v_eyeDirection.y, 0, 1), 0, 1);
 }
 
 void main() {
