@@ -38,8 +38,7 @@ namespace lab { namespace Render {
         int newViewport[4], oldViewport[4];
         int renderbufferWidth = 0, renderbufferHeight = 0;
         ErrorPolicy errorPolicy;
-        std::vector<unsigned int> drawBuffers;
-        std::vector<std::string> baseNames;
+        std::vector<std::string> baseNames;         // index is implicity the attachment number
         std::vector<std::string> drawBufferNames;
         std::vector<std::string> uniformNames;
         std::vector<Render::SemanticType> samplerType;

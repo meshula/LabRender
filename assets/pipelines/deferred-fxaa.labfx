@@ -12,7 +12,7 @@ buffer: gbuffer
     [ diffuse, u8x4, scale: 1.0
       position, f32x4, scale: 1.0
       normal, f16x4, scale: 1.0
-      color, u8x4, scale: 1.0 ]
+      color, f16x4, scale: 1.0 ]
 
 -------------------------------------------------------------------------------
 
@@ -266,7 +266,7 @@ void main()
 --------------------------------------------------------------------------------
 
 shader: fxaa
-  uniforms: [ u_colorTexture: sampler2d,
+  uniforms: [ u_color_texture: sampler2d,
               u_resolution: vec2 <- auto-resolution ]
   varying:  [ texCoord: vec2 ]
 
@@ -294,12 +294,11 @@ out vec4 fragColor;
 
 void main() {
     vec2 res = 1. / u_resolution;
-
-    vec3 rgbNW = texture( u_colorTexture, ( var.texCoord.xy + vec2( -1.0, -1.0 ) * res ) ).xyz;
-    vec3 rgbNE = texture( u_colorTexture, ( var.texCoord.xy + vec2( 1.0, -1.0 ) * res ) ).xyz;
-    vec3 rgbSW = texture( u_colorTexture, ( var.texCoord.xy + vec2( -1.0, 1.0 ) * res ) ).xyz;
-    vec3 rgbSE = texture( u_colorTexture, ( var.texCoord.xy + vec2( 1.0, 1.0 ) * res ) ).xyz;
-    vec4 rgbaM = texture( u_colorTexture,   var.texCoord.xy  * res );
+    vec3 rgbNW = texture( u_color_texture, ( var.texCoord.xy + vec2( -1.0, -1.0 ) * res ) ).xyz;
+    vec3 rgbNE = texture( u_color_texture, ( var.texCoord.xy + vec2( 1.0, -1.0 ) * res ) ).xyz;
+    vec3 rgbSW = texture( u_color_texture, ( var.texCoord.xy + vec2( -1.0, 1.0 ) * res ) ).xyz;
+    vec3 rgbSE = texture( u_color_texture, ( var.texCoord.xy + vec2( 1.0, 1.0 ) * res ) ).xyz;
+    vec4 rgbaM = texture( u_color_texture,   var.texCoord.xy * res );
     vec3 rgbM  = rgbaM.xyz;
     vec3 luma = vec3( 0.299, 0.587, 0.114 );
 
@@ -321,10 +320,10 @@ void main() {
     dir = min( vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
           max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
                 dir * rcpDirMin)) * res;
-    vec4 rgbA = (1.0/2.0) * (texture(u_colorTexture,  var.texCoord.xy + dir * (1.0/3.0 - 0.5)) +
-                             texture(u_colorTexture,  var.texCoord.xy + dir * (2.0/3.0 - 0.5)));
-    vec4 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (texture(u_colorTexture,  var.texCoord.xy + dir * (0.0/3.0 - 0.5)) +
-                                                texture(u_colorTexture,  var.texCoord.xy + dir * (3.0/3.0 - 0.5)));
+    vec4 rgbA = (1.0/2.0) * (texture(u_color_texture,  var.texCoord.xy + dir * (1.0/3.0 - 0.5)) +
+                             texture(u_color_texture,  var.texCoord.xy + dir * (2.0/3.0 - 0.5)));
+    vec4 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (texture(u_color_texture,  var.texCoord.xy + dir * (0.0/3.0 - 0.5)) +
+                                                texture(u_color_texture,  var.texCoord.xy + dir * (3.0/3.0 - 0.5)));
     float lumaB = dot(rgbB, vec4(luma, 0.0));
 
     if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {
@@ -333,6 +332,6 @@ void main() {
         fragColor = rgbB;
     }
 
-    fragColor = vec4(pow(texture( u_colorTexture, var.texCoord ).xyz, vec3(1.0/2.2)), 1. );
+    fragColor = vec4(pow(texture( u_color_texture, var.texCoord ).xyz, vec3(1.0/2.2)), 1. );
 }
 ```

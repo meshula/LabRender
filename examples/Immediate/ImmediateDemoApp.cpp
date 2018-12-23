@@ -117,8 +117,6 @@ tpImage images[sizeof(image_names) / sizeof(*image_names)];
 lab::ImmSpriteId sprite_ids[sizeof(image_names) / sizeof(*image_names)];
 
 
-
-
 class LabRenderExampleApp : public lab::GLFWAppBase {
 public:
     shared_ptr<lab::Render::PassRenderer> dr;
@@ -142,7 +140,8 @@ public:
 
 
     LabRenderExampleApp()
-    : oscServer("labrender")
+    : GLFWAppBase("LabRender ImmediateExample")
+    , oscServer("labrender")
     , wsServer("labrender")
     , previousMousePosition(V2F(0,0))
     {

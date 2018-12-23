@@ -99,17 +99,25 @@ void ShaderBuilder::clear()
 void ShaderBuilder::setFrameBufferOutputs(const FrameBuffer& fbo, const std::vector<std::string>& output_attachments)
 {
     // if no draw buffers specified on the fbo, then the fbo is representing the default gl draw buffer
-    if (fbo.drawBuffers.size() == 0)
+    if (fbo.baseNames.size() == 0)
         outputs.insert(new Semantic(SemanticType::vec4_st, "color", 0));
+    else if (false)
+    {
+        //&&&
+        for (int i = 0; i < fbo.drawBufferNames.size(); ++i)
+        {
+            outputs.insert(new Semantic(fbo.samplerType[i], fbo.drawBufferNames[i].c_str(), i));
+        }
+    }
     else
         for (auto& s : output_attachments)
         {
-            for (int i = 0; i < fbo.drawBuffers.size(); ++i)
+            for (int i = 0; i < fbo.baseNames.size(); ++i)
             {
                 std::string n = "o_" + s + "_texture";
                 if (n == fbo.drawBufferNames[i])
                 {
-                    outputs.insert(new Semantic(fbo.samplerType[i], fbo.drawBufferNames[i].c_str(), fbo.drawBuffers[i] - GL_COLOR_ATTACHMENT0));
+                    outputs.insert(new Semantic(fbo.samplerType[i], fbo.drawBufferNames[i].c_str(), i));
                     break;
                 }
             }

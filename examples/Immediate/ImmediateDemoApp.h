@@ -107,7 +107,7 @@ namespace lab {
 
     public:
 
-        GLFWAppBase()
+        GLFWAppBase(char const*const window_title)
         : mouseIsDown(false)
         {
             // window creation
@@ -123,7 +123,7 @@ namespace lab {
                 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #           endif
 
-            window = glfwCreateWindow(1280, 960, "LabRender", NULL, NULL);
+            window = glfwCreateWindow(1280, 960, window_title, NULL, NULL);
             if (!window) {
                 glfwTerminate();
                 throw std::runtime_error("Could not create a window");

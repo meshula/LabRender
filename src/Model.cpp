@@ -66,7 +66,7 @@ namespace lab { namespace Render {
         else
             hasTexture = false;
 
-        bool deferred = fbo.drawBuffers.size() > 0;
+        bool deferred = fbo.baseNames.size() > 0;
 
         // variant known, create variant identifier
 
@@ -164,20 +164,21 @@ namespace lab { namespace Render {
             vsh.assign(vshSrc);
         else
         {
-            vsh = R"glsl(void main() {
-                        vec4 pos = vec4(a_position, 1.0);
-                        vec4 n = u_rotationTransform * vec4(a_normal, 1.0);
-                        vec4 newPos = u_modelViewProj * pos;
-                        gl_Position = newPos;
-                        var.v_pos = newPos;
-                        var.v_normal = n.xyz;
-                        )glsl";
+            vsh = R"glsl(
+void main() {
+  vec4 pos = vec4(a_position, 1.0);
+  vec4 n = u_rotationTransform * vec4(a_normal, 1.0);
+  vec4 newPos = u_modelViewProj * pos;
+  gl_Position = newPos;
+  var.v_pos = newPos;
+  var.v_normal = n.xyz;
+)glsl";
 
-            if (shaderType == ShaderType::skyShader) vsh += "\n var.v_uvw = normalize(a_position.xyz); \n";
-            else if (hasTextureCubeAttr)             vsh += "\n var.v_uvw = a_uvw; \n";
-            else if (hasTextureCoordsAttr)           vsh += "\n var.v_uv = a_uv; \n";
+            if (shaderType == ShaderType::skyShader) vsh += "\n  var.v_uvw = normalize(a_position.xyz); \n";
+            else if (hasTextureCubeAttr)             vsh += "\n  var.v_uvw = a_uvw; \n";
+            else if (hasTextureCoordsAttr)           vsh += "\n  var.v_uv = a_uv; \n";
 
-            if (hasVertexColorAttr)                  vsh += "\n var.v_color = a_color; \n";
+            if (hasVertexColorAttr)                  vsh += "\n  var.v_color = a_color; \n";
             vsh += "}\n";
         }
 
@@ -190,36 +191,39 @@ namespace lab { namespace Render {
             fsh = "void main() { \n";
             if (deferred)
             {
-                fsh += R"glsl( o_normal_texture = vec4(var.v_normal, 1.0);
-                             o_position_texture = var.v_pos; )glsl";
+                fsh += 
+R"glsl( 
+  o_normal_texture = vec4(var.v_normal, 1.0);
+  o_position_texture = var.v_pos; 
+)glsl";
                 if (hasTexture && hasVertexColorAttr)
-                    fsh += "o_diffuse_texture = texture(u_texture, var.v_uv) * var.v_color;\n";
+                    fsh += "  o_diffuse_texture = texture(u_texture, var.v_uv) * var.v_color;\n";
                 else if (hasTextureCubeAttr)
-                    fsh += "o_diffuse_texture = texture(u_texture, var.v_uvw).bgra;\n";
+                    fsh += "  o_diffuse_texture = texture(u_texture, var.v_uvw).bgra;\n";
                 else if (hasTexture)
-                    fsh += "o_diffuse_texture = texture(u_texture, var.v_uv).bgra;\n";
+                    fsh += "  o_diffuse_texture = texture(u_texture, var.v_uv).bgra;\n";
                 else if (hasVertexColorAttr)
-                    fsh += "o_diffuse_texture = var.v_color;\n";
+                    fsh += "  o_diffuse_texture = var.v_color;\n";
                 else
-                    fsh += "o_diffuse_texture = vec4(1.0,1.0,1.0,1.0);\n";
+                    fsh += "  o_diffuse_texture = vec4(1.0,1.0,1.0,1.0);\n";
             }
             else
             {
                 // forward shaded
                 if (shaderType == ShaderType::skyShader)
-                    fsh += "float ndotl = 1.0;\n";        // emissive
+                    fsh += "  float ndotl = 1.0;\n";        // emissive
                 else
-                    fsh += "float ndotl = clamp(dot(normalize(vec3(0.0,-1.0,1.0)), var.v_normal), 0.0, 1.0);\n";
+                    fsh += "  float ndotl = clamp(dot(normalize(vec3(0.0,-1.0,1.0)), var.v_normal), 0.0, 1.0);\n";
                 if (hasTexture && hasVertexColorAttr)
-                    fsh += "o_diffuse_texture = texture(u_texture, var.v_uv) * var.v_color * ndotl;\n";
+                    fsh += "  o_diffuse_texture = texture(u_texture, var.v_uv) * var.v_color * ndotl;\n";
                 else if (hasTextureCubeAttr)
-                    fsh += "o_diffuse_texture = texture(u_texture, var.v_uvw).bgra * ndotl;\n";
+                    fsh += "  o_diffuse_texture = texture(u_texture, var.v_uvw).bgra * ndotl;\n";
                 else if (hasTexture)
-                    fsh += "o_diffuse_texture = texture(u_texture, var.v_uv) * ndotl;\n";
+                    fsh += "  o_diffuse_texture = texture(u_texture, var.v_uv) * ndotl;\n";
                 else if (hasVertexColorAttr)
-                    fsh += "o_diffuse_texture = var.v_color * ndotl;\n";
+                    fsh += "  o_diffuse_texture = var.v_color * ndotl;\n";
                 else
-                    fsh += "o_diffuse_texture = vec4(1.0,1.0,1.0,1.0) * ndotl;\n";
+                    fsh += "  o_diffuse_texture = vec4(1.0,1.0,1.0,1.0) * ndotl;\n";
             }
             fsh += "}\n";
         }

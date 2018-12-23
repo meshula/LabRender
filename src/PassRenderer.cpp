@@ -28,7 +28,6 @@ using namespace lab::Render;
 GLint depthTestToGL[] = {
     GL_LESS, GL_LEQUAL, GL_NEVER, GL_EQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, GL_ALWAYS };
 
-
 namespace lab {
 
 DepthTest stringToDepthTest(const std::string & df)
@@ -58,7 +57,7 @@ void PassRenderer::Pass::bindInputTextures(RenderLock& rl, const FramebufferSet&
     {
         std::shared_ptr<FrameBuffer> textureInputs = fbos.fbo(readBuffer.first);
         int texture_unit = rl.context.activeTextureUnit;
-        for (int i = 0; i < textureInputs->drawBuffers.size(); ++i)
+        for (int i = 0; i < textureInputs->baseNames.size(); ++i)
         {
             if (textureInputs->baseNames[i] == readBuffer.second)
             {
@@ -212,11 +211,6 @@ void PassRenderer::configure(char const*const path)
     int passNumber = 0;
     for (const auto& ps : fx->passes)
 	{
-//        Json::Value passVal = (*it)["type"];
-//        string passType = passVal["run"].asString();
-//        string passName = (*it)["name"].asCString();
-//        printf(" %s %s\n", passName.c_str(), passType.c_str());
-
         std::shared_ptr<Pass> pass = addPass(std::make_shared<Pass>(ps.name, passNumber++));
 
         lab::fx::shader const* shader = nullptr;
@@ -239,9 +233,9 @@ void PassRenderer::configure(char const*const path)
                 AutomaticUniform automatic = AutomaticUniform::none;
                 if (uniform.automatic.length() > 0)
 				{
-                    if (uniform.automatic == "resolution")
+                    if ((uniform.automatic == "resolution") || (uniform.automatic == "auto-resolution"))
                         automatic = AutomaticUniform::frameBufferResolution;
-                    else if (uniform.automatic == "sky_matrix")
+                    else if ((uniform.automatic == "sky_matrix") || (uniform.automatic == "auto-sky-matrix"))
                         automatic = AutomaticUniform::skyMatrix;
                     else if (uniform.automatic == "render_time")
                         automatic = AutomaticUniform::renderTime;
@@ -542,7 +536,7 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
 	{
         checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "render, before pass");
 
-        if (bound_frame_buffer != pass->writeBuffer || bound_attachments != pass->writeAttachments)
+        //&&&if (bound_frame_buffer != pass->writeBuffer || bound_attachments != pass->writeAttachments)
         {
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // unbind previous framebuffer
 

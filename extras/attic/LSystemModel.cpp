@@ -8,7 +8,7 @@
 using namespace std;
 
 namespace LabRender {
-    
+
     /*
      V=[cc!!!&&&&&&&&&[Zp]|[Zp]]
      p=h>>>>>>>>>>>>h>>>>>>>>>>>>h
@@ -17,8 +17,8 @@ namespace LabRender {
      H=[cccci[>>>>>dcFFF][>!!cb]]
      Code Sample 1: L-System rewriting rules for Airhorse
      */
-    
-    
+
+
     /*
      ---------------------------------------------------------------------------
      Turtle Orientation commands
@@ -35,7 +35,7 @@ namespace LabRender {
      <(x)  roll x left around forward vector
      >     roll right (clockwise) around forward vector
      >(x)  roll x right around forward vector
-     
+
      ---------------------------------------------------------------------------
      Special Orientation commands
      ---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ namespace LabRender {
      ~(x)        "     in a random direction with a maximum of x degrees
      t     correction for gravity with 0.2
      t(x)  correction for gravity with x
-     
+
      ---------------------------------------------------------------------------
      Movement commands                          when {} active
      ---------------------------------------------------------------------------
@@ -61,7 +61,7 @@ namespace LabRender {
      g     move forward with full length        don't record vertex
      g(x)  move x forward                       don't record vertex
      .     don't move                           record vertex
-     
+
      ---------------------------------------------------------------------------
      Structure commands
      ---------------------------------------------------------------------------
@@ -69,7 +69,7 @@ namespace LabRender {
      ]     pop current state
      {     start polygon shape
      }     end polygon shape
-     
+
      ---------------------------------------------------------------------------
      Inc/Dec commands
      ---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ namespace LabRender {
      ?     increment thickness with 1.4
      !     decrement thickness with 0.7
      ?(x)  multiply thickness with x also !(x)
-     
+
      ---------------------------------------------------------------------------
      Additional commands
      ---------------------------------------------------------------------------
@@ -91,19 +91,19 @@ namespace LabRender {
      @     end of object
      ---------------------------------------------------------------------------
      */
-    
+
     float lscaleMax = 1;
     float lscale = 1.0f / lscaleMax;
-    
-    
-    
+
+
+
     std::shared_ptr<Shader> lsystemShader() {
         static std::shared_ptr<Shader> shader;
         static std::once_flag init;
         std::call_once(init, [](){
             shader = std::make_shared<Shader>();
             shader->shader(std::string("LSystem vertex"),
-                           Shader::ProgramType::Vertex, true, glsl(
+                           Shader::ProgramType::Vertex, true, R"glsl(
                                                             uniform vec4 u_viewRect;
                                                             uniform mat4 u_view;
                                                             uniform mat4 u_viewProj;
@@ -121,21 +121,21 @@ namespace LabRender {
                                                                 v_pos = gl_Position;
                                                                 v_normal = n;
                                                             }
-                                                            ))
+                                                            )glsl")
             .shader(std::string("LSystem frag"),
-                    Shader::ProgramType::Fragment, true, glsl(
+                    Shader::ProgramType::Fragment, true, R"glsl(
                                                        in vec2 v_normal;
                                                        in vec4 v_pos;
                                                        out vec4 color;
                                                        void main() {
                                                            color = vec4(1,0,0,1);
                                                        }
-                                                       ))
+                                                       )glsl")
             .link();
         });
         return shader;
     }
-    
+
     LSystemMesh::LSystemMesh() : ModelPart() {
         setVAO(std::unique_ptr<VAO>(
                 new VAO(std::make_shared<Buffer<VertPN>>(
@@ -145,51 +145,51 @@ namespace LabRender {
         setShader(lsystemShader());
     }
     LSystemMesh::~LSystemMesh() { }
-    
-    
-    
-    
-    
+
+
+
+
+
     struct Vert { float x; float y; float z; };
-    
+
     Vert vertices[] = {
         // Front Face (1-2-3-4)
         { -1.0f,  1.0f, -1.0f },
         {  1.0f,  1.0f, -1.0f },
         { -1.0f, -1.0f, -1.0f },
         {  1.0f, -1.0f, -1.0f },
-        
+
         // Right Face (2-6-4-8)
         { 1.0f,  1.0f, -1.0f },
         { 1.0f,  1.0f,  1.0f },
         { 1.0f, -1.0f, -1.0f },
         { 1.0f, -1.0f,  1.0f },
-        
+
         // Top Face (5-6-1-2)
         { -1.0f, 1.0f,  1.0f },
         {  1.0f, 1.0f,  1.0f },
         { -1.0f, 1.0f, -1.0f },
         {  1.0f, 1.0f, -1.0f },
-        
+
         // Back Face (6-5-8-7)
         {  1.0f,  1.0f, 1.0f },
         { -1.0f,  1.0f, 1.0f },
         {  1.0f, -1.0f, 1.0f },
         { -1.0f, -1.0f, 1.0f },
-        
+
         // Left Face (5-1-7-3)
         { -1.0f,  1.0f,  1.0f },
         { -1.0f,  1.0f, -1.0f },
         { -1.0f, -1.0f,  1.0f },
         { -1.0f, -1.0f, -1.0f },
-        
+
         // Bottom Face (3-4-7-8)
         { -1.0f, -1.0f, -1.0f },
         {  1.0f, -1.0f, -1.0f },
         { -1.0f, -1.0f,  1.0f },
         {  1.0f, -1.0f,  1.0f }
     };
-    
+
     int indices[] = {
         1,2,3,4,  // front
         6,5,8,7,  // back
@@ -198,8 +198,8 @@ namespace LabRender {
         5,6,1,2,  // top
         3,4,7,8   // bottom
     };
-    
-    
+
+
     void drawUnitCube(LSystemMesh* mesh, const glm::mat4x4& transform) {
         static glm::vec3 size(1,1,1);
         static glm::vec3 c(0,0,0);
@@ -213,7 +213,7 @@ namespace LabRender {
             c.x+-1.0f*sx,c.y+1.0f*sy,c.z+1.0f*sz,	c.x+-1.0f*sx,c.y+1.0f*sy,c.z+-1.0f*sz,	c.x+-1.0f*sx,c.y+-1.0f*sy,c.z+-1.0f*sz,	c.x+-1.0f*sx,c.y+-1.0f*sy,c.z+1.0f*sz,	// -X
             c.x+-1.0f*sx,c.y+-1.0f*sy,c.z+-1.0f*sz,	c.x+1.0f*sx,c.y+-1.0f*sy,c.z+-1.0f*sz,	c.x+1.0f*sx,c.y+-1.0f*sy,c.z+1.0f*sz,	c.x+-1.0f*sx,c.y+-1.0f*sy,c.z+1.0f*sz,	// -Y
             c.x+1.0f*sx,c.y+-1.0f*sy,c.z+-1.0f*sz,	c.x+-1.0f*sx,c.y+-1.0f*sy,c.z+-1.0f*sz,	c.x+-1.0f*sx,c.y+1.0f*sy,c.z+-1.0f*sz,	c.x+1.0f*sx,c.y+1.0f*sy,c.z+-1.0f*sz};	// -Z
-        
+
         static float normals[24*3]={
             1,0,0,	1,0,0,	1,0,0,	1,0,0,
             0,1,0,	0,1,0,	0,1,0,	0,1,0,
@@ -221,7 +221,7 @@ namespace LabRender {
             -1,0,0,	-1,0,0,	-1,0,0,	-1,0,0,
             0,-1,0,	0,-1,0,  0,-1,0,0,-1,0,
             0,0,-1,	0,0,-1,	0,0,-1,	0,0,-1};
-        
+
 #if 0
         static float texs[24*2]={
             0,1,	1,1,	1,0,	0,0,
@@ -231,7 +231,7 @@ namespace LabRender {
             1,0,	0,0,	0,1,	1,1,
             1,0,	0,0,	0,1,	1,1 };
 #endif
-        
+
         static uint8_t elements[6*6] ={
             0, 1, 2, 0, 2, 3,
             4, 5, 6, 4, 6, 7,
@@ -239,7 +239,7 @@ namespace LabRender {
             12,13,14,12,14,15,
             16,17,18,16,18,19,
             20,21,22,20,22,23 };
-        
+
         for (int i = 0; i < 36; ++i) {
             int index = elements[i] * 3;
             glm::vec4 p(vertices[index], vertices[index+1], vertices[index+2], 1);
@@ -247,23 +247,23 @@ namespace LabRender {
             mesh->vertData->vertexData<VertPN>(true)->push_back( VertPN(glm::vec3(transform * p), glm::vec3(transform * n)) );
         }
     }
-    
-    
-    
+
+
+
     void renderLSystem(LSystemMesh* mesh, float depth_comparison, const std::vector<LSystem::Shape>& ls, const glm::mat4x4& invCamera)
     {
         static bool init = true;
         if (init) {
             init = false;
         }
-        
+
         depth_comparison = 1e6;
-        
+
         float s = lscale * lscaleMax;
-        
+
         // create a scale matrix
         glm::mat4x4 transform(s);
-        
+
 #if 0
         glBegin(GL_POINTS);
         glColor4f(0.2f,0.2f, 0.2f, 0.2f, 1);
@@ -277,7 +277,7 @@ namespace LabRender {
         }
         glEnd();
 #endif
-        
+
         for (std::vector<LSystem::Shape>::const_iterator i = ls.begin(); i != ls.end(); ++i) {
             const LSystem::Shape& s = *i;
             float d = float(s.depth);
@@ -293,5 +293,5 @@ namespace LabRender {
             }
         }
     }
-    
+
 } // LabRender
