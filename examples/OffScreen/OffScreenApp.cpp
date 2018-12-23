@@ -30,13 +30,13 @@ public:
     : _renderer(renderer), _drawlist(drawlist)
     {
         run =
-            [this](const lab::Command & cmd, const string & path, const std::vector<Argument> & args, lab::Ack & ack) 
+            [this](const lab::Command & cmd, const string & path, const std::vector<Argument> & args, lab::Ack & ack)
             {
                 string filepath = args[0].stringArg;
-                _renderer->enqueCommand([this, filepath]() 
+                _renderer->enqueCommand([this, filepath]()
                 {
                     shared_ptr<lab::Render::Model> model = lab::Render::loadMesh(filepath);
-                    if (model) 
+                    if (model)
                     {
                         _drawlist->deferredMeshes.clear();
                         for (auto& i : model->parts())
@@ -81,9 +81,7 @@ public:
             lab::addPathVariable("{RESOURCE_ROOT}", ASSET_ROOT);
         }
 
-        //std::string path = "{ASSET_ROOT}/pipelines/deferred.json";
-        //std::string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
-        std::string path = "{ASSET_ROOT}/pipelines/deferred-offscreen.json";
+        std::string path = "{ASSET_ROOT}/pipelines/deferred-offscreen.labfx";
         std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());
@@ -155,7 +153,7 @@ public:
                         lab::TestConditions::exhaustive, "main loop end");
     }
 
-    virtual void keyPress(int key) override 
+    virtual void keyPress(int key) override
     {
         switch (key) {
             case GLFW_KEY_C: cameraRigMode = lab::CameraRigMode::Crane; break;
@@ -165,13 +163,13 @@ public:
         }
     }
 
-    virtual void mouseDown(v2f windowSize, v2f pos) override 
+    virtual void mouseDown(v2f windowSize, v2f pos) override
     {
         previousMousePosition = pos;
         initialMousePosition = pos;
     }
 
-    virtual void mouseDrag(v2f windowSize, v2f pos) override 
+    virtual void mouseDrag(v2f windowSize, v2f pos) override
     {
         v2f delta = pos - previousMousePosition;
         previousMousePosition = pos;
@@ -184,16 +182,16 @@ public:
         lab::cameraRig_interact(camera, cameraRigMode, V2F(distanceX, distanceY));
     }
 
-    virtual void mouseUp(v2f windowSize, v2f pos) override 
+    virtual void mouseUp(v2f windowSize, v2f pos) override
     {
-        if (lab::vector_length(previousMousePosition - initialMousePosition) < 2) 
+        if (lab::vector_length(previousMousePosition - initialMousePosition) < 2)
         {
             // test for clicked object
             //
         }
     }
 
-    virtual void mouseMove(v2f windowSize, v2f pos) override 
+    virtual void mouseMove(v2f windowSize, v2f pos) override
     {
     }
 };
@@ -202,6 +200,8 @@ public:
 int main(void)
 {
     shared_ptr<LabRenderExampleApp> appPtr = make_shared<LabRenderExampleApp>();
+
+    printf("Note: This app tests offscreen rendering, so nothing will appear in the window\n");
 
     lab::checkError(lab::ErrorPolicy::onErrorThrow,
         lab::TestConditions::exhaustive, "main loop start");

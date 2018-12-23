@@ -32,7 +32,7 @@ pass: clear framebuffer
   clear depth: no
   clear outputs: yes
   outputs: resolve [ color ]
- 
+
 pass: clear gbuffer
   draw: no
   clear depth: no
@@ -129,17 +129,17 @@ shader: sky
         source:
         ```glsl
             void main() {
-                //o_diffuseTexture = vec4(texture(skyCube, var.eyeDirection).xyz, 1.0);
-                o_diffuseTexture = vec4(0.5 * clamp(1.0 - var.eyeDirection.y, 0, 1), 0.5 * clamp(var.eyeDirection.y, 0, 1), 0, 1);
-                o_diffuseTexture.x = 0;
+                //o_diffuse_texture = vec4(texture(skyCube, var.eyeDirection).xyz, 1.0);
+                o_diffuse_texture = vec4(0.5 * clamp(1.0 - var.eyeDirection.y, 0, 1), 0.5 * clamp(var.eyeDirection.y, 0, 1), 0, 1);
+                o_diffuse_texture.x = 0;
             }
         ```
 --------------------------------------------------------------------------------
 shader: full-screen-deferred-quad
 
     uniforms:
-        [ u_normalTexture: sampler2d,
-          u_diffuseTexture: sampler2d ]
+        [ u_normal_texture: sampler2d,
+          u_diffuse_texture: sampler2d ]
 
     varying:
        [ v_texCoord: vec2 ]
@@ -162,15 +162,15 @@ shader: full-screen-deferred-quad
         ```glsl
             void main()
             {
-                vec3 normal = texture(u_normalTexture, var.v_texCoord).xyz;
+                vec3 normal = texture(u_normal_texture, var.v_texCoord).xyz;
                 vec3 light = normalize(vec3(0.1, 0.4, 0.2));
                 float i = dot(normal, normal);
                 if (i > 0.0) {
                     i = dot(normal, light);
-                    o_colorTexture = texture(u_diffuseTexture, var.v_texCoord) * vec4(i,i,i, 1);
+                    o_color_texture = texture(u_diffuse_texture, var.v_texCoord) * vec4(i,i,i, 1);
                 }
                 else {
-                    o_colorTexture = texture(u_diffuseTexture, var.v_texCoord);
+                    o_color_texture = texture(u_diffuse_texture, var.v_texCoord);
                 }
             }
         ```

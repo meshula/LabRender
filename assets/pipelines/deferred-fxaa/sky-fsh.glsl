@@ -132,5 +132,5 @@ vec4 direction_color_main()
 }
 
 void main() {
-	o_colorTexture = sky_color_main();
+	o_color_texture = sky_color_main();
 }

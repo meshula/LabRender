@@ -33,7 +33,7 @@
 namespace lab {
 
 
-    class AppBase 
+    class AppBase
     {
     protected:
         v2f _mousePos;
@@ -62,7 +62,7 @@ namespace lab {
             return false;
         }
 
-        virtual void renderStart(Render::PassRenderer::RenderLock & rl, double globalTime, v2i offset, v2i size) 
+        virtual void renderStart(Render::PassRenderer::RenderLock & rl, double globalTime, v2i offset, v2i size)
         {
             if (!rl.valid() || rl.renderInProgress())
                 return;
@@ -73,7 +73,7 @@ namespace lab {
         }
         virtual void doRenderStart(Render::PassRenderer::RenderLock &, v2i offset, v2i size) = 0;
 
-        virtual void renderEnd(Render::PassRenderer::RenderLock& rl) 
+        virtual void renderEnd(Render::PassRenderer::RenderLock& rl)
         {
             if (!rl.valid() || !rl.renderInProgress())
                 return;
@@ -260,7 +260,7 @@ namespace lab {
             return {w,h};
         }
 
-        virtual bool isFinished() override 
+        virtual bool isFinished() override
         {
             return !!glfwWindowShouldClose(window);
         }
@@ -270,13 +270,13 @@ namespace lab {
             glfwPollEvents();
         }
 
-        virtual void frameEnd() override 
+        virtual void frameEnd() override
         {
             glfwSwapBuffers(window);
         }
 
     protected:
-        virtual void doRenderStart(Render::PassRenderer::RenderLock & rl, v2i offset, v2i size) override 
+        virtual void doRenderStart(Render::PassRenderer::RenderLock & rl, v2i offset, v2i size) override
         {
             if (!rl.valid())
                 return;
@@ -286,7 +286,7 @@ namespace lab {
             glClear(GL_COLOR_BUFFER_BIT);
         }
 
-        virtual void doRenderEnd(Render::PassRenderer::RenderLock & rl) override 
+        virtual void doRenderEnd(Render::PassRenderer::RenderLock & rl) override
         {
             if (!rl.valid())
                 return;

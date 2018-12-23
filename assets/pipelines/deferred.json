@@ -51,7 +51,7 @@
 		    "depth" : { "test": "always", "write": "no", "clear_buffer": "no" },
 	        "shader": { "vertex_shader_path":   "{ASSET_ROOT}/pipelines/deferred/full-screen-quad-vsh.glsl",
                	        "fragment_shader_path": "{ASSET_ROOT}/pipelines/deferred/full-screen-deferred-blit-fsh.glsl",
-	                    "uniforms": [ { "name": "u_normalTexture", "type": "sampler2d" }],
+	                    "uniforms": [ { "name": "u_normal_texture", "type": "sampler2d" }],
 	                    "varyings": [ { "name": "v_texCoord",     "type": "vec2" } ] },
 		    "inputs": [ { "buffer": "gbuffer",
 		                  "render_textures": ["diffuse", "position", "normal"] } ],

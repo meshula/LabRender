@@ -1,5 +1,5 @@
 
-add_executable(OffScreen 
+add_executable(OffScreen
     OffScreenApp.h
     OffScreenApp.cpp
 )
@@ -32,7 +32,6 @@ target_link_libraries(OffScreen
     LabRender::Imgui
     LabRender::ModelLoader
 )
-
 
 install(TARGETS OffScreen
     ARCHIVE DESTINATION lib
