@@ -30,13 +30,13 @@ public:
     : _renderer(renderer), _drawlist(drawlist)
     {
         run =
-            [this](const lab::Command & cmd, const string & path, const std::vector<Argument> & args, lab::Ack & ack) 
+            [this](const lab::Command & cmd, const string & path, const std::vector<Argument> & args, lab::Ack & ack)
             {
                 string filepath = args[0].stringArg;
-                _renderer->enqueCommand([this, filepath]() 
+                _renderer->enqueCommand([this, filepath]()
                 {
                     shared_ptr<lab::Render::Model> model = lab::Render::loadMesh(filepath);
-                    if (model) 
+                    if (model)
                     {
                         _drawlist->deferredMeshes.clear();
                         for (auto& i : model->parts())
@@ -75,9 +75,7 @@ public:
         else
             lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
 
-        //std::string path = "{ASSET_ROOT}/pipelines/deferred.json";
-        //std::string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
-        std::string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
+        std::string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
         std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());

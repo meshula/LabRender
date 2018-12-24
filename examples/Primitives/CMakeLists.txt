@@ -1,5 +1,5 @@
 
-add_executable(Primitives 
+add_executable(Primitives
     PrimitivesApp.h
     PrimitivesApp.cpp
 )
