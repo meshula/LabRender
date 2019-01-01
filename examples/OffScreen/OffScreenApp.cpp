@@ -145,9 +145,13 @@ public:
 
         renderEnd(rl);
 
-//        auto fb = dr->framebuffer("gbuffer");
-	//    if (fb && fb->textures.size())
-	  //      fb->textures[0]->save("C:\\Projects\\foo.png");
+        auto fb = dr->framebuffer("gbuffer");
+	    if (fb && fb->textures.size())
+            for (int i = 0; i < fb->baseNames.size(); ++i)
+            {
+                std::string name = "C:\\Projects\\foo_" + fb->baseNames[i] + ".png";
+    	        fb->textures[i]->save(name.c_str());
+            }
 
         lab::checkError(lab::ErrorPolicy::onErrorThrow,
                         lab::TestConditions::exhaustive, "main loop end");

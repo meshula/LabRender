@@ -1,10 +1,10 @@
 
 --- labfx version 1.0
 
-name: Deferred Example with FXAA
+name: Deferred Example
 version: 1.0
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 buffer: gbuffer
   has depth: yes
@@ -14,7 +14,7 @@ buffer: gbuffer
       normal, f16x4, scale: 1.0
       color, f16x4, scale: 1.0 ]
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 pass: clear gbuffer
   draw: no
@@ -60,7 +60,6 @@ shader: sky
     vsh:
         attributes:
         [ a_position: vec3 <- position ]
-
 
         source:
         ```glsl

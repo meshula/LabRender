@@ -2,7 +2,7 @@
 #include <LabRenderGraph/LabRenderGraph.h>
 #include <LabRenderTypes/Texture.h>
 
-#include <LabText/TextScanner.h>
+#include <LabText/LabText.h>
 
 #include <iostream>
 #include <string>

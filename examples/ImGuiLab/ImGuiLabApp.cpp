@@ -194,14 +194,14 @@ public:
 };
 
 
-int main(void)
+int main(int argc, char* argv[])
 {
     shared_ptr<LabRenderExampleApp> appPtr = make_shared<LabRenderExampleApp>();
 
 	lab::checkError(lab::ErrorPolicy::onErrorThrow,
 		lab::TestConditions::exhaustive, "main loop start");
 
-	LabRenderExampleApp *app = appPtr.get();
+	LabRenderExampleApp* app = appPtr.get();
 
     app->createScene();
 

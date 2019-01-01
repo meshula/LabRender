@@ -98,7 +98,7 @@ public:
 		else
 			lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
 
-		std::string path = "{ASSET_ROOT}/pipelines/deferred.labfx";
+		std::string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
 		std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());

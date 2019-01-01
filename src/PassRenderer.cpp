@@ -559,7 +559,7 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
         else
         {
             glEnable(GL_DEPTH_TEST);
-            int itype = static_cast< typename std::underlying_type<DepthTest>::type >(pass->depthTest);
+            int itype = static_cast<int>(pass->depthTest);
             glDepthFunc(depthTestToGL[itype]);
         }
 
