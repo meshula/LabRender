@@ -54,6 +54,7 @@ namespace lab { namespace Render {
             std::vector<std::pair<std::string, std::string>> readAttachments;
 
             DepthTest depthTest = DepthTest::less;
+            bool active = true;
             bool writeDepth = true;
             bool clearDepthBuffer = false;
             bool clearGbuffer = false;
@@ -85,7 +86,7 @@ namespace lab { namespace Render {
         LR_API virtual void render(RenderLock & rl, v2i fbSize, DrawList &) override;
 
     private:
-        Pass* _findPass(const std::string &) const;
+        LR_API Pass* _findPass(const std::string &) const;
 
         class Detail;
         Detail *_detail;

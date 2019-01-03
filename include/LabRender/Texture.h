@@ -46,21 +46,21 @@ namespace lab { namespace Render {
 
         Texture & create(int w, int h, Render::TextureType, int filter, int wrap);
 
-        Texture & create(int w, int h, Render::TextureType resultType, int filter, int wrap, 
+        Texture & create(int w, int h, Render::TextureType resultType, int filter, int wrap,
                          Render::TextureType srcDataType, void *data);
-        Texture & create(int w, int h, int depth, Render::TextureType resultType, int filter, int wrap, 
+        Texture & create(int w, int h, int depth, Render::TextureType resultType, int filter, int wrap,
                          Render::TextureType srcDataType, void *data);
 
         // create a depth texture
         Texture & createDepth(int w, int h);
 
         // cube from faces
-        Texture & createCube(int w, int h, Render::TextureType resultType, int filter, int wrap, 
+        Texture & createCube(int w, int h, Render::TextureType resultType, int filter, int wrap,
                              Render::TextureType srcDataType,
                              void* px, void* nx, void* py, void* ny, void* pz, void* nz);
 
         enum class CubeImageDataType { vstrip };
-        Texture & createCube(int w, int h, Render::TextureType resultType, int filter, int wrap, 
+        Texture & createCube(int w, int h, Render::TextureType resultType, int filter, int wrap,
                              Render::TextureType srcDataType,
                              CubeImageDataType cubeType, void* image);
 

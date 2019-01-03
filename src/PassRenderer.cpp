@@ -95,6 +95,7 @@ void PassRenderer::Pass::prepareFullScreenQuadAndShader(const FramebufferSet & f
         sb.setAttributes(* _fullScreenQuadMesh.get());
         sb.setVaryings(shaderSpec);
         sb.setUniforms(shaderSpec);
+        sb.setAttributes(shaderSpec);
         sb.setSamplers(shaderSpec);
 
         shaderSpec.name = name();
@@ -256,15 +257,21 @@ void PassRenderer::configure(char const*const path)
             {
                 pass->shaderSpec.varyings.push_back(make_pair(varying.name, varying.type));
             }
+
+            for (const auto& attribute : shader->attributes)
+            {
+                pass->shaderSpec.attributes.push_back(make_pair(attribute.name, attribute.type));
+            }
         }
 
-        pass->isQuadPass = ps.draw == lab::fx::pass_draw::quad;
+        pass->isQuadPass = ps.draw == lab::fx::pass_draw::quad || ps.draw == lab::fx::pass_draw::blit;
         pass->drawOpaqueGeometry = ps.draw == lab::fx::pass_draw::opaque_geometry;
         pass->writeDepth = ps.write_depth;
         pass->depthTest = ps.test;
         pass->clearDepthBuffer = ps.clear_depth;
         pass->clearGbuffer = ps.clear_outputs;
         pass->writeBuffer = ps.output_buffer;
+        pass->active = ps.active;
 
         for (const auto& tx : ps.output_textures)
             pass->writeAttachments.push_back(tx);
@@ -277,6 +284,91 @@ void PassRenderer::configure(char const*const path)
                                                 SemanticType::sampler2D_st,
                                                 AutomaticUniform::none,
                                                 tx.name));
+        }
+
+        if (pass->isQuadPass && !pass->shaderSpec.vtx_src.length())
+        {
+            // this bit is to support the convenience of having a blit draw pass.
+            // it does allow overriding either the vertex or fragment shader,
+            // so generally speaking this is a terrible idea except for the fact
+            // that I want to use it.
+            size_t i = 0;
+            for ( ; i < pass->shaderSpec.attributes.size(); ++i)
+                if (pass->shaderSpec.attributes[i].first == "a_position")
+                    break;
+            if (i == pass->shaderSpec.attributes.size())
+                pass->shaderSpec.attributes.push_back(make_pair("a_position", lab::Render::SemanticType::vec3_st));
+            i = 0;
+            for ( ; i < pass->shaderSpec.attributes.size(); ++i)
+                if (pass->shaderSpec.attributes[i].first == "a_uv")
+                    break;
+            if (i == pass->shaderSpec.attributes.size())
+                pass->shaderSpec.attributes.push_back(make_pair("a_uv", lab::Render::SemanticType::vec2_st));
+
+            i = 0;
+            for ( ; i < pass->shaderSpec.varyings.size(); ++i)
+                if (pass->shaderSpec.varyings[i].first == "texCoord")
+                    break;
+            if (i == pass->shaderSpec.varyings.size())
+                pass->shaderSpec.varyings.push_back(make_pair("texCoord", lab::Render::SemanticType::vec2_st));
+
+            pass->shaderSpec.vtx_src = R"glsl(
+void main()
+{
+  var.texCoord = a_uv;
+  gl_Position = vec4(a_position, 1.0);
+}
+            )glsl";
+        }
+        if (pass->isQuadPass && !pass->shaderSpec.fgmt_src.length() && ps.input_textures.size() > 0)
+        {
+            // this bit is to support the convenience of having a blit draw pass.
+            // it does allow overriding either the vertex or fragment shader,
+            // so generally speaking this is a terrible idea except for the fact
+            // that I want to use it.
+            size_t i = 0;
+            for ( ; i < pass->shaderSpec.attributes.size(); ++i)
+                if (pass->shaderSpec.attributes[i].first == "a_position")
+                    break;
+            if (i == pass->shaderSpec.attributes.size())
+                pass->shaderSpec.attributes.push_back(make_pair("a_position", lab::Render::SemanticType::vec3_st));
+            i = 0;
+            for ( ; i < pass->shaderSpec.attributes.size(); ++i)
+                if (pass->shaderSpec.attributes[i].first == "a_uv")
+                    break;
+            if (i == pass->shaderSpec.attributes.size())
+                pass->shaderSpec.attributes.push_back(make_pair("a_uv", lab::Render::SemanticType::vec2_st));
+
+            i = 0;
+            for ( ; i < pass->shaderSpec.varyings.size(); ++i)
+                if (pass->shaderSpec.varyings[i].first == "texCoord")
+                    break;
+            if (i == pass->shaderSpec.varyings.size())
+                pass->shaderSpec.varyings.push_back(make_pair("texCoord", lab::Render::SemanticType::vec2_st));
+
+            bool backbuffer_write = ps.output_textures.size() == 0;
+            for (const auto& tx : ps.output_textures)
+            {
+                if (tx == "visible")
+                {
+                    backbuffer_write = true;
+                    break;
+                }
+            }
+
+            std::string input_texture = "u_" + ps.input_textures[0].texture + "_texture";
+
+            pass->shaderSpec.uniforms.push_back(Uniform(input_texture, lab::Render::SemanticType::sampler2D_st, lab::Render::AutomaticUniform::none, ps.input_textures[0].name));
+
+            std::string output;
+            if (backbuffer_write)
+                output = "fragColor";
+            else
+                output = "o_" + ps.output_textures[0] + "_texture";
+
+            std::string s = backbuffer_write? "out vec4 fragColor;\n" : "";
+            s += "void main() {\n   " + output + " = vec4(texture(" + input_texture + ", var.texCoord).xyz, 1.0);\n}\n\n";
+            pass->shaderSpec.fgmt_src = s;
         }
     }
 
@@ -535,6 +627,9 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
 
     for (auto pass : _detail->passes)
 	{
+        if (!pass->active)
+            continue;
+
         checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "render, before pass");
 
         //&&&if (bound_frame_buffer != pass->writeBuffer || bound_attachments != pass->writeAttachments)

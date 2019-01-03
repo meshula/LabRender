@@ -61,7 +61,7 @@ struct buffer_select
 
 enum class pass_draw
 {
-    none, opaque_geometry, quad
+    none, blit, quad, opaque_geometry
 };
 
 struct pass
@@ -71,6 +71,7 @@ struct pass
 
     pass_draw draw {pass_draw::none};
     lab::Render::DepthTest test {lab::Render::DepthTest::always};
+    bool active {true};
     bool clear_depth {false};
     bool clear_outputs {false};
     bool write_depth {false};

@@ -85,6 +85,10 @@ public:
         std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());
+        auto pass = dr->findPass<lab::Render::PassRenderer::Pass>("blit");
+        if (pass)
+            pass->active = true;
+
         cameraRigMode = lab::CameraRigMode::TurnTableOrbit;
     }
 
@@ -145,13 +149,17 @@ public:
 
         renderEnd(rl);
 
-        auto fb = dr->framebuffer("gbuffer");
-	    if (fb && fb->textures.size())
-            for (int i = 0; i < fb->baseNames.size(); ++i)
-            {
-                std::string name = "C:\\Projects\\foo_" + fb->baseNames[i] + ".png";
-    	        fb->textures[i]->save(name.c_str());
-            }
+        static bool saving = false;
+        if (saving)
+        {
+            auto fb = dr->framebuffer("gbuffer");
+	        if (fb && fb->textures.size())
+                for (int i = 0; i < fb->baseNames.size(); ++i)
+                {
+                    std::string name = "C:\\Projects\\foo_" + fb->baseNames[i] + ".png";
+    	            fb->textures[i]->save(name.c_str());
+                }
+        }
 
         lab::checkError(lab::ErrorPolicy::onErrorThrow,
                         lab::TestConditions::exhaustive, "main loop end");

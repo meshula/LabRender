@@ -16,11 +16,11 @@
 
 namespace lab { namespace Render {
 
-    class ShaderBuilder 
+    class ShaderBuilder
 	{
     public:
 
-        class ShaderSpec 
+        class ShaderSpec
 		{
         public:
             std::string name;
@@ -29,10 +29,11 @@ namespace lab { namespace Render {
 
             std::vector<Uniform> uniforms;
             std::vector<Uniform> samplers;
+            std::vector<std::pair<std::string, SemanticType>> attributes;
             std::vector<std::pair<std::string, SemanticType>> varyings;
         };
 
-        class Cache 
+        class Cache
 		{
         public:
             Cache();
@@ -51,8 +52,9 @@ namespace lab { namespace Render {
 
         void clear();
         void setFrameBufferOutputs(const FrameBuffer& fbo, const std::vector<std::string>& output_attachments);
-        void setAttributes(const ModelPart& mesh);
+        void setAttributes(const ModelPart& mesh); /// @TODO deprecate
 
+        void setAttributes(const ShaderSpec&);  /// @TODO ModelPart should call this explicitly
         void setUniforms(const ShaderSpec&);
         void setVaryings(const ShaderSpec&);
         void setSamplers(const ShaderSpec&);
@@ -74,7 +76,7 @@ namespace lab { namespace Render {
 
         std::set<Semantic*> uniforms;
         std::set<Semantic*> samplers;
-        std::set<Semantic*> attributes;
+        std::map<std::string, Semantic*> attributes;
         std::set<Semantic*> varyings;
         std::set<Semantic*> outputs;
     };

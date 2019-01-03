@@ -9,7 +9,7 @@
 
 namespace lab {
 
-    class Mount 
+    class Mount
     {
         m44f _viewTransform;
 
@@ -46,7 +46,7 @@ namespace lab {
         v3f   gamma =    { 2.2f, 2.2f, 2.2f };
     };
 
-    struct Optics 
+    struct Optics
     {
         MM    focalLength = 50.f;
         float zfar =        1e5f;
@@ -60,7 +60,7 @@ namespace lab {
         return 2.f * atanf(sensor.aperture.y / (2.f * optics.focalLength));
     }
 
-    class Camera 
+    class Camera
     {
     public:
         Mount  mount;
@@ -79,7 +79,7 @@ namespace lab {
         // Creates a matrix suitable for an OpenGL style MVP matrix
         // invert the view transform for graphics engines that pre-multiply
         //
-        void updateViewTransform() 
+        void updateViewTransform()
         {
             mount.lookat(position, focusPoint, worldUp);
         }
@@ -88,7 +88,7 @@ namespace lab {
         LR_API void autoSetClippingPlanes(std::pair<v3f, v3f> bounds);
     };
 
-    enum class CameraRigMode 
+    enum class CameraRigMode
     {
         Dolly, Crane, TurnTableOrbit, Fly
     };

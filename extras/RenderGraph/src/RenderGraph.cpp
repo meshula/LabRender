@@ -21,8 +21,6 @@ StrView SkipComments(StrView str)
     return str;
 }
 
-
-
 using lab::Render::SemanticType;
 
 StrView tok_yes{"yes", 3};
@@ -38,6 +36,7 @@ enum class RenderToken
     texture, path,
     pass,
     draw,
+    active,
     clear_depth, write_depth, depth_test,
     clear_outputs,
     use_shader,
@@ -62,6 +61,7 @@ NamedRenderToken tokens[] =
     { RenderToken::textures,   {"textures", 8} },
     { RenderToken::texture,    {"texture", 7} },
     { RenderToken::pass,       {"pass", 4} },
+    { RenderToken::active,     {"active", 6} },
     { RenderToken::path,       {"path", 4} },
     { RenderToken::shader,     {"shader", 6} },
     { RenderToken::use_shader, {"use shader", 10} },
@@ -278,9 +278,11 @@ lab::Render::DepthTest depth_test_from_str(StrView str)
 pass_draw pass_draw_from_str(StrView str)
 {
     static StrView tok_opaque_geometry {"opaque geometry", 15};
-    if (str == tok_opaque_geometry) return pass_draw::opaque_geometry;
     static StrView tok_quad {"quad", 4};
+    static StrView tok_blit {"blit", 4};
+    if (str == tok_opaque_geometry) return pass_draw::opaque_geometry;
     if (str == tok_quad) return pass_draw::quad;
+    if (str == tok_blit) return pass_draw::blit;
     return pass_draw::none;
 }
 
@@ -459,6 +461,14 @@ StrView parse_pass(StrView start, labfx& fx)
             str_token = Expect(str_token, StrView{":", 1});
             str_token = Strip(ScanForNonWhiteSpace(str_token));
             fx.passes.back().shader = std::string(str_token.curr, str_token.sz);
+            break;
+
+        case RenderToken::active:
+            curr = ScanForEndOfLine(curr, str_token);
+            str_token = ScanForNonWhiteSpace(str_token);
+            str_token = Expect(str_token, StrView{":", 1});
+            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            fx.passes.back().active = str_token == tok_yes || str_token == tok_true;
             break;
 
         case RenderToken::draw:

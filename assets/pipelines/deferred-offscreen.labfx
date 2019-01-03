@@ -51,14 +51,19 @@ pass: sky
   use shader: sky
   outputs: gbuffer [diffuse]
 
-pass: post process and blit
+pass: post process
   draw: quad
   depth test: never
   write depth: no
   clear depth: no
-  use shader: full-screen-deferred-quad-to-fb
-  inputs: [gbuffer.diffuse, gbuffer.position, gbuffer.normal]
-  --outputs: resolve [ color ]
+  use shader: full-screen-deferred-quad
+  inputs: [gbuffer.diffuse, gbuffer.normal]
+  outputs: resolve [ color ]
+
+pass: blit
+  draw: blit
+  inputs: [resolve.color]
+  active: no
   outputs: visible -- visible is special: the default found frame buffer
 
 --------------------------------------------------------------------------------

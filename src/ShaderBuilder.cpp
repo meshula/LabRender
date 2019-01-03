@@ -91,7 +91,7 @@ ShaderBuilder::~ShaderBuilder()
 void ShaderBuilder::clear()
 {
     for (auto i : uniforms) delete i;   uniforms.clear();
-    for (auto i : attributes) delete i; attributes.clear();
+    for (auto i : attributes) delete i.second; attributes.clear();
     for (auto i : varyings) delete i;   varyings.clear();
     for (auto i : outputs) delete i;    outputs.clear();
 }
@@ -129,7 +129,14 @@ void ShaderBuilder::setAttributes(const ModelPart& mesh)
     VAO* vao = mesh.verts();
     vao->uploadVerts();
     for (int i = 0; i < vao->attributes.size(); ++i)
-        attributes.insert(new Semantic(vao->attributes[i]));
+        attributes[vao->attributes[i].name] = new Semantic(vao->attributes[i]);
+}
+
+void ShaderBuilder::setAttributes(const ShaderSpec& spec)
+{
+    std::set<Semantic*> u = Semantic::makeSemantics(spec.attributes);
+    for (auto i : u)
+        attributes[i->name] = i;
 }
 
 void ShaderBuilder::setUniforms(const ShaderSpec& spec)
@@ -178,7 +185,7 @@ std::string ShaderBuilder::generateVertexShader(const char* body)
     s << preamble();
 
     for (auto a : attributes)
-        s << a->attributeString() << std::endl;
+        s << a.second->attributeString() << std::endl;
     for (auto u : uniforms)
         s << u->uniformString() << std::endl;
 
