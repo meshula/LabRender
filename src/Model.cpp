@@ -25,12 +25,18 @@
 #include <map>
 #include <vector>
 
-#include <LabText/TextScanner.hpp>
-
 using std::shared_ptr;
 using std::unique_ptr;
 using std::vector;
 using std::string;
+
+inline uint64_t Hash(const char *buf, size_t len)
+{
+    uint64_t hash = 5381;
+    while (len--)
+        hash = ((hash << 5) + hash) + (*buf++); /* hash * 33 + c */
+    return hash;
+}
 
 namespace lab { namespace Render {
 
@@ -96,13 +102,13 @@ namespace lab { namespace Render {
         // hash in unique source to shader name if source was provided
 
         if (vshSrc) {
-            uint64_t hash = TextScanner::Hash(vshSrc, strlen(vshSrc));
+            uint64_t hash = Hash(vshSrc, strlen(vshSrc));
             std::stringstream ss;
             ss << "/v" << hash;
             shaderName += ss.str();
         }
         if (fshSrc) {
-            uint64_t hash = TextScanner::Hash(fshSrc, strlen(fshSrc));
+            uint64_t hash = Hash(fshSrc, strlen(fshSrc));
             std::stringstream ss;
             ss << "/f" << hash;
             shaderName += ss.str();
