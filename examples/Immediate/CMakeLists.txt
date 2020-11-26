@@ -28,7 +28,8 @@ set(${TARGET_NAME}_SRC
 )
 
 add_executable(${TARGET_NAME} ${${TARGET_NAME}_SRC})
-set_cxx_version(${TARGET_NAME} 14)
+
+lab_default_definitions(${TARGET_NAME} 14)
 
 target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(${TARGET_NAME} PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
@@ -48,7 +49,7 @@ target_link_libraries(${TARGET_NAME} optimized
 
 target_link_libraries(${TARGET_NAME} 
     Lab::Math 
-    LabCmd::Core 
+    Lab::Cmd 
     LabRender::Core 
     LabRender::ModelLoader
     Fmt::Format

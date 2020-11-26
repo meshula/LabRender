@@ -26,7 +26,7 @@ target_link_libraries(ImGuiLab optimized
 target_link_libraries(ImGuiLab
     GLM::Core
     GLEW::Shared
-    LabCmd::Core
+    Lab::Cmd
     Lab::Math
     LabRender::Core
     LabRender::Binder

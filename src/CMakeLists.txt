@@ -27,7 +27,7 @@ lab_library(LabRender
         ${GLEW_LIBRARY}
         ${OPENGL_LIBRARIES}
         LabRender::LabRenderGraph
-        LabCmd::Core
+        Lab::Cmd
         Lab::Math
         Lab::Text
 

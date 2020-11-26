@@ -20,7 +20,7 @@ target_link_libraries(LabRenderExample optimized
     ${Assimp_LIBRARY_RELEASE})
 
 target_link_libraries(LabRenderExample
-    LabCmd::Core
+    Lab::Cmd
     LabRender::Core
     LabRender::ModelLoader
     Lab::Math)

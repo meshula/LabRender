@@ -25,7 +25,7 @@ target_link_libraries(OffScreen optimized
 
 target_link_libraries(OffScreen
     GLEW::Shared
-    LabCmd::Core
+    Lab::Cmd
     Lab::Math
     LabRender::Core
     LabRender::Binder

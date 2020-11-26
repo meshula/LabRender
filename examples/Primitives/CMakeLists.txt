@@ -25,7 +25,7 @@ target_link_libraries(Primitives optimized
 
 target_link_libraries(Primitives
     GLEW::Shared
-    LabCmd::Core
+    Lab::Cmd
     Lab::Math
     LabRender::Core
     LabRender::Binder

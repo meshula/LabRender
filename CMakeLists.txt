@@ -1,4 +1,5 @@
 
+cmake_minimum_required(VERSION 3.08)
 project(LabRender)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -10,8 +11,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../LabCMake/scripts
 
 include(Utilities)
 include(Settings)
-include(Packages)
 
-add_subdirectory(src)
+find_package(LabCmd)
+find_package(LabMath)
+find_package(LabText)
+find_package(OpenGL)
+
 add_subdirectory(extras)
+add_subdirectory(src)
 add_subdirectory(examples)
+
+configure_file(cmake/LabRenderConfig.cmake.in
+  "${PROJECT_BINARY_DIR}/LabRenderConfig.cmake" @ONLY)
+install(FILES
+  "${PROJECT_BINARY_DIR}/LabRenderConfig.cmake"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}"
+)

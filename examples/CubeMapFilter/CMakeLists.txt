@@ -24,7 +24,7 @@ target_link_libraries(CubeMapFilterLab optimized
 target_link_libraries(CubeMapFilterLab
     GLM::Core 
     GLEW::Shared
-    LabCmd::Core
+    Lab::Cmd
     Lab::Math
     LabRender::Core
     LabRender::Binder
