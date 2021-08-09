@@ -21,7 +21,7 @@
 #    import <OpenGL/CGLCurrent.h>
 #    import <OpenGL/gl3.h>
 #  endif
-#elif defined(PLATFORM_WINDOWS)
+#elif defined(_WIN32)
 #  include <GL/glew.h>
 #  include <Windows.h>
 #  undef near

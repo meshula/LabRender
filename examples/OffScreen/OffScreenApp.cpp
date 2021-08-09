@@ -98,8 +98,10 @@ public:
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
         shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
-        for (auto& i : model->parts())
-            meshes.push_back({ lab::m44f_identity, i });
+        if (model) {
+            for (auto& i : model->parts())
+                meshes.push_back({ lab::m44f_identity, i });
+        }
 
         const float pi = float(M_PI);
 
@@ -123,11 +125,13 @@ public:
             meshes.push_back({m, mesh});
         }
 
-        static float foo = 0.f;
-        camera.position = {foo, 0, -1000};
-        lab::Bounds bounds = model->localBounds();
-        //bounds = model->transform.transformBounds(bounds);
-        camera.frame(bounds);
+        if (model) {
+            static float foo = 0.f;
+            camera.position = { foo, 0, -1000 };
+            lab::Bounds bounds = model->localBounds();
+            //bounds = model->transform.transformBounds(bounds);
+            camera.frame(bounds);
+        }
     }
 
     void render()

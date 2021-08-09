@@ -1,41 +1,33 @@
 
-cmake_minimum_required (VERSION 3.4)
+cmake_minimum_required (VERSION 3.19)
 
-
-if (APPLE)
-    set(DARWIN_SRC TextureLoader.mm)
-endif()
-
-lab_library(LabRenderTypes
-    TYPE STATIC
-    ALIAS LabRender::Types
-
-    PUBLIC_HEADERS
+set(LABRENDERTYPES_PUBLIC_HEADERS
         ../include/LabRenderTypes/DepthTest.h
         ../include/LabRenderTypes/SemanticType.h
         ../include/LabRenderTypes/Texture.h
-
-    CPPFILES
-        odr.cpp
 )
 
-lab_library(LabRender
-    TYPE SHARED
-    ALIAS LabRender::Core
+add_library(LabRenderTypes STATIC ${LABRENDERTYPES_PUBLIC_HEADERS} odr.cpp)
+target_include_directories(LabRenderTypes PUBLIC ${LABRENDER_ROOT}/include)
+set_target_properties(
+    LabRenderTypes
+    PROPERTIES
+        FOLDER "LabRenderTypes"
+        POSITION_INDEPENDENT_CODE ON
+        PUBLIC_HEADER "${LABRENDERTYPES_PUBLIC_HEADERS}"
+        OUTPUT_NAME "LabRenderTypes"
+        OUTPUT_NAME_DEBUG "LabRenderTypes_d"
+        INTERFACE_INCLUDE_DIRECTORIES ${LABRENDER_ROOT}/include
+)
 
-    LIBRARIES
-        ${GLEW_LIBRARY}
-        ${OPENGL_LIBRARIES}
-        LabRender::LabRenderGraph
-        Lab::Cmd
-        Lab::Math
-        Lab::Text
+add_library(Lab::RenderTypes ALIAS LabRenderTypes)
 
-    INCLUDE_DIRS
-        ${LABRENDER_ROOT}/include
-        ${GLM_INCLUDE_DIR}
 
-    PUBLIC_HEADERS
+if (APPLE)
+    set(LABRENDER_PLATFORM_SRC TextureLoader.mm)
+endif()
+
+set(LABRENDER_PUBLIC_HEADERS
         ../include/LabRender/Camera.h
         ../include/LabRender/DepthTest.h
         ../include/LabRender/DrawList.h
@@ -65,8 +57,9 @@ lab_library(LabRender
         ../include/LabRender/Vertex.h
         ../include/LabRender/ViewMatrices.h
         ../include/LabRenderTypes/Texture.h
+)
 
-    PRIVATE_HEADERS
+set(LABRENDER_PRIVATE_HEADERS
         tinyheaders/tinyalloc.h
         tinyheaders/tinypng.h
         tinyheaders/tinyspritebatch.h
@@ -75,8 +68,11 @@ lab_library(LabRender
         json/json.h
         gal/gl/gl-procedural-sky.hpp
         gal/gl/hosek_data_rgb.h
+)
 
-    CPPFILES
+
+
+add_library(LabRender STATIC ${LABRENDER_PUBLIC_HEADERS} ${LABRENDER_PRIVATE_HEADERS}
         Camera.cpp
         ErrorPolicy.cpp
         FrameBuffer.cpp
@@ -97,5 +93,37 @@ lab_library(LabRender
         Utils.cpp
         Vertex.cpp
         gal/gl/gl-procedural-sky.cpp
-        ${DARWIN_SRC}
+        ${LABRENDER_PLATFORM_SRC}
 )
+
+
+target_compile_definitions(LabRender 
+    PUBLIC LABRENDER_STATIC
+    PUBLIC GLEW_STATIC)
+
+
+target_include_directories(LabRender 
+    PUBLIC ${LABRENDER_ROOT}/include
+    PUBLIC ${STB_ROOT}
+)
+
+set_target_properties(
+    LabRender
+    PROPERTIES
+        FOLDER "LabRender"
+        POSITION_INDEPENDENT_CODE ON
+        PUBLIC_HEADER "${LABRENDER_PUBLIC_HEADERS}"
+        OUTPUT_NAME "LabRender"
+        OUTPUT_NAME_DEBUG "LabRender_d"
+        INTERFACE_INCLUDE_DIRECTORIES ${LABRENDER_ROOT}/include
+)
+
+target_link_libraries(LabRender 
+    GLEW::glew
+    ${OPENGL_LIBRARIES}
+    Lab::Cmd
+    Lab::Math
+    Lab::RenderGraph
+)
+
+add_library(Lab::Render ALIAS LabRender)

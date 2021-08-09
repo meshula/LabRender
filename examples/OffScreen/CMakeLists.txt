@@ -9,7 +9,6 @@ target_compile_definitions(OffScreen PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/asset
 target_include_directories(OffScreen PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(OffScreen PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(OffScreen PRIVATE "${LABRENDER_ROOT}/extras/include")
-target_include_directories(OffScreen PRIVATE "${GLEW_INCLUDE_DIR}")
 
 target_link_libraries(OffScreen debug
     ${OPENGL_LIBRARIES}
@@ -24,13 +23,13 @@ target_link_libraries(OffScreen optimized
 )
 
 target_link_libraries(OffScreen
-    GLEW::Shared
+    GLEW::glew
     Lab::Cmd
     Lab::Math
-    LabRender::Core
-    LabRender::Binder
-    LabRender::Imgui
-    LabRender::ModelLoader
+    Lab::Render
+    Lab::RenderBinder
+    Lab::RenderImgui
+    Lab::ModelLoader
 )
 
 install(TARGETS OffScreen

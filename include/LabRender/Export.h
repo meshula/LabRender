@@ -1,7 +1,7 @@
 
 #pragma once
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && defined(LABRENDER_SHARED)
 # ifdef BUILDING_LabRender
 #  define LR_CAPI extern "C" __declspec(dllexport)
 #  define LR_API __declspec(dllexport)

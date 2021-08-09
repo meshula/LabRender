@@ -1,4 +1,5 @@
 
+
 file(GLOB CUBEMAPFILTER_SRC "*.cpp")
 file(GLOB CMFT_SRC "cmft/*.cpp")
 file(GLOB CMFT_INC "cmft/*.h")
@@ -9,7 +10,7 @@ target_compile_definitions(CubeMapFilterLab PRIVATE ASSET_ROOT="${LABRENDER_ROOT
 target_include_directories(CubeMapFilterLab PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(CubeMapFilterLab PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(CubeMapFilterLab PRIVATE "${LABRENDER_ROOT}/extras/include")
-target_include_directories(CubeMapFilterLab PRIVATE "${GLEW_INCLUDE_DIR}")
+target_include_directories(CubeMapFilterLab PRIVATE "${STB_ROOT}")
 
 target_link_libraries(CubeMapFilterLab debug
     ${OPENGL_LIBRARIES}
@@ -22,14 +23,14 @@ target_link_libraries(CubeMapFilterLab optimized
     ${Assimp_LIBRARY_RELEASE})
 
 target_link_libraries(CubeMapFilterLab
-    GLM::Core 
-    GLEW::Shared
+    GLEW::glew
+    glfw
     Lab::Cmd
     Lab::Math
-    LabRender::Core
-    LabRender::Binder
-    LabRender::Imgui
-    LabRender::ModelLoader)
+    Lab::Render
+    Lab::RenderBinder
+    Lab::RenderImgui
+    Lab::ModelLoader)
 
 set_property(TARGET CubeMapFilterLab PROPERTY FOLDER "examples")
 

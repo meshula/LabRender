@@ -9,35 +9,30 @@ target_compile_definitions(Primitives PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/asse
 target_include_directories(Primitives PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(Primitives PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(Primitives PRIVATE "${LABRENDER_ROOT}/extras/include")
-target_include_directories(Primitives PRIVATE "${GLEW_INCLUDE_DIR}")
 
 target_link_libraries(Primitives debug
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
+    glfw
 )
 
 target_link_libraries(Primitives optimized
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
+    glfw
 )
 
 target_link_libraries(Primitives
-    GLEW::Shared
+    GLEW::glew
     Lab::Cmd
     Lab::Math
-    LabRender::Core
-    LabRender::Binder
-    LabRender::Imgui
-    LabRender::ModelLoader
+    Lab::Render
+    Lab::RenderBinder
+    Lab::RenderImgui
+    Lab::ModelLoader
 )
-
 
 install(TARGETS Primitives
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-)
+    RUNTIME DESTINATION bin)
 
 set_property(TARGET Primitives PROPERTY FOLDER "examples")

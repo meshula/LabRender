@@ -6,11 +6,15 @@
 #define BUILDING_LABRENDER_MODELLOADER
 #include "LabRenderModelLoader/modelLoader.h"
 
+#ifdef HAVE_ASSIMP
+
 #include <assimp/Importer.hpp>
 #include <assimp/IOSystem.hpp>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#endif
 
 #include <sstream>
 
@@ -214,6 +218,7 @@ namespace lab {
 			return path.substr(path.rfind('/') + 1, path.length());
 		}
 
+#ifdef HAVE_ASSIMP
 		std::unique_ptr<ModelPart> convertMesh(const aiMesh *aim)
 		{
 			const int hasNormalsAttr = 1;
@@ -591,7 +596,7 @@ namespace lab {
 
 			return labmesh;
 		}
-
+#endif
 
 		std::string intToString(int i)
 		{
@@ -609,6 +614,7 @@ namespace lab {
 
 	std::shared_ptr<Model> loadMesh(const std::string& srcFilename)
 	{
+#ifdef HAVE_ASSIMP
 		unsigned int flags =
 			aiProcess_Triangulate
 			| aiProcess_FlipUVs
@@ -657,6 +663,8 @@ namespace lab {
 			meshNames.push_back(name);
 		}
 		return mesh;
+#endif
+		return {};
 	}
 
     } // Render

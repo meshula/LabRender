@@ -29,8 +29,6 @@ set(${TARGET_NAME}_SRC
 
 add_executable(${TARGET_NAME} ${${TARGET_NAME}_SRC})
 
-lab_default_definitions(${TARGET_NAME} 14)
-
 target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(${TARGET_NAME} PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
 target_include_directories(${TARGET_NAME} PRIVATE "${LOCAL_ROOT}/include")
@@ -50,11 +48,10 @@ target_link_libraries(${TARGET_NAME} optimized
 target_link_libraries(${TARGET_NAME} 
     Lab::Math 
     Lab::Cmd 
-    LabRender::Core 
-    LabRender::ModelLoader
-    Fmt::Format
-    GLM::Core 
-    GLEW::Shared)
+    Lab::Render 
+    Lab::ModelLoader
+    glfw
+    GLEW::glew)
 
 set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "examples")
 

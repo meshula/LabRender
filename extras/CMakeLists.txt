@@ -2,81 +2,98 @@
 #-------------------------------------------------------------------------------
 # LabModelLoader
 
-lab_library(LabModelLoader
-    TYPE SHARED
-    ALIAS LabRender::ModelLoader
 
-    LIBRARIES
-        ${GLEW_LIBRARY}
-        ${OPENGL_LIBRARIES}
-        ${Assimp_LIBRARY_RELEASE}
-        LabRender::Core
-        Lab::Math
+set(LabModelLoader_PUBLIC_HEADERS
+        include/LabRenderModelLoader/modelLoader.h)
 
-    INCLUDE_DIRS
-        ${LABRENDER_ROOT}/include
-        ${LABRENDER_ROOT}/extras/include
-        ${GLM_INCLUDE_DIR}
 
-    PUBLIC_HEADERS
-        include/LabRenderModelLoader/modelLoader.h
+set(LabModelLoader_SRC
+    src/modelLoader.cpp)
 
-    PRIVATE_HEADERS
+add_library(LabModelLoader STATIC
+    ${LabModelLoader_PUBLIC_HEADERS} ${LabModelLoader_SRC})
 
-    CPPFILES
-        src/modelLoader.cpp
-)
+target_include_directories(LabModelLoader PUBLIC include)
+
+set_target_properties(LabModelLoader PROPERTIES
+    FOLDER "LabModelLoader"
+    POSITION_INDEPENDENT_CODE ON
+    PUBLIC_HEADER "${LabModelLoader_PUBLIC_HEADERS}"
+    OUTPUT_NAME "LabModelLoader"
+    OUTPUT_NAME_DEBUG "LabModelLoader_d"
+    INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
+
+target_link_libraries(LabModelLoader
+    ${Assimp_LIBRARY_RELEASE}
+    GLEW::glew
+    Lab::Render
+    Lab::Math)
+
+add_library(Lab::ModelLoader ALIAS LabModelLoader)
+
 
 #-------------------------------------------------------------------------------
 # LabRenderBinder
 
-lab_library(LabRenderBinder
-    TYPE SHARED
-    ALIAS LabRender::Binder
+set(LabRenderBinder_PUBLIC_HEADERS
+                include/LabRenderBinder/LabRenderBinder.h)
 
-    LIBRARIES
-        ${GLEW_LIBRARY}
-        ${OPENGL_LIBRARIES}
-        LabRender::Core
-        LabRender::ModelLoader
-        Lab::Math
 
-    INCLUDE_DIRS
-        ${LABRENDER_ROOT}/include
-        ${LABRENDER_ROOT}/extras/include
-        ${LABRENDER_ROOT}/extras/imgui
-        ${GLM_INCLUDE_DIR}
+set(LabRenderBinder_SRC
+    src/LabRenderBinder.cpp)
 
-    PUBLIC_HEADERS
-        include/LabRenderBinder/LabRenderBinder.h
+add_library(LabRenderBinder STATIC
+    ${LabRenderBinder_PUBLIC_HEADERS} ${LabRenderBinder_SRC})
 
-    PRIVATE_HEADERS
+target_include_directories(LabRenderBinder PUBLIC include)
 
-    CPPFILES
-        src/LabRenderBinder.cpp
-)
+set_target_properties(LabRenderBinder PROPERTIES
+    FOLDER "LabRenderBinder"
+    POSITION_INDEPENDENT_CODE ON
+    PUBLIC_HEADER "${LabRenderBinder_PUBLIC_HEADERS}"
+    OUTPUT_NAME "LabRenderBinder"
+    OUTPUT_NAME_DEBUG "LabRenderBinder_d"
+    INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
+
+target_link_libraries(LabRenderBinder
+    ${Assimp_LIBRARY_RELEASE}
+    GLEW::glew
+    Lab::Render
+    Lab::ModelLoader
+    Lab::Math)
+
+add_library(Lab::RenderBinder ALIAS LabRenderBinder)
+
 
 #-------------------------------------------------------------------------------
 # LabRenderGraph
 
-lab_library(LabRenderGraph
-    TYPE STATIC
-    ALIAS LabRender::LabRenderGraph
 
-    CPPFILES
-        RenderGraph/src/RenderGraph.cpp
+set(LabRenderGraph_PUBLIC_HEADERS
+                RenderGraph/include/LabRenderGraph/LabRenderGraph.h)
 
-    PUBLIC_HEADERS
-        RenderGraph/include/LabRenderGraph/LabRenderGraph.h
 
-    INCLUDE_DIRS
-        ${LABRENDER_ROOT}/include
-        ${LABRENDER_ROOT}/extras/RenderGraph/include
+set(LabRenderGraph_SRC
+    RenderGraph/src/RenderGraph.cpp)
 
-    LIBRARIES
-        Lab::Text
-)
+add_library(LabRenderGraph STATIC
+    ${LabRenderGraph_PUBLIC_HEADERS} ${LabRenderGraph_SRC})
 
+target_include_directories(LabRenderGraph PUBLIC "${LABRENDER_ROOT}/extras/RenderGraph/include")
+
+set_target_properties(LabRenderGraph PROPERTIES
+    FOLDER "LabRenderGraph"
+    POSITION_INDEPENDENT_CODE ON
+    PUBLIC_HEADER "${LabRenderGraph_PUBLIC_HEADERS}"
+    OUTPUT_NAME "LabRenderGraph"
+    OUTPUT_NAME_DEBUG "LabRenderGraph_d"
+    INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/extras/RenderGraph/include")
+
+target_link_libraries(LabRenderGraph
+    Lab::RenderTypes
+    Lab::Text)
+
+add_library(Lab::RenderGraph ALIAS LabRenderGraph)
 
 set(IMGUILAB_SRC
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderDemoApp.h"
@@ -87,7 +104,7 @@ set(IMGUILAB_SRC
 add_executable(RenderGraphTest RenderGraph/src/test.cpp)
 target_compile_definitions(RenderGraphTest PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(RenderGraphTest PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
-target_link_libraries(RenderGraphTest LabRender::LabRenderGraph)
+target_link_libraries(RenderGraphTest Lab::RenderGraph)
 target_include_directories(RenderGraphTest PRIVATE "${LOCAL_ROOT}/include")
 
 install (TARGETS RenderGraphTest
@@ -100,47 +117,60 @@ set_property(TARGET RenderGraphTest PROPERTY FOLDER "examples")
 #-------------------------------------------------------------------------------
 # LabRenderImgui
 
-lab_library(LabRenderImgui
-    TYPE STATIC
-    ALIAS LabRender::Imgui
 
-    LIBRARIES
-        ${GLEW_LIBRARY}
-        ${GLFW_LIBRARY_RELEASE}
-        ${OPENGL_LIBRARIES}
+set(LabRenderImgui_PUBLIC_HEADERS
+    ${IMGUI_ROOT}/imconfig.h
+        ${IMGUI_ROOT}/imgui.h
+        ${IMGUI_ROOT}/imgui_internal.h
+        ${IMGUI_ROOT}/backends/imgui_impl_glfw.h
+        ${IMGUI_ROOT}/backends/imgui_impl_opengl3.h
+        ${LABRENDER_ROOT}/extras/LabImgui/FontManager.h
+        ${LABRENDER_ROOT}/extras/LabImgui/materialIconDefinitions.h
+        ${LABRENDER_ROOT}/extras/LabImgui/meshula-icons.h
+        ${LABRENDER_ROOT}/extras/LabImgui/Widgets.h)
 
-    INCLUDE_DIRS
-        ${LABRENDER_ROOT}/include
-        ${LABRENDER_ROOT}/extras/imgui
-        ${GLEW_INCLUDE_DIR}
-        ${GLFW_INCLUDE_DIR}
+set(LabRenderImgui_PRIVATE_HEADERS
+        ${IMGUI_ROOT}/backends/imgui_impl_glfw.h
+        ${IMGUI_ROOT}/backends/imgui_impl_opengl3.h
+        ${IMGUI_ROOT}/imstb_rectpack.h
+        ${IMGUI_ROOT}/imstb_textedit.h
+        ${IMGUI_ROOT}/imstb_truetype.h
+        ${LABRENDER_ROOT}/extras/LabImgui/roboto_regular.ttf.h
+        ${LABRENDER_ROOT}/extras/LabImgui/robotomono_regular.ttf.h)
 
-    PUBLIC_HEADERS
-        ${LABRENDER_ROOT}/extras/imgui/imconfig.h
-        ${LABRENDER_ROOT}/extras/imgui/imgui.h
-        ${LABRENDER_ROOT}/extras/imgui/imgui_internal.h
-        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.h
-        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.h
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/FontManager.h
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/materialIconDefinitions.h
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/meshula-icons.h
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/Widgets.h
+set(LabRenderImgui_SRC
+        ${IMGUI_ROOT}/imgui.cpp
+        ${IMGUI_ROOT}/imgui_demo.cpp
+        ${IMGUI_ROOT}/imgui_draw.cpp
+        ${IMGUI_ROOT}/imgui_tables.cpp
+        ${IMGUI_ROOT}/imgui_widgets.cpp
+        ${IMGUI_ROOT}/backends/imgui_impl_glfw.cpp
+        ${IMGUI_ROOT}/backends/imgui_impl_opengl3.cpp
+        ${LABRENDER_ROOT}/extras/LabImgui/FontManager.cpp
+        ${LABRENDER_ROOT}/extras/LabImgui/Widgets.cpp)
 
-    PRIVATE_HEADERS
-        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.h
-        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.h
-        ${LABRENDER_ROOT}/extras/imgui/stb_rect_pack.h
-        ${LABRENDER_ROOT}/extras/imgui/stb_textedit.h
-        ${LABRENDER_ROOT}/extras/imgui/stb_truetype.h
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/roboto_regular.ttf.h
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/robotomono_regular.ttf.h
+add_library(LabRenderImgui STATIC
+    ${LabRenderImgui_PUBLIC_HEADERS} ${LabRenderImgui_PRIVATE_HEADERS} ${LabRenderImgui_SRC})
 
-    CPPFILES
-        ${LABRENDER_ROOT}/extras/imgui/imgui.cpp
-        ${LABRENDER_ROOT}/extras/imgui/imgui_demo.cpp
-        ${LABRENDER_ROOT}/extras/imgui/imgui_draw.cpp
-        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_glfw.cpp
-        ${LABRENDER_ROOT}/extras/imgui/imgui_impl_opengl3.cpp
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/FontManager.cpp
-        ${LABRENDER_ROOT}/extras/imgui/LabImgui/Widgets.cpp
-)
+target_compile_definitions(LabRenderImgui PRIVATE GLEW_STATIC)
+
+target_include_directories(LabRenderImgui PUBLIC ${IMGUI_ROOT}
+    PRIVATE ${IMGUI_ROOT}/backends)
+
+set_target_properties(LabRenderImgui PROPERTIES
+    FOLDER "LabRenderImgui"
+    POSITION_INDEPENDENT_CODE ON
+    PUBLIC_HEADER "${LabRenderImgui_PUBLIC_HEADERS}"
+    OUTPUT_NAME "LabRenderImgui"
+    OUTPUT_NAME_DEBUG "LabRenderImgui_d"
+    INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
+
+target_link_libraries(LabRenderImgui
+    GLEW::glew
+    glfw
+    Lab::Text)
+
+target_compile_features(LabRenderImgui PRIVATE cxx_std_17)
+
+add_library(Lab::RenderImgui ALIAS LabRenderImgui)
+

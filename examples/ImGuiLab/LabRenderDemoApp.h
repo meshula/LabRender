@@ -116,7 +116,7 @@ namespace lab {
         GLFWwindow*  g_Window = NULL;
         double       g_Time = 0.0f;
         bool         g_MouseJustPressed[3] = { false, false, false };
-        GLFWcursor*  g_MouseCursors[ImGuiMouseCursor_Count_] = { 0 };
+        GLFWcursor*  g_MouseCursors[ImGuiMouseCursor_COUNT] = { 0 };
 
         // OpenGL3 data
         GLuint       g_FontTexture = 0;

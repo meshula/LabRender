@@ -7,7 +7,7 @@
 
 namespace lab {
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 enum class FontName : int
 {

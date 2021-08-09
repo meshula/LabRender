@@ -1,7 +1,7 @@
 
 #define BUILDING_LABRENDER_MODELLOADER
 
-#include "LabREnderBinder/LabRenderBinder.h"
+#include "LabRenderBinder/LabRenderBinder.h"
 #include "LabRender/PassRenderer.h"
 #include "LabRender/Renderer.h"
 #include "LabRenderModelLoader/modelLoader.h"

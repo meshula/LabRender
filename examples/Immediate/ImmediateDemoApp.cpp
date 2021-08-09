@@ -24,8 +24,6 @@
 
 #include <LabCmd/FFI.h>
 
-#include <fmt/format.h>
-
 // ping loader for this demo
 
 #define TINYALLOC_IMPLEMENTATION
@@ -161,7 +159,7 @@ public:
 
         for (int i = 0; i < images_count; ++i)
         {
-            auto p = fmt::format("{{ASSET_ROOT}}/sprites/{}", image_names[i]);
+            std::string p = std::string("{ASSET_ROOT}/sprites/") + image_names[i];
             images[i] = tpLoadPNG(lab::expandPath(p.c_str()).c_str());
             uint8_t* pixels = reinterpret_cast<uint8_t*>(images[i].pix);
             shared_ptr<uint8_t> pixelPtr(pixels, [](uint8_t*) {});
@@ -184,19 +182,21 @@ public:
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
         shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
-        for (auto& i : model->parts())
-            meshes.push_back({ lab::m44f_identity, i });
+        if (model)
+            for (auto& i : model->parts())
+                meshes.push_back({ lab::m44f_identity, i });
 
 		shared_ptr<lab::Render::UtilityModel> cube = make_shared<lab::Render::UtilityModel>();
 		cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
         meshes.push_back({ lab::m44f_identity, cube });
 
-        static float foo = 0.f;
-        camera.position = {foo, 0, -1000};
-        lab::Bounds bounds = model->localBounds();
-        //bounds = model->transform.transformBounds(bounds);
-        camera.frame(bounds);
-
+        if (model) {
+            static float foo = 0.f;
+            camera.position = { foo, 0, -1000 };
+            lab::Bounds bounds = model->localBounds();
+            //bounds = model->transform.transformBounds(bounds);
+            camera.frame(bounds);
+        }
 
         pVehicle = std::make_shared<InsectAI::Agent>();
         auto pLightSensor = std::make_shared<InsectAI::LightSensor>(pVehicle.get());

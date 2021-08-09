@@ -12,6 +12,7 @@
 #include <LabCmd/Queue.h>
 
 #include <atomic>
+#include <functional>
 #include <unordered_map>
 #include <memory>
 #include <mutex>

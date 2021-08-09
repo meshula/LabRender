@@ -110,18 +110,22 @@ public:
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
         shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
-        for (auto& i : model->parts())
-            meshes.push_back({ lab::m44f_identity, i });
+        if (model) {
+            for (auto& i : model->parts())
+                meshes.push_back({ lab::m44f_identity, i });
+        }
 
 		shared_ptr<lab::Render::UtilityModel> cube = make_shared<lab::Render::UtilityModel>();
 		cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
         meshes.push_back({ lab::m44f_identity, cube });
 
-        static float foo = 0.f;
-        camera.position = {foo, 0, -1000};
-        lab::Bounds bounds = model->localBounds();
-        //bounds = model->transform.transformBounds(bounds);
-        camera.frame(bounds);
+        if (model) {
+            static float foo = 0.f;
+            camera.position = { foo, 0, -1000 };
+            lab::Bounds bounds = model->localBounds();
+            //bounds = model->transform.transformBounds(bounds);
+            camera.frame(bounds);
+        }
 
         shared_ptr<lab::Command> command = make_shared<PingCommand>();
         oscServer.registerCommand(command);

@@ -7,7 +7,6 @@ target_compile_definitions(LabRenderExample PRIVATE ASSET_ROOT="${LABRENDER_ROOT
 target_include_directories(LabRenderExample PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(LabRenderExample PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/include")
-target_include_directories(LabRenderExample PRIVATE "${GLEW_INCLUDE_DIR}")
 
 target_link_libraries(LabRenderExample debug
     ${OPENGL_LIBRARIES}
@@ -20,9 +19,11 @@ target_link_libraries(LabRenderExample optimized
     ${Assimp_LIBRARY_RELEASE})
 
 target_link_libraries(LabRenderExample
+    glfw
+    GLEW::glew
     Lab::Cmd
-    LabRender::Core
-    LabRender::ModelLoader
+    Lab::Render
+    Lab::ModelLoader
     Lab::Math)
 
 set_property(TARGET LabRenderExample PROPERTY FOLDER "examples")
