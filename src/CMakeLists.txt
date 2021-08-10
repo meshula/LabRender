@@ -66,8 +66,6 @@ set(LABRENDER_PRIVATE_HEADERS
         gl4.h
         json/json-forwards.h
         json/json.h
-        gal/gl/gl-procedural-sky.hpp
-        gal/gl/hosek_data_rgb.h
 )
 
 
@@ -92,7 +90,6 @@ add_library(LabRender STATIC ${LABRENDER_PUBLIC_HEADERS} ${LABRENDER_PRIVATE_HEA
         UtilityModel.cpp
         Utils.cpp
         Vertex.cpp
-        gal/gl/gl-procedural-sky.cpp
         ${LABRENDER_PLATFORM_SRC}
 )
 
