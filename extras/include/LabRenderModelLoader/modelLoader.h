@@ -24,4 +24,5 @@
 
 namespace lab { namespace Render {
 	LRML_API std::shared_ptr<Model> loadMesh(const std::string& filename);
+	LRML_API std::shared_ptr<Model> load_ObjMesh(const std::string& srcFilename_);
 }}

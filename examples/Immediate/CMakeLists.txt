@@ -1,9 +1,7 @@
 
 set(TARGET_NAME ImmediateExample)
 
-set(${TARGET_NAME}_SRC
-    ImmediateDemoApp.cpp
-    ImmediateDemoApp.h
+set(INSECTAI_SRC
     InsectAI/src/Actuator.cpp
     InsectAI/src/Agent.cpp
     InsectAI/src/BoidSensors.cpp
@@ -26,6 +24,14 @@ set(${TARGET_NAME}_SRC
     InsectAI/include/InsectAI/OpenSteerUtilities.h
     InsectAI/include/InsectAI/OpenSteerVec3.h
 )
+
+set(${TARGET_NAME}_SRC
+    ImmediateDemoApp.cpp
+    ImmediateDemoApp.h
+    ${INSECTAI_SRC}
+)
+
+source_group(InsectAI FILES ${INSECTAI_SRC})
 
 add_executable(${TARGET_NAME} ${${TARGET_NAME}_SRC})
 

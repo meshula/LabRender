@@ -24,7 +24,7 @@
 
 #include <LabCmd/FFI.h>
 
-// ping loader for this demo
+// png loader for this demo
 
 #define TINYALLOC_IMPLEMENTATION
 #include "tinyalloc.h"
@@ -91,23 +91,22 @@ public:
 
 // example file/asset i/o system
 const char* image_names[] = {
-    "basu.png",
-    "bat.png",
-    "behemoth.png",
-    "crow.png",
-    "dragon_zombie.png",
-    "fire_whirl.png",
-    "giant_pignon.png",
-    "night_spirit.png",
-    "orangebell.png",
-    "petit.png",
-    "polish.png",
-    "power_critter.png",
+    "rocket.png",
+    "rocket-blue_tank.png",
+    "rocket-booster.png",
+    "rocket-capsule.png",
+    "rocket-escape.png",
+    "rocket-landing_gear.png",
+    "rocket-main_stage.png",
+    "rocket-module.png",
+    "rocket-red_tank.png"
 };
 
+
 enum class Image : int {
-    Basu = 0,
-    Bat, Behemoth, Crow, Dragon, Fire, Giant, Night, OrangeBell, Petit, Polish, Power
+    Rocket = 0,
+    Rocket_BlueTank, Rocket_Booster, Rocket_Capsule, Rocket_Escape, Rocket_LandingGear,
+    Rocket_MainStage, Rocket_Module, Rocket_RedTank
 };
 
 int images_count = sizeof(image_names) / sizeof(*image_names);
@@ -282,11 +281,11 @@ public:
         irc.quad({ 100,100 }, { 150, 200 }, { 100, 175 }, { 50, 200 }, 0xff0080ff);
         //dl.AddText({ 50, 50 }, 0xffffffff, "This is a test");
 
-        static float rotate = 0;
-        static float scale = 3;
+        static float rotate = -0.5f * M_PI;
+        static float scale = 5;
 
-//        for (int i = 0; i < 12; ++i)
-//            irc.sprite(sprite_ids[i], 0, scale, rotate, 200 + 75 * float(i), 200);
+        for (int i = 1; i < int(Image::Rocket_RedTank) + 1; ++i)
+            irc.sprite(sprite_ids[i], 0, scale, rotate, 200 + 120 * float(i), 200);
 
         float x = _agent.body.state0.pos.x;
         float y = _agent.body.state0.pos.y;
@@ -301,7 +300,6 @@ public:
 
         lab::checkError(lab::ErrorPolicy::onErrorLog,
                               lab::TestConditions::exhaustive, "main loop end");
-
     }
 
     virtual void keyPress(int key) override 

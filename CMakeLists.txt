@@ -29,6 +29,31 @@ endif()
 set(STB_ROOT ${PROJECT_BINARY_DIR}/_deps/stb-src)
 
 
+#-------------------- tinyobjloader
+
+if (NOT TARGET tinyobjloader)
+    find_package(tinyobjloader QUIET)
+endif()
+if (NOT TARGET tinyobjloader)
+    message(STATUS "Installing tinyobjloader")
+    FetchContent_Declare(tinyobjloader
+        GIT_REPOSITORY "https://github.com/tinyobjloader/tinyobjloader.git"
+        GIT_TAG "master"
+        GIT_SHALLOW ON)
+
+    FetchContent_GetProperties(tinyobjloader)
+    if(NOT tinyobjloader_POPULATED)
+        FetchContent_Populate(tinyobjloader)
+        add_subdirectory(${tinyobjloader_SOURCE_DIR} ${tinyobjloader_BINARY_DIR})
+    endif()
+else()
+    message(STATUS "Found tinyobjloader")
+endif()
+
+set(TINYOBJLOADER_ROOT ${PROJECT_BINARY_DIR}/_deps/tinyobjloader-src)
+
+
+#-------------------- Lab::Cmd
 
 if (NOT TARGET Lab::Cmd)
     find_package(LabCmd QUIET)

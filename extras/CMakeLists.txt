@@ -14,6 +14,7 @@ add_library(LabModelLoader STATIC
     ${LabModelLoader_PUBLIC_HEADERS} ${LabModelLoader_SRC})
 
 target_include_directories(LabModelLoader PUBLIC include)
+target_include_directories(LabModelLoader PRIVATE ${TINYOBJLOADER_ROOT})
 
 set_target_properties(LabModelLoader PROPERTIES
     FOLDER "LabModelLoader"
@@ -24,7 +25,6 @@ set_target_properties(LabModelLoader PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
 target_link_libraries(LabModelLoader
-    ${Assimp_LIBRARY_RELEASE}
     GLEW::glew
     Lab::Render
     Lab::Math)
