@@ -8,7 +8,7 @@
 
 #include "LabRender/PassRenderer.h"
 
-#include "LabRender/Camera.h"
+#include <LabCamera/LabCamera.h>
 #include "LabRender/FrameBuffer.h"
 #include "LabRender/Model.h"
 #include "LabRender/SemanticType.h"
@@ -184,7 +184,15 @@ void PassRenderer::configure(char const*const path)
     fclose(f);
 
     labfx_t* fx_ptr = parse_labfx(&buff[0], sz);
+    if (!fx_ptr) {
+        std::cerr << "Could not parse " << p << std::endl;
+        return;
+    }
     labfx_gen_t* sh_ptr = generate_shaders(fx_ptr);
+    if (!sh_ptr) {
+        std::cerr << "Could not generate shaders " << p << std::endl;
+        return;
+    }
 
     auto fx = reinterpret_cast<lab::fx::labfx*>(fx_ptr);
     auto sh = reinterpret_cast<lab::fx::shader*>(sh_ptr);

@@ -6,7 +6,6 @@ add_executable(OffScreen
 
 target_compile_definitions(OffScreen PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(OffScreen PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
-target_include_directories(OffScreen PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(OffScreen PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(OffScreen PRIVATE "${LABRENDER_ROOT}/extras/include")
 

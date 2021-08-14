@@ -13,124 +13,33 @@ set(LABRENDER_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 option(LABRENDER_EXAMPLES "" ON)
 
 
-#------------------- stb
-
-FetchContent_Declare(stb
-   GIT_REPOSITORY "https://github.com/nothings/stb.git"
-   GIT_TAG "master"
-   GIT_SHALLOW ON)
-FetchContent_MakeAvailable(stb)
-FetchContent_GetProperties(stb)
-if(NOT stb_POPULATED)
-  message(STATUS "Fetching stb")
-  FetchContent_Populate(stb)
-endif()
-
-set(STB_ROOT ${PROJECT_BINARY_DIR}/_deps/stb-src)
-
-
-#-------------------- tinyobjloader
-
-if (NOT TARGET tinyobjloader)
-    find_package(tinyobjloader QUIET)
-endif()
-if (NOT TARGET tinyobjloader)
-    message(STATUS "Installing tinyobjloader")
-    FetchContent_Declare(tinyobjloader
-        GIT_REPOSITORY "https://github.com/tinyobjloader/tinyobjloader.git"
-        GIT_TAG "master"
-        GIT_SHALLOW ON)
-
-    FetchContent_GetProperties(tinyobjloader)
-    if(NOT tinyobjloader_POPULATED)
-        FetchContent_Populate(tinyobjloader)
-        add_subdirectory(${tinyobjloader_SOURCE_DIR} ${tinyobjloader_BINARY_DIR})
-    endif()
-else()
-    message(STATUS "Found tinyobjloader")
-endif()
-
-set(TINYOBJLOADER_ROOT ${PROJECT_BINARY_DIR}/_deps/tinyobjloader-src)
-
-
-#-------------------- Lab::Cmd
-
-if (NOT TARGET Lab::Cmd)
-    find_package(LabCmd QUIET)
-endif()
-if (NOT TARGET Lab::Cmd)
-    message(STATUS "Installing Lab::Cmd")
-    FetchContent_Declare(LabCmd
-        GIT_REPOSITORY "https://github.com/meshula/LabCmd.git"
-        GIT_TAG "main"
-        GIT_SHALLOW ON)
-
-    FetchContent_GetProperties(LabCmd)
-    if(NOT LabCmd_POPULATED)
-        FetchContent_Populate(LabCmd)
-        add_subdirectory(${labcmd_SOURCE_DIR} ${labcmd_BINARY_DIR})
-    endif()
-else()
-    message(STATUS "Found Lab::Cmd")
-endif()
-
-if (NOT TARGET Lab::Math)
-    find_package(LabMath QUIET)
-endif()
-if (NOT TARGET Lab::Math)
-    message(STATUS "Installing Lab::Math")
-    FetchContent_Declare(LabMath
-        GIT_REPOSITORY "https://github.com/meshula/LabMath.git"
-        GIT_TAG "master"
-        GIT_SHALLOW ON)
-
-    FetchContent_GetProperties(LabMath)
-    if(NOT LabMath_POPULATED)
-        FetchContent_Populate(LabMath)
-        add_subdirectory(${labmath_SOURCE_DIR} ${labmath_BINARY_DIR})
-    endif()
-else()
-    message(STATUS "Found Lab::Math")
-endif()
-
-if (NOT TARGET Lab::Text)
-    find_package(LabText QUIET)
-endif()
-if (NOT TARGET Lab::Text)
-    message(STATUS "Installing Lab::Text")
-    FetchContent_Declare(LabText
-        GIT_REPOSITORY "https://github.com/meshula/LabText.git"
-        GIT_TAG "main"
-        GIT_SHALLOW ON)
-
-    FetchContent_GetProperties(LabText)
-    if(NOT LabText_POPULATED)
-        FetchContent_Populate(LabText)
-        add_subdirectory(${labtext_SOURCE_DIR} ${labtext_BINARY_DIR})
-    endif()
-else()
-    message(STATUS "Found Lab::Text")
-endif()
+# notes: this block appears to be the canonically correct way to do FetchContent
+#if (NOT TARGET Lab::LabCamera)
+#    find_package(LabCamera QUIET)
+#endif()
+#if (NOT TARGET Lab::LabCamera)
+#    message(STATUS "Installing LabCamera")
+#    FetchContent_Declare(LabCamera
+#        GIT_REPOSITORY "https://github.com/meshula/LabCamera.git"
+#        GIT_TAG "main"
+#        GIT_SHALLOW ON)
+#
+#    FetchContent_GetProperties(LabCamera)
+#    if(NOT LabCamera_POPULATED)
+#        FetchContent_Populate(LabCamera)
+#        add_subdirectory(${labcamera_SOURCE_DIR} ${labcamera_BINARY_DIR})
+#    endif()
+#else()
+#    message(STATUS "Found Lab::Camera")
+#endif()
 
 if (LABRENDER_EXAMPLES)
-
-
 
 if (NOT TARGET GLEW::glew)
     find_package(GLEW QUIET)
 endif()
 if (NOT TARGET GLEW::glew)
-    message(STATUS "Installing glew")
-    FetchContent_Declare(GLEW
-        GIT_REPOSITORY "https://github.com/vfxpro99/glew-build-club.git"
-        GIT_TAG "main"
-        GIT_SHALLOW ON)
-
-    FetchContent_GetProperties(GLEW)
-    if(NOT GLEW_POPULATED)
-        FetchContent_Populate(GLEW)
-        add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
-    endif()
+    add_subdirectory("3rdParty/glew-build-club")
 else()
     message(STATUS "Found GLEW::glew")
 endif()
@@ -151,41 +60,27 @@ set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "glfw docs")
 set(GLFW_INSTALL OFF CACHE INTERNAL "glfw install")
 set(GLFW_VULKAN_STATIC OFF CACHE INTERNAL "glfw vulkan") # "Assume the Vulkan loader is linked with the application"
 
-FetchContent_Declare(glfw
-    GIT_REPOSITORY "https://github.com/glfw/glfw.git"
-    GIT_TAG "master"
-    GIT_SHALLOW ON)
-
-FetchContent_GetProperties(glfw)
-
-if(NOT glfw_POPULATED)
-    message(STATUS "Fetching glfw")
-    FetchContent_Populate(glfw)
-    add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
-endif()
-
-
-#------------------- DearImgui
-
-FetchContent_Declare(imgui
-   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
-   GIT_TAG "master"
-   GIT_SHALLOW ON)
-FetchContent_MakeAvailable(imgui)
-FetchContent_GetProperties(imgui)
-if(NOT imgui_POPULATED)
-  message(STATUS "Fetching ImGui v${IMGUI_VERSION}")
-  FetchContent_Populate(imgui)
-endif()
-
-set(IMGUI_ROOT ${PROJECT_BINARY_DIR}/_deps/imgui-src)
-
-
+add_subdirectory("3rdParty/glfw")
 
 
 endif(LABRENDER_EXAMPLES)
 
+#------------------- DearImgui
+
+set(IMGUI_ROOT "${CMAKE_SOURCE_DIR}/3rdParty/imgui")
+
+#------------------- stb
+
+set(STB_ROOT "${CMAKE_SOURCE_DIR}/3rdParty/stb")
+
 find_package(OpenGL)
+
+add_subdirectory(3rdParty/LabCamera)
+add_subdirectory(3rdParty/LabCmd)
+add_subdirectory(3rdParty/LabMath)
+add_subdirectory(3rdParty/LabText)
+add_subdirectory(3rdParty/tinyobjloader)
+set(TINYOBJLOADER_ROOT ${CMAKE_SOURCE_DIR}/3rdParty/tinyobjloader)
 
 add_subdirectory(src)
 add_subdirectory(extras)
@@ -199,4 +94,3 @@ configure_file(cmake/LabRenderConfig.cmake.in
 install(FILES
   "${PROJECT_BINARY_DIR}/LabRenderConfig.cmake"
   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake")
-

@@ -27,7 +27,6 @@ set(INSECTAI_SRC
 
 set(${TARGET_NAME}_SRC
     ImmediateDemoApp.cpp
-    ImmediateDemoApp.h
     ${INSECTAI_SRC}
 )
 
@@ -37,7 +36,6 @@ add_executable(${TARGET_NAME} ${${TARGET_NAME}_SRC})
 
 target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(${TARGET_NAME} PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
-target_include_directories(${TARGET_NAME} PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(${TARGET_NAME} PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(${TARGET_NAME} PRIVATE "${LABRENDER_ROOT}/extras/include")
 
@@ -64,4 +62,4 @@ set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "examples")
 target_include_directories(${TARGET_NAME} PRIVATE InsectAI/include)
 
 install (TARGETS ${TARGET_NAME} 
-    RUNTIME DESTINATION "${LOCAL_ROOT}/bin")
+    RUNTIME DESTINATION bin)

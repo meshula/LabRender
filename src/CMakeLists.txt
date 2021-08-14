@@ -28,7 +28,6 @@ if (APPLE)
 endif()
 
 set(LABRENDER_PUBLIC_HEADERS
-        ../include/LabRender/Camera.h
         ../include/LabRender/DepthTest.h
         ../include/LabRender/DrawList.h
         ../include/LabRender/ErrorPolicy.h
@@ -71,7 +70,6 @@ set(LABRENDER_PRIVATE_HEADERS
 
 
 add_library(LabRender STATIC ${LABRENDER_PUBLIC_HEADERS} ${LABRENDER_PRIVATE_HEADERS}
-        Camera.cpp
         ErrorPolicy.cpp
         FrameBuffer.cpp
         Immediate.cpp
@@ -118,6 +116,7 @@ set_target_properties(
 target_link_libraries(LabRender 
     GLEW::glew
     ${OPENGL_LIBRARIES}
+    Lab::LabCamera
     Lab::Cmd
     Lab::Math
     Lab::RenderGraph

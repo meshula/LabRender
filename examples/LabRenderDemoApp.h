@@ -101,10 +101,13 @@ namespace lab {
     {
         friend class SupplementalGuiHandler;
 
-        GLFWwindow* window;
         bool mouseIsDown;
         bool rightMouseIsDown;
+
+
+    protected:
         SupplementalGuiHandler* _supplemental = nullptr;
+        GLFWwindow* window;
 
     public:
 

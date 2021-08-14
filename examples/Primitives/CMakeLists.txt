@@ -1,12 +1,10 @@
 
 add_executable(Primitives
-    PrimitivesApp.h
     PrimitivesApp.cpp
 )
 
 target_compile_definitions(Primitives PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(Primitives PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
-target_include_directories(Primitives PRIVATE "${LOCAL_ROOT}/include")
 target_include_directories(Primitives PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(Primitives PRIVATE "${LABRENDER_ROOT}/extras/include")
 

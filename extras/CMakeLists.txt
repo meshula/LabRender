@@ -105,7 +105,6 @@ add_executable(RenderGraphTest RenderGraph/src/test.cpp)
 target_compile_definitions(RenderGraphTest PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(RenderGraphTest PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
 target_link_libraries(RenderGraphTest Lab::RenderGraph)
-target_include_directories(RenderGraphTest PRIVATE "${LOCAL_ROOT}/include")
 
 install (TARGETS RenderGraphTest
     ARCHIVE DESTINATION lib

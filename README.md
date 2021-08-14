@@ -10,23 +10,9 @@ See the examples directory for an example.
 
 ## Building
 
-LabRender requires GLEW.
-
-The LabModelLoader library requires GLEW and Assimp.
-
-The example program also requires GLFW, LabRender, and LabModelLoader.
-
-At the moment, the cmake scripts assume that they are installed in a directory
-named local, where local is a sister directory to the LabRender directory. That
-can be changed by modifying the "LOCAL_ROOT" variable in the root cmake script.
-This will be cleaned up in the future.
-
-One easy way to install the prerequisites is to use mkvfx, and run it in the
-directory containing the LabRender directory.
-
 Run cmake in the root directory picking the generator you wish to use.
 
-Currently, LabRender is tested on Windows 10, with VS2015 or greater.
+Currently, LabRender is tested on Windows 10, with VS2019 or greater.
 
 ## Copyright
 
@@ -35,3 +21,4 @@ Copyright 2017, Nick Porcino
 ## License
 
 The license is BSD 2 clause
+

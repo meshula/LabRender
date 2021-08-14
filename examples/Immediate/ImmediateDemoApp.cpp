@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Planet IX. All rights reserved.
 //
 
-#include "ImmediateDemoApp.h"
+#include "../LabRenderDemoApp.h"
 #include "InsectAI/InsectAI3.h"
 #include "InsectAI/InsectAI.h"
 #include "InsectAI/InsectAI_Actuator.h"
@@ -14,7 +14,7 @@
 #include "InsectAI/InsectAI_Sensor.h"
 #include "InsectAI/InsectAI_Sensors.h"
 
-#include <LabRender/Camera.h>
+#include <LabCamera/LabCamera.h>
 #include <LabRender/Immediate.h>
 #include <LabMath/LabMath.h>
 #include <LabRender/PassRenderer.h>
@@ -118,8 +118,10 @@ class LabRenderExampleApp : public lab::GLFWAppBase {
 public:
     shared_ptr<lab::Render::PassRenderer> dr;
     lab::Render::DrawList drawList;
-    lab::Camera camera;
-	lab::CameraRigMode cameraRigMode;
+
+    lc_camera camera;
+    lc_interaction* camera_controller = nullptr;
+    lc_i_Mode cameraRigMode = lc_i_ModeTurnTableOrbit;
 
     lab::OSCServer oscServer;
     lab::WebSocketsServer wsServer;
@@ -142,6 +144,9 @@ public:
     , wsServer("labrender")
     , previousMousePosition(V2F(0,0))
     {
+        lc_camera_set_defaults(&camera);
+        camera_controller = lc_i_create_interactive_controller();
+
 		const char * env = getenv("ASSET_ROOT");
 		if (env)
 			lab::addPathVariable("{ASSET_ROOT}", env);
@@ -173,6 +178,8 @@ public:
 
         for (int i = 0; i < images_count; ++i)
             tpFreePNG(images + i);
+
+        lc_i_free_interactive_controller(camera_controller);
     }
 
     void createScene()
@@ -191,10 +198,12 @@ public:
 
         if (model) {
             static float foo = 0.f;
-            camera.position = { foo, 0, -1000 };
+            camera.mount.transform.position = { foo, 0, -1000 };
             lab::Bounds bounds = model->localBounds();
             //bounds = model->transform.transformBounds(bounds);
-            camera.frame(bounds);
+            v3f& mn = bounds.first;
+            v3f& mx = bounds.second;
+            lc_camera_frame(&camera, lc_v3f{ mn.x, mn.y, mn.z }, lc_v3f{ mx.x, mx.y, mx.z });
         }
 
         pVehicle = std::make_shared<InsectAI::Agent>();
@@ -263,9 +272,12 @@ public:
 
         v2i fbSize = frameBufferDimensions();
 
-        drawList.modl = camera.mount.rotationTransform();
-        drawList.view = camera.mount.viewTransform();
-        drawList.proj = lab::perspective(camera.sensor, camera.optics, float(fbSize.x) / float(fbSize.y));
+        lc_m44f modl = lc_mount_rotation_transform(&camera.mount);
+        drawList.modl = *reinterpret_cast<lab::m44f*>(&modl);
+        lc_m44f view = lc_mount_gl_view_transform(&camera.mount);
+        drawList.view = *reinterpret_cast<lab::m44f*>(&view);
+        lc_m44f proj = lc_camera_view_projection(&camera, float(fbSize.x) / float(fbSize.y));
+        drawList.proj = *reinterpret_cast<lab::m44f*>(&proj);
 
         lab::Render::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
 		v2i fbOffset = V2I(0, 0);
@@ -305,10 +317,10 @@ public:
     virtual void keyPress(int key) override 
     {
         switch (key) {
-            case GLFW_KEY_C: cameraRigMode = lab::CameraRigMode::Crane; break;
-            case GLFW_KEY_D: cameraRigMode = lab::CameraRigMode::Dolly; break;
+            case GLFW_KEY_C: cameraRigMode = lc_i_ModeCrane; break;
+            case GLFW_KEY_D: cameraRigMode = lc_i_ModeDolly; break;
             case GLFW_KEY_T:
-            case GLFW_KEY_O: cameraRigMode = lab::CameraRigMode::TurnTableOrbit; break;
+            case GLFW_KEY_O: cameraRigMode = lc_i_ModeTurnTableOrbit; break;
         }
     }
 
@@ -325,9 +337,22 @@ public:
         float distanceX = 20.f * delta.x / windowSize.x;
         float distanceY = -20.f * delta.y / windowSize.y;
 
-		//printf("%f %f\n", pos.x, pos.y);
+        v2i fbSize = frameBufferDimensions();
+        
+        //printf("%f %f\n", pos.x, pos.y);
+        InteractionToken it = lc_i_begin_interaction(camera_controller, lc_v2f{(float)fbSize.x, (float)fbSize.y});
 
-        lab::cameraRig_interact(camera, cameraRigMode, V2F(distanceX, distanceY));
+        lc_i_ttl_interaction(
+            camera_controller,
+            &camera,
+            it,
+            lc_i_PhaseContinue,
+            cameraRigMode,
+            lc_v2f{ pos.x, pos.y },
+            lc_radians{ 0 },
+            1.f/60.f);
+
+        lc_i_end_interaction(camera_controller, it);
     }
 
     virtual void mouseUp(v2f windowSize, v2f pos) override {

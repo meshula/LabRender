@@ -1,6 +1,5 @@
 
 set(IMGUILAB_SRC
-    "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderDemoApp.h"
     "${LABRENDER_ROOT}/examples/ImGuiLab/ImGuiLabApp.cpp"
     "${LABRENDER_ROOT}/examples/ImGuiLab/ImGuiIntegration.cpp"
 )
