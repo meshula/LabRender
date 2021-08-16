@@ -55,16 +55,37 @@ ImGuiIntegration::~ImGuiIntegration()
     ImGui::DestroyContext();
 }
 
-void ImGuiIntegration::ui()
+void ImGuiIntegration::ui(int window_width, int window_height)
 {
     // Start the ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Lab")) {
+            ImGui::MenuItem("Quit", 0, &quit);
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+
+    ImGui::SetNextWindowPos({ 0, 0 });
+    ImGui::SetNextWindowSize({ (float)window_width, (float)window_height });
+    static bool begin_flag = false;
+    ImGui::Begin("###FULLSCREEN", &begin_flag,
+        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+    ImGui::SetCursorScreenPos(ImVec2{ 0, 0 });
+    ImGui::InvisibleButton("####FULL_SCREEN", { (float)window_width, (float)window_height });
+    is_main_clicked = ImGui::IsItemClicked();
+    is_main_active = ImGui::IsItemActive();
+    is_main_hovered = ImGui::IsItemHovered();
+
     // 1. Show a simple window.
-    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
     {
+        ImGui::Begin("Hello World");
         static float f = 0.0f;
         static int counter = 0;
         ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
@@ -80,6 +101,7 @@ void ImGuiIntegration::ui()
         ImGui::Text("counter = %d", counter);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
     }
 
     // 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name your windows.
@@ -99,6 +121,10 @@ void ImGuiIntegration::ui()
         ImGui::ShowDemoWindow(&show_demo_window);
     }
 
+    ImGui::End(); // full screen window
+}
+
+void ImGuiIntegration::render() {
     // Rendering
     ImGui::Render();
     int display_w, display_h;

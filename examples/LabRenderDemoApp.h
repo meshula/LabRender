@@ -96,7 +96,12 @@ namespace lab {
     public:
         virtual void mouseButtonCallback(int /*button*/, int /*action*/, int /*mods*/) {}
         virtual void keyCallback(int key, int scancode, int action, int mods) {}
-        virtual void ui() {}
+        virtual void ui(int window_width, int window_height) {}
+        virtual void render() {}
+        bool quit = false;
+        bool is_main_clicked = false;
+        bool is_main_active = false;
+        bool is_main_hovered = false;
     };
 
     class GLFWAppBase : public AppBase
@@ -296,8 +301,9 @@ namespace lab {
             if (!rl.valid())
                 return;
 
-            if (_supplemental)
-                _supplemental->ui();
+            if (_supplemental) {
+                _supplemental->render();
+            }
         }
     };
 
@@ -362,8 +368,25 @@ namespace lab {
         }
 
         void update() {
+            if (_supplemental) {
+                int width, height;
+                glfwGetWindowSize(window, &width, &height);
+                _supplemental->ui(width, height);
+            }
+
             if (scene) {
                 scene->update();
+
+                if (_supplemental) {
+                    if (_supplemental->is_main_clicked || _supplemental->is_main_active || _supplemental->is_main_hovered)
+                    {
+                    }
+                    else {
+                        // if the main viewport is not active, stop camera interaction
+                        if (interactionPhase != lc_i_PhaseNone)
+                            interactionPhase = lc_i_PhaseFinish;
+                    }
+                }
 
                 if (interactionPhase != lc_i_PhaseNone) {
                     InteractionToken it = lc_i_begin_interaction(camera_controller, { previousWindowSize.x, previousWindowSize.y });
@@ -427,7 +450,6 @@ namespace lab {
             }
         }
 
-
         virtual void keyPress(int key) override {
             switch (key) {
             case GLFW_KEY_C: cameraRigMode = lc_i_ModeCrane; break;
@@ -440,27 +462,47 @@ namespace lab {
         }
 
         virtual void mouseDown(v2f windowSize, v2f pos) override {
-            previousMousePosition = pos;
-            initialMousePosition = pos;
-            previousWindowSize = windowSize;
-            interactionPhase = lc_i_PhaseStart;
+            bool accept = true;
+            if (_supplemental) 
+                accept = _supplemental->is_main_clicked || _supplemental->is_main_active || _supplemental->is_main_hovered;
+            if (accept) {
+                previousMousePosition = pos;
+                initialMousePosition = pos;
+                previousWindowSize = windowSize;
+                interactionPhase = lc_i_PhaseStart;
+            }
         }
 
         virtual void mouseDrag(v2f windowSize, v2f pos) override {
-            previousMousePosition = pos;
-            previousWindowSize = { windowSize.x, windowSize.y };
-            interactionPhase = lc_i_PhaseContinue;
+            bool accept = true;
+            if (_supplemental)
+                accept = _supplemental->is_main_clicked || _supplemental->is_main_active || _supplemental->is_main_hovered;
+            if (accept) {
+                previousMousePosition = pos;
+                previousWindowSize = { windowSize.x, windowSize.y };
+                interactionPhase = lc_i_PhaseContinue;
+            }
         }
 
         virtual void mouseUp(v2f windowSize, v2f pos) override {
-            previousMousePosition = pos;
-            previousWindowSize = { windowSize.x, windowSize.y };
-            interactionPhase = lc_i_PhaseFinish;
+            bool accept = true;
+            if (_supplemental)
+                accept = _supplemental->is_main_clicked || _supplemental->is_main_active || _supplemental->is_main_hovered;
+            if (accept) {
+                previousMousePosition = pos;
+                previousWindowSize = { windowSize.x, windowSize.y };
+                interactionPhase = lc_i_PhaseFinish;
+            }
         }
 
         virtual void mouseMove(v2f windowSize, v2f pos) override {
-            previousMousePosition = pos;
-            previousWindowSize = { windowSize.x, windowSize.y };
+            bool accept = true;
+            if (_supplemental)
+                accept = _supplemental->is_main_clicked || _supplemental->is_main_active || _supplemental->is_main_hovered;
+            if (accept) {
+                previousMousePosition = pos;
+                previousWindowSize = { windowSize.x, windowSize.y };
+            }
         }
     };
 

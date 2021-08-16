@@ -130,11 +130,14 @@ public:
 
 class ImGuiApp : public lab::LabRenderExampleApp {
 public:
+    lab::ImGuiIntegration* imgui = nullptr;
+
     ImGuiApp()
     : lab::LabRenderExampleApp("Dear ImGui")
     {
         scene = new ImGUISceneBuilder();
-        _supplemental = new lab::ImGuiIntegration(window);
+        imgui = new lab::ImGuiIntegration(window);
+        _supplemental = imgui;
         
         const char * env = getenv("ASSET_ROOT");
 		if (env)
@@ -147,6 +150,11 @@ public:
     {
         delete scene;
         delete _supplemental;
+    }
+
+    virtual bool isFinished() override
+    {
+        return glfwWindowShouldClose(window) != 0 || imgui->quit;
     }
 };
 
@@ -164,6 +172,7 @@ int main(int argc, char* argv[])
 
     while (!app->isFinished())
     {
+        app->update();
         app->frameBegin();
         app->render();
         app->frameEnd();
