@@ -13,7 +13,9 @@
 #endif
 
 #include <LabRender/PassRenderer.h>
+#include <LabRender/Utils.h>
 #include <LabMath/LabMath.h>
+#include <LabCamera/LabCamera.h>
 
 #include <GLFW/glfw3.h>
 
@@ -101,13 +103,13 @@ namespace lab {
     {
         friend class SupplementalGuiHandler;
 
-        bool mouseIsDown;
-        bool rightMouseIsDown;
+        bool mouseIsDown = false;
+        bool rightMouseIsDown = false;
 
 
     protected:
         SupplementalGuiHandler* _supplemental = nullptr;
-        GLFWwindow* window;
+        GLFWwindow* window = nullptr;
 
     public:
 
@@ -265,7 +267,7 @@ namespace lab {
 
         virtual bool isFinished() override
         {
-            return !!glfwWindowShouldClose(window);
+            return glfwWindowShouldClose(window) != 0;
         }
 
         virtual void frameBegin() override
@@ -298,6 +300,170 @@ namespace lab {
                 _supplemental->ui();
         }
     };
+
+
+    class LabRenderAppScene {
+    public:
+        LabRenderAppScene() {
+            lc_camera_set_defaults(&camera);
+        }
+        virtual ~LabRenderAppScene() = default;
+
+
+        virtual void build() = 0;
+        virtual void update() {}
+        virtual void render(lab::Render::Renderer::RenderLock& rl, v2i fbSize)
+        {
+            if (dr)
+                dr->render(rl, fbSize, drawList);
+        }
+
+
+        lab::Render::DrawList drawList;
+        lc_camera camera;
+        std::shared_ptr<lab::Render::PassRenderer> dr;
+    };
+
+
+
+    class LabRenderExampleApp : public lab::GLFWAppBase {
+    public:
+        LabRenderAppScene* scene = nullptr;
+        lc_interaction* camera_controller = nullptr;
+        lc_i_Mode cameraRigMode = lc_i_ModeTurnTableOrbit;
+        lc_i_Phase interactionPhase = lc_i_PhaseNone;
+
+        v2f initialMousePosition;
+        v2f previousMousePosition;
+        v2f previousWindowSize;
+
+        LabRenderExampleApp()
+            : GLFWAppBase("LabRender Primitives")
+            , previousMousePosition(V2F(0, 0))
+        {
+            camera_controller = lc_i_create_interactive_controller();
+
+            const char* env = getenv("ASSET_ROOT");
+            if (env)
+                lab::addPathVariable("{ASSET_ROOT}", env);
+            else
+                lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
+        }
+
+        ~LabRenderExampleApp()
+        {
+            lc_i_free_interactive_controller(camera_controller);
+        }
+
+        void createScene()
+        {
+            if (scene)
+                scene->build();
+        }
+
+        void update() {
+            if (scene) {
+                scene->update();
+
+                if (interactionPhase != lc_i_PhaseNone) {
+                    InteractionToken it = lc_i_begin_interaction(camera_controller, { previousWindowSize.x, previousWindowSize.y });
+                    lc_i_ttl_interaction(
+                        camera_controller,
+                        &scene->camera,
+                        it,
+                        interactionPhase,
+                        cameraRigMode,
+                        lc_v2f{ previousMousePosition.x, previousMousePosition.y },
+                        lc_radians{ 0 },
+                        1.f / 60.f);
+                    lc_i_end_interaction(camera_controller, it);
+
+                    if (interactionPhase == lc_i_PhaseStart)
+                        interactionPhase = lc_i_PhaseContinue;
+                    if (interactionPhase == lc_i_PhaseFinish)
+                        interactionPhase = lc_i_PhaseNone;
+                }
+            }
+        }
+
+        void render()
+        {
+            // run the immediate gui. @TODO: add a ui() method
+            if (scene) {
+                // now render
+                lab::checkError(lab::ErrorPolicy::onErrorThrow,
+                    lab::TestConditions::exhaustive, "main loop start");
+
+                v2i fbSize = frameBufferDimensions();
+
+                lc_m44f modl = lc_mount_rotation_transform(&scene->camera.mount);
+                scene->drawList.modl = *reinterpret_cast<lab::m44f*>(&modl);
+                lc_m44f view = lc_mount_gl_view_transform(&scene->camera.mount);
+                scene->drawList.view = *reinterpret_cast<lab::m44f*>(&view);
+                lc_m44f proj = lc_camera_perspective(&scene->camera, float(fbSize.x) / float(fbSize.y));
+                scene->drawList.proj = *reinterpret_cast<lab::m44f*>(&proj);
+                lab::Render::PassRenderer::RenderLock rl(scene->dr.get(), renderTime(), mousePosition());
+                v2i fbOffset = V2I(0, 0);
+                renderStart(rl, renderTime(), fbOffset, fbSize);
+
+                scene->render(rl, fbSize);
+
+                renderEnd(rl);
+
+                lab::checkError(lab::ErrorPolicy::onErrorThrow,
+                    lab::TestConditions::exhaustive, "main loop end");
+
+                static bool saving = false;
+                if (saving)
+                {
+                    auto fb = scene->dr->framebuffer("gbuffer");
+                    if (fb && fb->textures.size())
+                        for (int i = 0; i < fb->baseNames.size(); ++i)
+                        {
+                            std::string name = "C:\\Projects\\foo_" + fb->baseNames[i] + ".png";
+                            fb->textures[i]->save(name.c_str());
+                        }
+                }
+            }
+        }
+
+
+        virtual void keyPress(int key) override {
+            switch (key) {
+            case GLFW_KEY_C: cameraRigMode = lc_i_ModeCrane; break;
+            case GLFW_KEY_D: cameraRigMode = lc_i_ModeDolly; break;
+            case GLFW_KEY_T:
+            case GLFW_KEY_O: cameraRigMode = lc_i_ModeTurnTableOrbit; break;
+            case GLFW_KEY_P: cameraRigMode = lc_i_ModePanTilt; break;
+            case GLFW_KEY_A: cameraRigMode = lc_i_ModeArcball; break;
+            }
+        }
+
+        virtual void mouseDown(v2f windowSize, v2f pos) override {
+            previousMousePosition = pos;
+            initialMousePosition = pos;
+            previousWindowSize = windowSize;
+            interactionPhase = lc_i_PhaseStart;
+        }
+
+        virtual void mouseDrag(v2f windowSize, v2f pos) override {
+            previousMousePosition = pos;
+            previousWindowSize = { windowSize.x, windowSize.y };
+            interactionPhase = lc_i_PhaseContinue;
+        }
+
+        virtual void mouseUp(v2f windowSize, v2f pos) override {
+            previousMousePosition = pos;
+            previousWindowSize = { windowSize.x, windowSize.y };
+            interactionPhase = lc_i_PhaseFinish;
+        }
+
+        virtual void mouseMove(v2f windowSize, v2f pos) override {
+            previousMousePosition = pos;
+            previousWindowSize = { windowSize.x, windowSize.y };
+        }
+    };
+
 
 
 } // lab

@@ -9,6 +9,7 @@
 #include "../LabRenderDemoApp.h"
 #include <LabRenderModelLoader/modelLoader.h>
 
+#include <LabCamera/LabCamera.h>
 #include <LabRender/PassRenderer.h>
 #include <LabRender/UtilityModel.h>
 #include <LabRender/Utils.h>
@@ -22,26 +23,25 @@ using lab::v2f;
 using lab::v3f;
 using lab::v4f;
 
-class PrimitivesSceneBuilder : public lab::LabRenderAppScene {
-    virtual ~PrimitivesSceneBuilder() = default;
-
+class CubeMapSceneBuilder : public lab::LabRenderAppScene {
+    virtual ~CubeMapSceneBuilder() = default;
     virtual void build() override {
         // load a pipeline
-
-        std::string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
+        std::string path = "{ASSET_ROOT}/pipelines/deferred-offscreen.labfx";
         std::cout << "Loading pipeline configuration " << path << std::endl;
-        dr = std::make_shared<lab::Render::PassRenderer>();
+        dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());
-
-        // create a drawlist
-
+        auto pass = dr->findPass<lab::Render::PassRenderer::Pass>("blit");
+        if (pass)
+            pass->active = true;
         auto& meshes = drawList.deferredMeshes;
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
         shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
-        if (model)
+        if (model) {
             for (auto& i : model->parts())
                 meshes.push_back({ lab::m44f_identity, i });
+        }
 
         const float pi = float(M_PI);
 
@@ -65,8 +65,6 @@ class PrimitivesSceneBuilder : public lab::LabRenderAppScene {
             meshes.push_back({ m, mesh });
         }
 
-        // set the initial camera
-
         if (model) {
             static float foo = 0.f;
             camera.mount.transform.position = { foo, 0, -1000 };
@@ -76,28 +74,33 @@ class PrimitivesSceneBuilder : public lab::LabRenderAppScene {
             v3f& mx = bounds.second;
             lc_camera_frame(&camera, lc_v3f{ mn.x, mn.y, mn.z }, lc_v3f{ mx.x, mx.y, mx.z });
         }
+
     }
+
 };
 
-class PrimitivesApp : public lab::LabRenderExampleApp {
+class CubeMapApp : public lab::LabRenderExampleApp {
 public:
-    PrimitivesApp() : lab::LabRenderExampleApp() {
-        scene = new PrimitivesSceneBuilder();
+    CubeMapApp() : lab::LabRenderExampleApp() {
+        scene = new CubeMapSceneBuilder();
     }
 
-    virtual ~PrimitivesApp() {
+    virtual ~CubeMapApp() {
         delete scene;
     }
+
 };
+
 
 int main(void)
 {
-    shared_ptr<PrimitivesApp> appPtr = make_shared<PrimitivesApp>();
+    shared_ptr<CubeMapApp> appPtr = make_shared<CubeMapApp>();
 
     lab::checkError(lab::ErrorPolicy::onErrorThrow,
         lab::TestConditions::exhaustive, "main loop start");
 
-    PrimitivesApp*app = appPtr.get();
+    CubeMapApp* app = appPtr.get();
+
     app->createScene();
 
     while (!app->isFinished())

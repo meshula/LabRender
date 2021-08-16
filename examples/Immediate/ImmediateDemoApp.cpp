@@ -113,54 +113,43 @@ int images_count = sizeof(image_names) / sizeof(*image_names);
 tpImage images[sizeof(image_names) / sizeof(*image_names)];
 lab::ImmSpriteId sprite_ids[sizeof(image_names) / sizeof(*image_names)];
 
-
-class LabRenderExampleApp : public lab::GLFWAppBase {
+class ImmediateSceneBuilder : public lab::LabRenderAppScene {
 public:
-    shared_ptr<lab::Render::PassRenderer> dr;
-    lab::Render::DrawList drawList;
-
-    lc_camera camera;
-    lc_interaction* camera_controller = nullptr;
-    lc_i_Mode cameraRigMode = lc_i_ModeTurnTableOrbit;
-
-    lab::OSCServer oscServer;
-    lab::WebSocketsServer wsServer;
-
-    v2f initialMousePosition;
-    v2f previousMousePosition;
-
     shared_ptr<InsectAI::Engine> pEngine;
     shared_ptr<InsectAI::Agent> pVehicle;
     float epoch{ 0.f };
-
-
-
     InsectAI3::Agent _agent;
+    lab::OSCServer oscServer;
+    lab::WebSocketsServer wsServer;
 
-
-    LabRenderExampleApp()
-    : GLFWAppBase("LabRender ImmediateExample")
+    ImmediateSceneBuilder()
+    : lab::LabRenderAppScene() 
     , oscServer("labrender")
     , wsServer("labrender")
-    , previousMousePosition(V2F(0,0))
     {
-        lc_camera_set_defaults(&camera);
-        camera_controller = lc_i_create_interactive_controller();
+    }
 
-		const char * env = getenv("ASSET_ROOT");
-		if (env)
-			lab::addPathVariable("{ASSET_ROOT}", env);
-		else
-			lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
+    virtual ~ImmediateSceneBuilder()
+    {
+        wsServer.stop();
+        oscServer.stop();
 
-		//string path = "{ASSET_ROOT}/pipelines/deferred.json";
-		//string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
-		//string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
-		string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
-		std::cout << "Loading pipeline configuration " << path << std::endl;
+        for (int i = 0; i < images_count; ++i)
+            tpFreePNG(images + i);
+
+    }
+
+    virtual void build() override {
+        // load a pipeline
+        //string path = "{ASSET_ROOT}/pipelines/deferred.json";
+        //string path = "{ASSET_ROOT}/pipelines/shadertoy.json";
+        //string path = "{ASSET_ROOT}/pipelines/deferred_fxaa.json";
+        string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
+        std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());
 
+        // load some sprites
         for (int i = 0; i < images_count; ++i)
         {
             std::string p = std::string("{ASSET_ROOT}/sprites/") + image_names[i];
@@ -169,21 +158,6 @@ public:
             shared_ptr<uint8_t> pixelPtr(pixels, [](uint8_t*) {});
             sprite_ids[i] = lab::SpriteId(pixelPtr, images[i].w, images[i].h);
         }
-    }
-
-    ~LabRenderExampleApp()
-    {
-        wsServer.stop();
-        oscServer.stop();
-
-        for (int i = 0; i < images_count; ++i)
-            tpFreePNG(images + i);
-
-        lc_i_free_interactive_controller(camera_controller);
-    }
-
-    void createScene()
-	{
         auto& meshes = drawList.deferredMeshes;
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
@@ -192,8 +166,8 @@ public:
             for (auto& i : model->parts())
                 meshes.push_back({ lab::m44f_identity, i });
 
-		shared_ptr<lab::Render::UtilityModel> cube = make_shared<lab::Render::UtilityModel>();
-		cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
+        shared_ptr<lab::Render::UtilityModel> cube = make_shared<lab::Render::UtilityModel>();
+        cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
         meshes.push_back({ lab::m44f_identity, cube });
 
         if (model) {
@@ -227,8 +201,36 @@ public:
         wsServer.start(PORT_NUM + 1);
     }
 
-    void updateScene()
-    {
+    virtual void render(lab::Render::Renderer::RenderLock& rl, v2i fbSize) override {
+        if (dr) {
+            dr->render(rl, fbSize, drawList);
+            //---------------------------------------
+            // demo immediate 2d drawing
+
+            lab::ImmRenderContext irc;
+
+            irc.rectangle({ 20,20 }, { 200, 100 }, 0xff00ffff);
+            irc.quad({ 100,100 }, { 150, 200 }, { 100, 175 }, { 50, 200 }, 0xff0080ff);
+            //dl.AddText({ 50, 50 }, 0xffffffff, "This is a test");
+
+            static float rotate = -0.5f * M_PI;
+            static float scale = 5;
+
+            for (int i = 1; i < int(Image::Rocket_RedTank) + 1; ++i)
+                irc.sprite(sprite_ids[i], 0, scale, rotate, 200 + 120 * float(i), 200);
+
+            float x = _agent.body.state0.pos.x;
+            float y = _agent.body.state0.pos.y;
+            irc.sprite(sprite_ids[0], 0, scale, rotate, x, y);
+
+            //rotate += 0.05f;
+
+            irc.render(fbSize.x, fbSize.y);
+            //---------------------------------------
+        }
+    }
+
+    virtual void update() override {
         float dt = 1.f / 60.f;
         pEngine->UpdateEntities(epoch, dt);
         const float kSteeringSpeed = 0.25f;
@@ -241,7 +243,7 @@ public:
         // connect actuators to physics
         for (auto& actuator : pVehicle->m_Actuators)
         {
-            switch (actuator->GetKind()) 
+            switch (actuator->GetKind())
             {
             case InsectAI::Actuator::kMotor:
                 pState.yaw_pitch_roll[0] += kSteeringSpeed /* * actuator->mSteeringActivation*/;
@@ -264,116 +266,29 @@ public:
         t1.angular_velocity = ...
 #endif
     }
+};
 
-    void render()
-	{
-        lab::checkError(lab::ErrorPolicy::onErrorThrow,
-                        lab::TestConditions::exhaustive, "main loop start");
+class ImmediateApp : public lab::LabRenderExampleApp {
+public:
 
-        v2i fbSize = frameBufferDimensions();
-
-        lc_m44f modl = lc_mount_rotation_transform(&camera.mount);
-        drawList.modl = *reinterpret_cast<lab::m44f*>(&modl);
-        lc_m44f view = lc_mount_gl_view_transform(&camera.mount);
-        drawList.view = *reinterpret_cast<lab::m44f*>(&view);
-        lc_m44f proj = lc_camera_view_projection(&camera, float(fbSize.x) / float(fbSize.y));
-        drawList.proj = *reinterpret_cast<lab::m44f*>(&proj);
-
-        lab::Render::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
-		v2i fbOffset = V2I(0, 0);
-        renderStart(rl, renderTime(), fbOffset, fbSize);
-
-        dr->render(rl, fbSize, drawList);
-        //---------------------------------------
-        // demo immediate 2d drawing
-
-        lab::ImmRenderContext irc;
-
-        irc.rectangle({ 20,20 }, { 200, 100 }, 0xff00ffff);
-        irc.quad({ 100,100 }, { 150, 200 }, { 100, 175 }, { 50, 200 }, 0xff0080ff);
-        //dl.AddText({ 50, 50 }, 0xffffffff, "This is a test");
-
-        static float rotate = -0.5f * M_PI;
-        static float scale = 5;
-
-        for (int i = 1; i < int(Image::Rocket_RedTank) + 1; ++i)
-            irc.sprite(sprite_ids[i], 0, scale, rotate, 200 + 120 * float(i), 200);
-
-        float x = _agent.body.state0.pos.x;
-        float y = _agent.body.state0.pos.y;
-        irc.sprite(sprite_ids[0], 0, scale, rotate, x, y);
-
-        //rotate += 0.05f;
-
-        irc.render(fbSize.x, fbSize.y);
-        //---------------------------------------
-
-        renderEnd(rl);
-
-        lab::checkError(lab::ErrorPolicy::onErrorLog,
-                              lab::TestConditions::exhaustive, "main loop end");
+    ImmediateApp() : lab::LabRenderExampleApp() {
+        scene = new ImmediateSceneBuilder();
     }
 
-    virtual void keyPress(int key) override 
-    {
-        switch (key) {
-            case GLFW_KEY_C: cameraRigMode = lc_i_ModeCrane; break;
-            case GLFW_KEY_D: cameraRigMode = lc_i_ModeDolly; break;
-            case GLFW_KEY_T:
-            case GLFW_KEY_O: cameraRigMode = lc_i_ModeTurnTableOrbit; break;
-        }
-    }
-
-    virtual void mouseDown(v2f windowSize, v2f pos) override 
-    {
-        previousMousePosition = pos;
-        initialMousePosition = pos;
-    }
-
-    virtual void mouseDrag(v2f windowSize, v2f pos) override {
-        v2f delta = pos - previousMousePosition;
-        previousMousePosition = pos;
-
-        float distanceX = 20.f * delta.x / windowSize.x;
-        float distanceY = -20.f * delta.y / windowSize.y;
-
-        v2i fbSize = frameBufferDimensions();
-        
-        //printf("%f %f\n", pos.x, pos.y);
-        InteractionToken it = lc_i_begin_interaction(camera_controller, lc_v2f{(float)fbSize.x, (float)fbSize.y});
-
-        lc_i_ttl_interaction(
-            camera_controller,
-            &camera,
-            it,
-            lc_i_PhaseContinue,
-            cameraRigMode,
-            lc_v2f{ pos.x, pos.y },
-            lc_radians{ 0 },
-            1.f/60.f);
-
-        lc_i_end_interaction(camera_controller, it);
-    }
-
-    virtual void mouseUp(v2f windowSize, v2f pos) override {
-        if (lab::vector_length(previousMousePosition - initialMousePosition) < 2) {
-            // test for clicked object
-            //
-        }
-    }
-    virtual void mouseMove(v2f windowSize, v2f pos) override {
+    virtual ~ImmediateApp() {
+        delete scene;
     }
 };
 
 
 int main(void)
 {
-    shared_ptr<LabRenderExampleApp> appPtr = make_shared<LabRenderExampleApp>();
+    shared_ptr<ImmediateApp> appPtr = make_shared<ImmediateApp>();
 
 	lab::checkError(lab::ErrorPolicy::onErrorThrow,
 		            lab::TestConditions::exhaustive, "main loop start");
 
-	LabRenderExampleApp *app = appPtr.get();
+    ImmediateApp*app = appPtr.get();
     app->createScene();
 
     while (!app->isFinished())
@@ -381,7 +296,7 @@ int main(void)
         app->frameBegin();
         app->render();
         app->frameEnd();
-        app->updateScene();
+        app->update();
     }
 
     return 0;

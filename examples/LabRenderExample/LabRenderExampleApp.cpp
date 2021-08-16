@@ -71,49 +71,26 @@ public:
     lab::Render::DrawList * _drawlist;
 };
 
-
-
-
-class LabRenderExampleApp : public lab::GLFWAppBase {
+class ExampleSceneBuilder : public lab::LabRenderAppScene {
 public:
-    shared_ptr<lab::Render::PassRenderer> dr;
-    lab::Render::DrawList drawList;
-
     lab::OSCServer oscServer;
     lab::WebSocketsServer wsServer;
 
-    lc_camera camera;
-    lc_interaction* camera_controller = nullptr;
-    lc_i_Mode cameraRigMode = lc_i_ModeTurnTableOrbit;
-    lc_i_Phase interactionPhase = lc_i_PhaseNone;
-
-    v2f initialMousePosition;
-    v2f previousMousePosition;
-    v2f previousWindowSize;
-
-    LabRenderExampleApp()
-    : GLFWAppBase("LabRender Example")
-    , oscServer("labrender")
+    ExampleSceneBuilder()
+    : oscServer("labrender")
     , wsServer("labrender")
-    , previousMousePosition(V2F(0,0))
-    {
-        lc_camera_set_defaults(&camera);
-        camera_controller = lc_i_create_interactive_controller();
-        
-        const char * env = getenv("ASSET_ROOT");
-		if (env)
-			lab::addPathVariable("{ASSET_ROOT}", env);
-		else
-			lab::addPathVariable("{ASSET_ROOT}", ASSET_ROOT);
+    {}
 
-		std::string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
-		std::cout << "Loading pipeline configuration " << path << std::endl;
+    virtual ~ExampleSceneBuilder() = default;
+
+    virtual void build() override {
+        // pipeline
+        std::string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
+        std::cout << "Loading pipeline configuration " << path << std::endl;
         dr = make_shared<lab::Render::PassRenderer>();
         dr->configure(path.c_str());
-    }
 
-    void createScene()
-	{
+        // drawlist
         auto& meshes = drawList.deferredMeshes;
 
         //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
@@ -123,9 +100,11 @@ public:
                 meshes.push_back({ lab::m44f_identity, i });
         }
 
-		shared_ptr<lab::Render::UtilityModel> cube = make_shared<lab::Render::UtilityModel>();
-		cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
+        shared_ptr<lab::Render::UtilityModel> cube = make_shared<lab::Render::UtilityModel>();
+        cube->createCylinder(0.5f, 0.5f, 2.f, 16, 3, false);
         meshes.push_back({ lab::m44f_identity, cube });
+
+        // set the initial camera
 
         if (model) {
             static float foo = 0.f;
@@ -137,6 +116,8 @@ public:
             lc_camera_frame(&camera, lc_v3f{ mn.x, mn.y, mn.z }, lc_v3f{ mx.x, mx.y, mx.z });
         }
 
+        // servers
+
         shared_ptr<lab::Command> command = make_shared<PingCommand>();
         oscServer.registerCommand(command);
         command = make_shared<LoadMeshCommand>(dr.get(), &drawList);
@@ -147,102 +128,50 @@ public:
 
         wsServer.start(PORT_NUM + 1);
     }
+};
 
-    void render()
-	{
-        // run the immediate gui. @TODO: add a ui() method
 
-        if (interactionPhase != lc_i_PhaseNone) {
-            InteractionToken it = lc_i_begin_interaction(camera_controller, { previousWindowSize.x, previousWindowSize.y });
-            lc_i_ttl_interaction(
-                camera_controller,
-                &camera,
-                it,
-                interactionPhase,
-                cameraRigMode,
-                lc_v2f{ previousMousePosition.x, previousMousePosition.y },
-                lc_radians{ 0 },
-                1.f / 60.f);
-            lc_i_end_interaction(camera_controller, it);
+class ExampleApp : public lab::LabRenderExampleApp {
+public:
+    shared_ptr<lab::Render::PassRenderer> dr;
+    lab::Render::DrawList drawList;
 
-            if (interactionPhase == lc_i_PhaseStart)
-                interactionPhase = lc_i_PhaseContinue;
-            if (interactionPhase == lc_i_PhaseFinish)
-                interactionPhase = lc_i_PhaseNone;
-        }
 
-        lab::checkError(lab::ErrorPolicy::onErrorThrow,
-                        lab::TestConditions::exhaustive, "main loop start");
+    lc_camera camera;
+    lc_interaction* camera_controller = nullptr;
+    lc_i_Mode cameraRigMode = lc_i_ModeTurnTableOrbit;
+    lc_i_Phase interactionPhase = lc_i_PhaseNone;
 
-        v2i fbSize = frameBufferDimensions();
+    v2f initialMousePosition;
+    v2f previousMousePosition;
+    v2f previousWindowSize;
 
-        lc_m44f modl = lc_mount_rotation_transform(&camera.mount);
-        drawList.modl = *reinterpret_cast<lab::m44f*>(&modl);
-        lc_m44f view = lc_mount_gl_view_transform(&camera.mount);
-        drawList.view = *reinterpret_cast<lab::m44f*>(&view);
-        lc_m44f proj = lc_camera_perspective(&camera, float(fbSize.x) / float(fbSize.y));
-        drawList.proj = *reinterpret_cast<lab::m44f*>(&proj);
-
-        lab::Render::PassRenderer::RenderLock rl(dr.get(), renderTime(), mousePosition());
-		v2i fbOffset = V2I(0, 0);
-        renderStart(rl, renderTime(), fbOffset, fbSize);
-
-        dr->render(rl, fbSize, drawList);
-
-        renderEnd(rl);
-
-        lab::checkError(lab::ErrorPolicy::onErrorThrow,
-                        lab::TestConditions::exhaustive, "main loop end");
+    ExampleApp() : lab::LabRenderExampleApp() {
+        scene = new ExampleSceneBuilder();
     }
 
-    virtual void keyPress(int key) override {
-        switch (key) {
-        case GLFW_KEY_C: cameraRigMode = lc_i_ModeCrane; break;
-        case GLFW_KEY_D: cameraRigMode = lc_i_ModeDolly; break;
-        case GLFW_KEY_T:
-        case GLFW_KEY_O: cameraRigMode = lc_i_ModeTurnTableOrbit; break;
-        }
+    virtual ~ExampleApp() {
+        delete scene;
     }
 
-    virtual void mouseDown(v2f windowSize, v2f pos) override {
-        previousMousePosition = pos;
-        initialMousePosition = pos;
-        previousWindowSize = windowSize;
-        interactionPhase = lc_i_PhaseStart;
-    }
 
-    virtual void mouseDrag(v2f windowSize, v2f pos) override {
-        previousMousePosition = pos;
-        previousWindowSize = { windowSize.x, windowSize.y };
-        interactionPhase = lc_i_PhaseContinue;
-    }
-
-    virtual void mouseUp(v2f windowSize, v2f pos) override {
-        previousMousePosition = pos;
-        previousWindowSize = { windowSize.x, windowSize.y };
-        interactionPhase = lc_i_PhaseFinish;
-    }
-
-    virtual void mouseMove(v2f windowSize, v2f pos) override {
-        previousMousePosition = pos;
-        previousWindowSize = { windowSize.x, windowSize.y };
-    }
 };
 
 
 int main(void)
 {
-    shared_ptr<LabRenderExampleApp> appPtr = make_shared<LabRenderExampleApp>();
+    shared_ptr<ExampleApp> appPtr = make_shared<ExampleApp>();
 
 	lab::checkError(lab::ErrorPolicy::onErrorThrow,
 		lab::TestConditions::exhaustive, "main loop start");
 
-	LabRenderExampleApp *app = appPtr.get();
+    ExampleApp* app = appPtr.get();
 
     app->createScene();
 
     while (!app->isFinished())
     {
+        app->update();
         app->frameBegin();
         app->render();
         app->frameEnd();
