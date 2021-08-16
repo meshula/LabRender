@@ -337,8 +337,8 @@ namespace lab {
         v2f previousMousePosition;
         v2f previousWindowSize;
 
-        LabRenderExampleApp()
-            : GLFWAppBase("LabRender Primitives")
+        explicit LabRenderExampleApp(const char* name)
+            : GLFWAppBase(name)
             , previousMousePosition(V2F(0, 0))
         {
             camera_controller = lc_i_create_interactive_controller();

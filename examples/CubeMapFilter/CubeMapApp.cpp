@@ -81,7 +81,7 @@ class CubeMapSceneBuilder : public lab::LabRenderAppScene {
 
 class CubeMapApp : public lab::LabRenderExampleApp {
 public:
-    CubeMapApp() : lab::LabRenderExampleApp() {
+    CubeMapApp() : lab::LabRenderExampleApp("WIP Cubemap") {
         scene = new CubeMapSceneBuilder();
     }
 

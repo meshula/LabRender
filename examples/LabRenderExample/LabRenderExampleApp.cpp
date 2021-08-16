@@ -146,7 +146,7 @@ public:
     v2f previousMousePosition;
     v2f previousWindowSize;
 
-    ExampleApp() : lab::LabRenderExampleApp() {
+    ExampleApp() : lab::LabRenderExampleApp("Example") {
         scene = new ExampleSceneBuilder();
     }
 

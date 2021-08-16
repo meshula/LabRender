@@ -271,7 +271,7 @@ public:
 class ImmediateApp : public lab::LabRenderExampleApp {
 public:
 
-    ImmediateApp() : lab::LabRenderExampleApp() {
+    ImmediateApp() : lab::LabRenderExampleApp("Immediate Rendering") {
         scene = new ImmediateSceneBuilder();
     }
 

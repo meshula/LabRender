@@ -81,7 +81,7 @@ class OffScreenSceneBuilder : public lab::LabRenderAppScene {
 
 class OffScreenApp : public lab::LabRenderExampleApp {
 public:
-    OffScreenApp() : lab::LabRenderExampleApp() {
+    OffScreenApp() : lab::LabRenderExampleApp("Deferred Rendering") {
         scene = new OffScreenSceneBuilder();
     }
 

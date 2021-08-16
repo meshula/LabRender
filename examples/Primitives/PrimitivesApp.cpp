@@ -81,7 +81,7 @@ class PrimitivesSceneBuilder : public lab::LabRenderAppScene {
 
 class PrimitivesApp : public lab::LabRenderExampleApp {
 public:
-    PrimitivesApp() : lab::LabRenderExampleApp() {
+    PrimitivesApp() : lab::LabRenderExampleApp("Primitives") {
         scene = new PrimitivesSceneBuilder();
     }
 

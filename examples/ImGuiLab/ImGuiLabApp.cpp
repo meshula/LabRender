@@ -131,7 +131,7 @@ public:
 class ImGuiApp : public lab::LabRenderExampleApp {
 public:
     ImGuiApp()
-    : lab::LabRenderExampleApp()
+    : lab::LabRenderExampleApp("Dear ImGui")
     {
         scene = new ImGUISceneBuilder();
         _supplemental = new lab::ImGuiIntegration(window);
