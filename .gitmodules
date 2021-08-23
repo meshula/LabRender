@@ -28,3 +28,6 @@
 [submodule "3rdParty/Effekseer"]
 	path = 3rdParty/Effekseer
 	url = https://github.com/meshula/Effekseer.git
+[submodule "3rdParty/opengametools"]
+	path = 3rdParty/opengametools
+	url = https://github.com/jpaver/opengametools.git
