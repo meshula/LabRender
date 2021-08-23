@@ -25,3 +25,6 @@
 [submodule "3rdParty/stb"]
 	path = 3rdParty/stb
 	url = https://github.com/nothings/stb.git
+[submodule "3rdParty/Effekseer"]
+	path = 3rdParty/Effekseer
+	url = https://github.com/meshula/Effekseer.git
