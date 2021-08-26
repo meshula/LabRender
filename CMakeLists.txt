@@ -65,6 +65,24 @@ add_subdirectory("3rdParty/glfw")
 
 endif(LABRENDER_EXAMPLES)
 
+#------------------- Effekseer
+
+message(STATUS "Configuring Effekseer")
+
+set(BUILD_GL ON CACHE INTERNAL "Effekseer GL")
+set(BUILD_EXAMPLES OFF CACHE INTERNAL "Effekseer Examples")
+set(BUILD_DX9 OFF CACHE INTERNAL "Effekseer DX9")
+set(BUILD_DX11 OFF CACHE INTERNAL "Effekseer DX11")
+set(BUILD_DX12 OFF CACHE INTERNAL "Effekseer DX12")
+set(BUILD_METAL OFF CACHE INTERNAL "Effekseer Metal")
+set(USE_OPENGL3 ON CACHE INTERNAL "Effekseer OpenGL 3")
+
+add_subdirectory("3rdParty/Effekseer")
+    
+#------------------- OpenGameTools)
+
+set(OPENGAMETOOL_ROOT ${CMAKE_SOURCE_DIR}/3rdParty/opengametools)
+
 #------------------- DearImgui
 
 set(IMGUI_ROOT "${CMAKE_SOURCE_DIR}/3rdParty/imgui")

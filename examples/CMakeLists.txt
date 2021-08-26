@@ -6,6 +6,7 @@ set(SAMPLES
     Immediate
     LabRenderExample
     OffScreen
+    Particles
     Primitives
 )
 

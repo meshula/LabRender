@@ -68,7 +68,6 @@ set(LABRENDER_PRIVATE_HEADERS
 )
 
 
-
 add_library(LabRender STATIC ${LABRENDER_PUBLIC_HEADERS} ${LABRENDER_PRIVATE_HEADERS}
         ErrorPolicy.cpp
         FrameBuffer.cpp

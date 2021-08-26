@@ -68,7 +68,7 @@ void ImGuiIntegration::ui(int window_width, int window_height)
 
 
 
-
+    // docking template from https://gist.github.com/PossiblyAShrub/0aea9511b84c34e191eaa90dd7225969
 
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
 
