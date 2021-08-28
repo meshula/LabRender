@@ -81,15 +81,15 @@ add_subdirectory("3rdParty/Effekseer")
     
 #------------------- OpenGameTools)
 
-set(OPENGAMETOOL_ROOT ${CMAKE_SOURCE_DIR}/3rdParty/opengametools)
+set(OPENGAMETOOL_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/opengametools)
 
 #------------------- DearImgui
 
-set(IMGUI_ROOT "${CMAKE_SOURCE_DIR}/3rdParty/imgui")
+set(IMGUI_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui")
 
 #------------------- stb
 
-set(STB_ROOT "${CMAKE_SOURCE_DIR}/3rdParty/stb")
+set(STB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/stb")
 
 find_package(OpenGL)
 
@@ -98,7 +98,7 @@ add_subdirectory(3rdParty/LabCmd)
 add_subdirectory(3rdParty/LabMath)
 add_subdirectory(3rdParty/LabText)
 add_subdirectory(3rdParty/tinyobjloader)
-set(TINYOBJLOADER_ROOT ${CMAKE_SOURCE_DIR}/3rdParty/tinyobjloader)
+set(TINYOBJLOADER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/tinyobjloader)
 
 add_subdirectory(src)
 add_subdirectory(extras)

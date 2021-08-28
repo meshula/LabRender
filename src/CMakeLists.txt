@@ -7,8 +7,11 @@ set(LABRENDERTYPES_PUBLIC_HEADERS
         ../include/LabRenderTypes/Texture.h
 )
 
-add_library(LabRenderTypes STATIC ${LABRENDERTYPES_PUBLIC_HEADERS} odr.cpp)
-target_include_directories(LabRenderTypes PUBLIC ${LABRENDER_ROOT}/include)
+add_library(LabRenderTypes STATIC 
+    ${LABRENDERTYPES_PUBLIC_HEADERS} odr.cpp)
+target_include_directories(LabRenderTypes 
+    PUBLIC ${LABRENDER_ROOT}/include)
+
 set_target_properties(
     LabRenderTypes
     PROPERTIES
@@ -21,7 +24,6 @@ set_target_properties(
 )
 
 add_library(Lab::RenderTypes ALIAS LabRenderTypes)
-
 
 if (APPLE)
     set(LABRENDER_PLATFORM_SRC TextureLoader.mm)
@@ -67,7 +69,6 @@ set(LABRENDER_PRIVATE_HEADERS
         json/json.h
 )
 
-
 add_library(LabRender STATIC ${LABRENDER_PUBLIC_HEADERS} ${LABRENDER_PRIVATE_HEADERS}
         ErrorPolicy.cpp
         FrameBuffer.cpp
@@ -89,7 +90,6 @@ add_library(LabRender STATIC ${LABRENDER_PUBLIC_HEADERS} ${LABRENDER_PRIVATE_HEA
         Vertex.cpp
         ${LABRENDER_PLATFORM_SRC}
 )
-
 
 target_compile_definitions(LabRender 
     PUBLIC LABRENDER_STATIC
