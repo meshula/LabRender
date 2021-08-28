@@ -31,3 +31,6 @@
 [submodule "3rdParty/opengametools"]
 	path = 3rdParty/opengametools
 	url = https://github.com/jpaver/opengametools.git
+[submodule "3rdParty/USD"]
+	path = 3rdParty/USD
+	url = https://github.com/PixarAnimationStudios/USD.git
