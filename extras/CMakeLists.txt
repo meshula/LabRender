@@ -153,8 +153,10 @@ add_library(LabRenderImgui STATIC
 
 target_compile_definitions(LabRenderImgui PRIVATE GLEW_STATIC)
 
-target_include_directories(LabRenderImgui PUBLIC ${IMGUI_ROOT}
-    PRIVATE ${IMGUI_ROOT}/backends)
+target_include_directories(LabRenderImgui 
+    PUBLIC "${IMGUI_ROOT}"
+    PUBLIC "${LABRENDER_ROOT}/extras"
+    PRIVATE "${IMGUI_ROOT}/backends")
 
 set_target_properties(LabRenderImgui PROPERTIES
     FOLDER "LabRenderImgui"
