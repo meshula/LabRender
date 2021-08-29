@@ -8,14 +8,10 @@ target_include_directories(LabRenderExample PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(LabRenderExample PRIVATE "${LABRENDER_ROOT}/extras/include")
 
 target_link_libraries(LabRenderExample debug
-    ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE})
+    ${OPENGL_LIBRARIES})
 
 target_link_libraries(LabRenderExample optimized
-    ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE})
+    ${OPENGL_LIBRARIES})
 
 target_link_libraries(LabRenderExample
     glfw

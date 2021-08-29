@@ -11,14 +11,10 @@ target_include_directories(OffScreen PRIVATE "${LABRENDER_ROOT}/extras/include")
 
 target_link_libraries(OffScreen debug
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
 )
 
 target_link_libraries(OffScreen optimized
     ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE}
 )
 
 target_link_libraries(OffScreen

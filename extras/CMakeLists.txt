@@ -56,7 +56,6 @@ set_target_properties(LabRenderBinder PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
 target_link_libraries(LabRenderBinder
-    ${Assimp_LIBRARY_RELEASE}
     GLEW::glew
     Lab::Render
     Lab::ModelLoader

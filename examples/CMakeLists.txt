@@ -2,6 +2,7 @@
 
 set(SAMPLES
     CubeMapFilter
+    Hydra
     ImGuiLab
     Immediate
     LabRenderExample

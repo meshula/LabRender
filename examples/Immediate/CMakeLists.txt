@@ -40,14 +40,10 @@ target_include_directories(${TARGET_NAME} PRIVATE "${LABRENDER_ROOT}/include")
 target_include_directories(${TARGET_NAME} PRIVATE "${LABRENDER_ROOT}/extras/include")
 
 target_link_libraries(${TARGET_NAME} debug
-    ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE})
+    ${OPENGL_LIBRARIES})
 
 target_link_libraries(${TARGET_NAME} optimized
-    ${OPENGL_LIBRARIES}
-    ${GLFW_LIBRARY_RELEASE}
-    ${Assimp_LIBRARY_RELEASE})
+    ${OPENGL_LIBRARIES})
 
 target_link_libraries(${TARGET_NAME} 
     Lab::Math 
