@@ -103,9 +103,6 @@ int main(void)
     HydraApp*app = appPtr.get();
     app->createScene();
 
-    // Play an effect
-    // エフェクトの再生
-    Effekseer::Handle handle = app->hydra_scene->fxr_manager->Play(app->hydra_scene->fxr_effect, 0, 0, 0);
 
     while (!app->isFinished())
     {
