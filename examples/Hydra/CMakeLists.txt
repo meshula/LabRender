@@ -20,7 +20,6 @@ target_link_libraries(Hydra optimized
 )
 
 target_link_libraries(Hydra
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render

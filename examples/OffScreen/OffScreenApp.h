@@ -8,10 +8,6 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <GL/glew.h>
-#endif
-
 #include <LabRender/PassRenderer.h>
 #include <LabMath/LabMath.h>
 
@@ -139,14 +135,10 @@ namespace lab {
             glfwSetMouseButtonCallback(window, mouseButtonCallback);
             glfwSetCursorPosCallback(window, mousePosCallback);
 
-            // start GLEW extension handler
             checkError(ErrorPolicy::onErrorThrow,
                 TestConditions::exhaustive, "main loop start");
 
-#           ifdef _WIN32
-                glewExperimental = GL_TRUE;
-                glewInit(); // create GLEW after the context has been created
-#           endif
+            labrender_init();
 
             // get version info
             const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
@@ -281,9 +273,9 @@ namespace lab {
             if (!rl.valid())
                 return;
 
-            glViewport(offset.x, offset.y, size.x, size.y);
-            glClearColor(0.5f,0,0,1);
-            glClear(GL_COLOR_BUFFER_BIT);
+//            glViewport(offset.x, offset.y, size.x, size.y);
+  //          glClearColor(0.5f,0,0,1);
+    //        glClear(GL_COLOR_BUFFER_BIT);
         }
 
         virtual void doRenderEnd(Render::PassRenderer::RenderLock & rl) override

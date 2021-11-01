@@ -19,7 +19,6 @@ target_link_libraries(Primitives optimized
 )
 
 target_link_libraries(Primitives
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render

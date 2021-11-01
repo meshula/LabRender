@@ -18,6 +18,7 @@
 #include <LabRender/ShaderBuilder.h>
 #include <LabRender/Texture.h>
 
+#include <functional>
 #include <string>
 
 namespace lab { namespace Render {
@@ -31,6 +32,7 @@ namespace lab { namespace Render {
 			std::string _name;
 			int _passNumber;
 			std::shared_ptr<Shader> _shader;
+            std::shared_ptr<ModelPart> _fullScreenQuadMesh;
 
 		public:
 
@@ -61,7 +63,7 @@ namespace lab { namespace Render {
             bool isQuadPass = false;
             bool drawOpaqueGeometry = false;
 
-            std::shared_ptr<ModelPart> _fullScreenQuadMesh;
+            std::function<void()> renderPlug;
 
             void prepareFullScreenQuadAndShader(const FramebufferSet&);
         };
@@ -71,7 +73,7 @@ namespace lab { namespace Render {
 
         LR_API void configure(char const*const path);
 
-        LR_API virtual std::shared_ptr<Render::Texture> texture(const std::string & name) override;
+        LR_API virtual std::shared_ptr<Render::Texture> texture(const std::string & name);
 
         LR_API std::shared_ptr<FrameBuffer> framebuffer(const std::string & name);
 
@@ -84,6 +86,9 @@ namespace lab { namespace Render {
         }
 
         LR_API virtual void render(RenderLock & rl, v2i fbSize, DrawList &) override;
+
+        LR_API std::function<void()> findPlug(char const* const name);
+        LR_API void registerPlug(char const* const name, std::function<void()>);
 
     private:
         LR_API Pass* _findPass(const std::string &) const;

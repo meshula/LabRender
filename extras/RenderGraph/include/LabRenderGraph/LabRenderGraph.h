@@ -61,7 +61,7 @@ struct buffer_select
 
 enum class pass_draw
 {
-    none, blit, quad, opaque_geometry
+    none, blit, quad, opaque_geometry, plug
 };
 
 struct pass

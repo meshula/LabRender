@@ -33,17 +33,6 @@ option(LABRENDER_EXAMPLES "" ON)
 #endif()
 
 if (LABRENDER_EXAMPLES)
-
-if (NOT TARGET GLEW::glew)
-    find_package(GLEW QUIET)
-endif()
-if (NOT TARGET GLEW::glew)
-    add_subdirectory("3rdParty/glew-build-club")
-else()
-    message(STATUS "Found GLEW::glew")
-endif()
-
-
 # glfw doesn't have a proper install so force it.
 # it would be nice to detect glfw in _deps and simply add_subdirectory without
 # the slow FetchContent step.

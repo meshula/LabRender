@@ -22,7 +22,10 @@
 #    import <OpenGL/gl3.h>
 #  endif
 #elif defined(_WIN32)
-#  include <GL/glew.h>
+#  ifdef __gl_h_
+#    error GL has already been included"
+#  endif
+#  include "GL/gl3w.h"
 #  include <Windows.h>
 #  undef near
 #  undef far

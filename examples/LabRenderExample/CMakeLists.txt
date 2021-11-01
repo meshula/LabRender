@@ -15,7 +15,6 @@ target_link_libraries(LabRenderExample optimized
 
 target_link_libraries(LabRenderExample
     glfw
-    GLEW::glew
     Lab::Cmd
     Lab::Render
     Lab::ModelLoader
