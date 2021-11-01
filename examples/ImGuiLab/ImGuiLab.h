@@ -10,30 +10,8 @@
 
 #include "../LabRenderDemoApp.h"
 
-#ifdef _WIN32
-#include <GL/glew.h>
-#endif
 
-#include <LabMath/LabMath.h>
-#include <LabRender/PassRenderer.h>
-
-#include <GLFW/glfw3.h>
-
-#ifdef _WIN32
-# undef APIENTRY
-# define GLFW_EXPOSE_NATIVE_WIN32
-# define GLFW_EXPOSE_NATIVE_WGL
-# include <GLFW/glfw3native.h>
-#endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <atomic>
-#include <mutex>
-#include <string>
-
-#include "imgui.h"
-
+struct GLFWwindow;
 
 namespace lab {
 

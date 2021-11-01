@@ -27,6 +27,11 @@ add_library(Lab::RenderTypes ALIAS LabRenderTypes)
 
 if (APPLE)
     set(LABRENDER_PLATFORM_SRC TextureLoader.mm)
+    set(LABRENDER_PLATFORM_LIBS ${OPENGL_LIBRARIES})
+endif()
+
+if (WIN32)
+    set(LABRENDER_PLATFORM_SRC gl3w.c)
 endif()
 
 set(LABRENDER_PUBLIC_HEADERS
@@ -92,8 +97,7 @@ add_library(LabRender STATIC ${LABRENDER_PUBLIC_HEADERS} ${LABRENDER_PRIVATE_HEA
 )
 
 target_compile_definitions(LabRender 
-    PUBLIC LABRENDER_STATIC
-    PUBLIC GLEW_STATIC)
+    PUBLIC LABRENDER_STATIC)
 
 
 target_include_directories(LabRender 
@@ -113,8 +117,7 @@ set_target_properties(
 )
 
 target_link_libraries(LabRender 
-    GLEW::glew
-    ${OPENGL_LIBRARIES}
+    ${LABRENDER_PLATFORM_LIBS}
     Lab::LabCamera
     Lab::Cmd
     Lab::Math

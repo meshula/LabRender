@@ -52,7 +52,7 @@ namespace lab {
 #if defined __gl_h_
                 ERR(GL_STACK_OVERFLOW);
                 ERR(GL_STACK_UNDERFLOW);
-                ERR(GL_TABLE_TOO_LARGE);
+                //ERR(GL_TABLE_TOO_LARGE);
 #endif
             default:
                 return "Error occurred";

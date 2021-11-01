@@ -20,7 +20,6 @@ target_link_libraries(CubeMapFilterLab optimized
     glfw)
 
 target_link_libraries(CubeMapFilterLab
-    GLEW::glew
     glfw
     Lab::Cmd
     Lab::Math

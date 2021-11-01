@@ -280,9 +280,11 @@ pass_draw pass_draw_from_str(StrView str)
     static StrView tok_opaque_geometry {"opaque geometry", 15};
     static StrView tok_quad {"quad", 4};
     static StrView tok_blit {"blit", 4};
+    static StrView tok_plug{ "plug", 4 };
     if (str == tok_opaque_geometry) return pass_draw::opaque_geometry;
     if (str == tok_quad) return pass_draw::quad;
     if (str == tok_blit) return pass_draw::blit;
+    if (tok_plug.begins(str)) return pass_draw::plug;
     return pass_draw::none;
 }
 
@@ -471,12 +473,21 @@ StrView parse_pass(StrView start, labfx& fx)
             fx.passes.back().active = str_token == tok_yes || str_token == tok_true;
             break;
 
-        case RenderToken::draw:
+        case RenderToken::draw: {
             curr = ScanForEndOfLine(curr, str_token);
             str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
+            str_token = Expect(str_token, StrView{ ":", 1 });
             str_token = Strip(ScanForNonWhiteSpace(str_token));
-            fx.passes.back().draw = pass_draw_from_str(str_token);
+            lab::fx::pass_draw pd = pass_draw_from_str(str_token);
+            fx.passes.back().draw = pd;
+            if (pd == lab::fx::pass_draw::plug) {
+                str_token.curr += 4;
+                str_token.sz -= 4;
+                str_token = Strip(ScanForNonWhiteSpace(str_token));
+                // use the shader string as the name of the plug to search for
+                fx.passes.back().shader = std::string(str_token.curr, str_token.sz);
+            }
+            }
             break;
 
         case RenderToken::clear_depth:

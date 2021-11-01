@@ -18,7 +18,6 @@ target_link_libraries(OffScreen optimized
 )
 
 target_link_libraries(OffScreen
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render

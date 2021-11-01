@@ -25,7 +25,6 @@ set_target_properties(LabModelLoader PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
 target_link_libraries(LabModelLoader
-    GLEW::glew
     Lab::Render
     Lab::Math)
 
@@ -56,7 +55,6 @@ set_target_properties(LabRenderBinder PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
 target_link_libraries(LabRenderBinder
-    GLEW::glew
     Lab::Render
     Lab::ModelLoader
     Lab::Math)
@@ -125,7 +123,8 @@ set(LabRenderImgui_PUBLIC_HEADERS
         ${LABRENDER_ROOT}/extras/LabImgui/FontManager.h
         ${LABRENDER_ROOT}/extras/LabImgui/materialIconDefinitions.h
         ${LABRENDER_ROOT}/extras/LabImgui/meshula-icons.h
-        ${LABRENDER_ROOT}/extras/LabImgui/Widgets.h)
+        ${LABRENDER_ROOT}/extras/LabImgui/Widgets.h
+        ${LABRENDER_ROOT}/extras/LabImgui/LabImgui-gl-glfw.h)
 
 set(LabRenderImgui_PRIVATE_HEADERS
         ${IMGUI_ROOT}/backends/imgui_impl_glfw.h
@@ -145,12 +144,11 @@ set(LabRenderImgui_SRC
         ${IMGUI_ROOT}/backends/imgui_impl_glfw.cpp
         ${IMGUI_ROOT}/backends/imgui_impl_opengl3.cpp
         ${LABRENDER_ROOT}/extras/LabImgui/FontManager.cpp
-        ${LABRENDER_ROOT}/extras/LabImgui/Widgets.cpp)
+        ${LABRENDER_ROOT}/extras/LabImgui/Widgets.cpp
+        ${LABRENDER_ROOT}/extras/LabImgui/LabImgui-gl-glfw.cpp)
 
 add_library(LabRenderImgui STATIC
     ${LabRenderImgui_PUBLIC_HEADERS} ${LabRenderImgui_PRIVATE_HEADERS} ${LabRenderImgui_SRC})
-
-target_compile_definitions(LabRenderImgui PRIVATE GLEW_STATIC)
 
 target_include_directories(LabRenderImgui 
     PUBLIC "${IMGUI_ROOT}"
@@ -166,7 +164,6 @@ set_target_properties(LabRenderImgui PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
 target_link_libraries(LabRenderImgui
-    GLEW::glew
     glfw
     Lab::Text)
 
