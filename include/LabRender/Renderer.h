@@ -41,7 +41,8 @@ public:
     class RenderLock;
     class RenderContext;
 
-    virtual ~Renderer() {}
+    Renderer() = default;
+    virtual ~Renderer() = default;
 
     virtual std::shared_ptr<Render::Texture> texture(const std::string & name) = 0;
     virtual void render(RenderLock & rl, v2i fbSize, DrawList &) = 0;
@@ -51,8 +52,6 @@ public:
         _jobs.emplace_back(std::move(c));
     }
 
-
-
     /**
         RenderLock is an RAII object that prevents re-entrancy during a render.
         */
@@ -60,7 +59,7 @@ public:
     class RenderLock 
 	{
 		std::atomic<bool> _renderInProgress;
-		Renderer* _dr;
+        Renderer* _dr = nullptr;
 
 	public:
 		class RenderContext

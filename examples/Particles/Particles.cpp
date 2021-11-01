@@ -26,67 +26,28 @@ using lab::v2f;
 using lab::v3f;
 using lab::v4f;
 
-class ParticlesSceneBuilder : public lab::LabRenderAppScene {
+class LabEffekseer
+{
 public:
     ::EffekseerRendererGL::RendererRef fxr_renderer;
     ::Effekseer::ManagerRef fxr_manager;
     ::Effekseer::EffectRef fxr_effect;
 
-    virtual ~ParticlesSceneBuilder() = default;
+    ::Effekseer::Handle effect_handle;
 
-    virtual void build() override {
-        // load a pipeline
+    ~LabEffekseer()
+    {
+        // Dispose the manager
+        // マネージャーの破棄
+        fxr_manager.Reset();
 
-        std::string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
-        std::cout << "Loading pipeline configuration " << path << std::endl;
-        dr = std::make_shared<lab::Render::PassRenderer>();
-        dr->configure(path.c_str());
+        // Dispose the renderer
+        // レンダラーの破棄
+        fxr_renderer.Reset();
+    }
 
-        // create a drawlist
-
-        auto& meshes = drawList.deferredMeshes;
-
-        //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
-        shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
-        if (model)
-            for (auto& i : model->parts())
-                meshes.push_back({ lab::m44f_identity, i });
-
-        const float pi = float(M_PI);
-
-        for (int i = 0; i < 10; ++i)
-        {
-            float th = float(i) / 10.f * 2.f * pi;
-            float sx = cos(th);
-            float sy = sin(th);
-
-            shared_ptr<lab::Render::UtilityModel> mesh = make_shared<lab::Render::UtilityModel>();
-            switch (i % 5)
-            {
-            case 0: mesh->createBox(75, 75, 75, 2, 3, 4, false, false); break;
-            case 1: mesh->createCylinder(75, 100, 200, 20, 1, false);  break;
-            case 2: mesh->createSphere(75, 32, 32, 0, 2.f * pi, -pi, 2.f * pi, false);   break;
-            case 3: mesh->createIcosahedron(75);   break;
-            case 4: mesh->createPlane(75, 75, 3, 3);   break;
-            }
-            auto m = lab::m44f_identity;
-            m[3] = v4f{ sx * 300.f, 100.f, sy * 300.f, 1 };
-            meshes.push_back({ m, mesh });
-        }
-
-        // set the initial camera
-
-        if (model) {
-            static float foo = 0.f;
-            camera.mount.transform.position = { foo, 0, -1000 };
-            lab::Bounds bounds = model->localBounds();
-            //bounds = model->transform.transformBounds(bounds);
-            v3f& mn = bounds.first;
-            v3f& mx = bounds.second;
-            lc_camera_frame(&camera, lc_v3f{ mn.x, mn.y, mn.z }, lc_v3f{ mx.x, mx.y, mx.z });
-        }
-
-
+    void init()
+    {
         // Create a renderer of effects
         // エフェクトのレンダラーの作成
         fxr_renderer = ::EffekseerRendererGL::Renderer::Create(8000, EffekseerRendererGL::OpenGLDeviceType::OpenGL3);
@@ -121,12 +82,106 @@ public:
         fxr_effect = Effekseer::Effect::Create(fxr_manager, buff);
         free(buff);
     }
+
+    void play()
+    {
+        // Play an effect
+        // エフェクトの再生
+        effect_handle = fxr_manager->Play(fxr_effect, 0, 0, 0);
+    }
+
+    void render()
+    {
+        // Update the manager
+        // マネージャーの更新
+        fxr_manager->Update();
+
+        // Begin to rendering effects
+        // エフェクトの描画開始処理を行う。
+        fxr_renderer->BeginRendering();
+
+        // Render effects
+        // エフェクトの描画を行う。
+        fxr_manager->Draw();
+
+        // Finish to rendering effects
+        // エフェクトの描画終了処理を行う。
+        fxr_renderer->EndRendering();
+    }
+};
+
+class ParticlesSceneBuilder : public lab::LabRenderAppScene {
+public:
+    LabEffekseer particlePlug;
+
+    virtual ~ParticlesSceneBuilder() = default;
+
+    virtual void build() override 
+    {
+        // load a pipeline
+        std::string path = "{ASSET_ROOT}/pipelines/deferred-fxaa.labfx";
+        std::cout << "Loading pipeline configuration " << path << std::endl;
+        dr = std::make_shared<lab::Render::PassRenderer>();
+        dr->configure(path.c_str());
+
+        // create a drawlist
+
+        auto& meshes = drawList.deferredMeshes;
+
+        //shared_ptr<lab::ModelBase> model = lab::Model::loadMesh("{ASSET_ROOT}/models/starfire.25.obj");
+        shared_ptr<lab::Render::Model> model = lab::Render::loadMesh("{ASSET_ROOT}/models/ShaderBall/shaderBallNoCrease/shaderBall.obj");
+        if (false&&model)
+            for (auto& i : model->parts())
+                meshes.push_back({ lab::m44f_identity, i });
+
+        const float pi = float(M_PI);
+        const float sc = 0.005f;
+        const float r = 3;
+
+        for (int i = 0; i < 10; ++i)
+        {
+            float th = float(i) / 10.f * 2.f * pi;
+            float sx = cos(th);
+            float sy = sin(th);
+
+            shared_ptr<lab::Render::UtilityModel> mesh = make_shared<lab::Render::UtilityModel>();
+            switch (i % 5)
+            {
+                // box has a bug!!
+            case 0: mesh->createBox(sc * 75, sc * 75, sc * 75, 2, 3, 4, false, false); break;
+            case 1: mesh->createCylinder(sc * 75, sc * 100, sc * 200, 20, 1, false);  break;
+            case 2: mesh->createSphere(sc * 75, 32, 32, 0, 2.f * pi, -pi, 2.f * pi, false);   break;
+            case 3: mesh->createIcosahedron(sc * 75);   break;
+            case 4: mesh->createPlane(sc * 75, sc * 75, 3, 3);   break;
+            }
+            auto m = lab::m44f_identity;
+            m[3] = v4f{ sx * r, r * 0.25f, sy * r, 1 };
+            meshes.push_back({ m, mesh });
+        }
+
+        // set the initial camera
+
+        if (model) {
+            static float foo = -200.f;
+            camera.mount.transform.position = { foo, 200, -1000 };
+            lab::Bounds bounds = model->localBounds();
+            //bounds = model->transform.transformBounds(bounds);
+            v3f& mn = bounds.first;
+            v3f& mx = bounds.second;
+            lc_camera_frame(&camera, lc_v3f{ mn.x, mn.y, mn.z }, lc_v3f{ mx.x, mx.y, mx.z });
+        }
+        lc_mount_look_at(&camera.mount,
+            lc_v3f{ 20,5,30 },
+            lc_v3f{ 0,0,0 }, lc_v3f{ 0,1,0 });
+
+        particlePlug.init();
+    }
 };
 
 class ParticlesApp : public lab::LabRenderExampleApp {
 public:
     ParticlesSceneBuilder* particles_scene = nullptr;
-    ParticlesApp() : lab::LabRenderExampleApp("Primitives") {
+    ParticlesApp() : lab::LabRenderExampleApp("Particles") {
         particles_scene = new ParticlesSceneBuilder();
         scene = particles_scene;
     }
@@ -143,12 +198,13 @@ int main(void)
     lab::checkError(lab::ErrorPolicy::onErrorThrow,
         lab::TestConditions::exhaustive, "main loop start");
 
-    ParticlesApp*app = appPtr.get();
+    ParticlesApp* app = appPtr.get();
     app->createScene();
 
     // Play an effect
     // エフェクトの再生
-    Effekseer::Handle handle = app->particles_scene->fxr_manager->Play(app->particles_scene->fxr_effect, 0, 0, 0);
+    LabEffekseer* plug = &app->particles_scene->particlePlug;
+    plug->play();
 
     while (!app->isFinished())
     {
@@ -157,57 +213,58 @@ int main(void)
         app->render();
 
         {
-            // Specify a position of view
-            // 視点位置を確定
-            auto g_position = ::Effekseer::Vector3D(10.0f, 5.0f, 20.0f);
-
-            // Specify a projection matrix
-            // 投影行列を設定
             v2i fbSize = app->frameBufferDimensions();
 
-            app->particles_scene->fxr_renderer->SetProjectionMatrix(
-                ::Effekseer::Matrix44().PerspectiveFovRH_OpenGL(90.0f / 180.0f * 3.14f,
-                    (float)fbSize.x / (float)fbSize.y, 1.0f, 500.0f));
 
-            // Specify a camera matrix
-            // カメラ行列を設定
-            app->particles_scene->fxr_renderer->SetCameraMatrix(
-                ::Effekseer::Matrix44().LookAtRH(g_position,
-                    ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f),
-                    ::Effekseer::Vector3D(0.0f, 1.0f, 0.0f)));
+    //            then move all the rest of this into the nascent plug
+
+
+            if (app->scene) {
+
+                // Specify a projection matrix
+                // 投影行列を設定
+                lc_m44f proj = lc_camera_perspective(&app->scene->camera, float(fbSize.x) / float(fbSize.y));
+                plug->fxr_renderer->SetProjectionMatrix(
+                    *reinterpret_cast<::Effekseer::Matrix44*>(&proj));
+
+                // Specify a camera matrix
+                // カメラ行列を設定
+                lc_m44f view = lc_mount_gl_view_transform(&app->scene->camera.mount);
+
+                plug->fxr_renderer->SetCameraMatrix(
+                    *reinterpret_cast<::Effekseer::Matrix44*>(&view));
+            }
+            else {
+                // Specify a position of view
+                // 視点位置を確定
+                auto g_position = ::Effekseer::Vector3D(10.0f, 5.0f, 20.0f);
+
+                // Specify a projection matrix
+                // 投影行列を設定
+                plug->fxr_renderer->SetProjectionMatrix(
+                    ::Effekseer::Matrix44().PerspectiveFovRH_OpenGL(90.0f / 180.0f * 3.14f,
+                        (float)fbSize.x / (float)fbSize.y, 1.0f, 500.0f));
+
+                // Specify a camera matrix
+                // カメラ行列を設定
+                plug->fxr_renderer->SetCameraMatrix(
+                    ::Effekseer::Matrix44().LookAtRH(g_position,
+                        ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f),
+                        ::Effekseer::Vector3D(0.0f, 1.0f, 0.0f)));
+            }
+
 
             // Move the effect
             // エフェクトの移動
-            app->particles_scene->fxr_manager->AddLocation(handle, ::Effekseer::Vector3D(0.2f, 0.0f, 0.0f));
+            plug->fxr_manager->AddLocation(plug->effect_handle, ::Effekseer::Vector3D(0.2f, 0.0f, 0.0f));
 
-            // Update the manager
-            // マネージャーの更新
-            app->particles_scene->fxr_manager->Update();
-
-            // Begin to rendering effects
-            // エフェクトの描画開始処理を行う。
-            app->particles_scene->fxr_renderer->BeginRendering();
-
-            // Render effects
-            // エフェクトの描画を行う。
-            app->particles_scene->fxr_manager->Draw();
-
-            // Finish to rendering effects
-            // エフェクトの描画終了処理を行う。
-            app->particles_scene->fxr_renderer->EndRendering();
+            plug->render(); // this function is evolving into the plugMgr plug
         }
 
 
         app->frameEnd();
     }
 
-    // Dispose the manager
-    // マネージャーの破棄
-    app->particles_scene->fxr_manager.Reset();
-
-    // Dispose the renderer
-    // レンダラーの破棄
-    app->particles_scene->fxr_renderer.Reset();
 
     return 0;
 }

@@ -21,7 +21,6 @@ target_link_libraries(Particles optimized
 )
 
 target_link_libraries(Particles
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render
