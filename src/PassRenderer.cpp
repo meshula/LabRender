@@ -136,6 +136,9 @@ void PassRenderer::Pass::run(RenderLock& rl, const FramebufferSet& fbos)
             model.second->draw(*gbufferAOVs.get(), writeAttachments, rl);
         }
     }
+
+    if (renderPlug)
+        renderPlug();
 }
 
 class PassRenderer::Detail {
@@ -146,6 +149,8 @@ public:
     Render::TextureSet textures;
 
     vector<shared_ptr<Pass>> passes;
+
+    std::map<std::string, std::function<void()>> plugs;
 };
 
 PassRenderer::PassRenderer() : _detail(new Detail()) {
@@ -223,52 +228,58 @@ void PassRenderer::configure(char const*const path)
 	{
         std::shared_ptr<Pass> pass = addPass(std::make_shared<Pass>(ps.name, passNumber++));
 
-        lab::fx::shader const* shader = nullptr;
-        for (const auto& s : fx->shaders)
-            if (s.name == ps.shader)
-            {
-                shader = &s;
-                break;
+        if (ps.draw == lab::fx::pass_draw::plug) {
+            pass->renderPlug = findPlug(ps.shader.c_str());
+        }
+        else {
+
+            lab::fx::shader const* shader = nullptr;
+            for (const auto& s : fx->shaders) {
+                if (s.name == ps.shader) {
+                    shader = &s;
+                    break;
+                }
             }
 
-        if (shader)
-        {
-            pass->shaderSpec.vtx_src = shader->vsh_source;
-            pass->shaderSpec.fgmt_src = shader->fsh_source;
-            //pass->shaderSpec.fgmt_post_src = fragment_shader_postamble_path.asString();
-
-            for (const auto& uniform : shader->uniforms)
+            if (shader)
             {
-                string texture;
-                AutomaticUniform automatic = AutomaticUniform::none;
-                if (uniform.automatic.length() > 0)
-				{
-                    if ((uniform.automatic == "resolution") || (uniform.automatic == "auto-resolution"))
-                        automatic = AutomaticUniform::frameBufferResolution;
-                    else if ((uniform.automatic == "sky_matrix") || (uniform.automatic == "auto-sky-matrix"))
-                        automatic = AutomaticUniform::skyMatrix;
-                    else if (uniform.automatic == "render_time")
-                        automatic = AutomaticUniform::renderTime;
-                    else if (uniform.automatic == "mouse_position")
-                        automatic = AutomaticUniform::mousePosition;
+                pass->shaderSpec.vtx_src = shader->vsh_source;
+                pass->shaderSpec.fgmt_src = shader->fsh_source;
+                //pass->shaderSpec.fgmt_post_src = fragment_shader_postamble_path.asString();
+
+                for (const auto& uniform : shader->uniforms)
+                {
+                    string texture;
+                    AutomaticUniform automatic = AutomaticUniform::none;
+                    if (uniform.automatic.length() > 0)
+                    {
+                        if ((uniform.automatic == "resolution") || (uniform.automatic == "auto-resolution"))
+                            automatic = AutomaticUniform::frameBufferResolution;
+                        else if ((uniform.automatic == "sky_matrix") || (uniform.automatic == "auto-sky-matrix"))
+                            automatic = AutomaticUniform::skyMatrix;
+                        else if (uniform.automatic == "render_time")
+                            automatic = AutomaticUniform::renderTime;
+                        else if (uniform.automatic == "mouse_position")
+                            automatic = AutomaticUniform::mousePosition;
+                        else
+                            texture = uniform.automatic;
+                    }
+
+                    if (semanticTypeIsSampler(uniform.type))
+                        pass->shaderSpec.samplers.push_back(Uniform(uniform.name, uniform.type, automatic, texture));
                     else
-                        texture = uniform.automatic;
+                        pass->shaderSpec.uniforms.push_back(Uniform(uniform.name, uniform.type, automatic, texture));
                 }
 
-                if (semanticTypeIsSampler(uniform.type))
-                    pass->shaderSpec.samplers.push_back(Uniform(uniform.name, uniform.type, automatic, texture));
-                else
-                    pass->shaderSpec.uniforms.push_back(Uniform(uniform.name, uniform.type, automatic, texture));
-            }
+                for (const auto& varying : shader->varyings)
+                {
+                    pass->shaderSpec.varyings.push_back(make_pair(varying.name, varying.type));
+                }
 
-            for (const auto& varying : shader->varyings)
-            {
-                pass->shaderSpec.varyings.push_back(make_pair(varying.name, varying.type));
-            }
-
-            for (const auto& attribute : shader->attributes)
-            {
-                pass->shaderSpec.attributes.push_back(make_pair(attribute.name, attribute.type));
+                for (const auto& attribute : shader->attributes)
+                {
+                    pass->shaderSpec.attributes.push_back(make_pair(attribute.name, attribute.type));
+                }
             }
         }
 
@@ -640,7 +651,7 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
 
         checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "render, before pass");
 
-        //&&&if (bound_frame_buffer != pass->writeBuffer || bound_attachments != pass->writeAttachments)
+        if (bound_frame_buffer != pass->writeBuffer || bound_attachments != pass->writeAttachments)
         {
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // unbind previous framebuffer
 
@@ -648,12 +659,14 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
                 glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rl.context.rootFramebuffer);
             else
                 _detail->fbos.fbo(pass->writeBuffer)->bindForWrite(pass->writeAttachments);
-
-			bound_frame_buffer = pass->writeBuffer;
-            bound_attachments = pass->writeAttachments;
         }
-		checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "render, bind for write");
+        bound_frame_buffer = pass->writeBuffer;
+        bound_attachments = pass->writeAttachments;
 
+        checkError(ErrorPolicy::onErrorThrow, TestConditions::exhaustive, "render, bind for write");
+
+        // quad pass is a convenience where a full screen quad is automatically provided
+        // before preparing the the pass' own shader and setting input data appropriately
 		if (pass->isQuadPass)
 	        pass->prepareFullScreenQuadAndShader(_detail->fbos);
 
@@ -684,5 +697,20 @@ void PassRenderer::render(RenderLock& rl, v2i fbSize, DrawList& drawList)
 
     glUseProgram(0);
 }
+
+std::function<void()> PassRenderer::findPlug(char const* const name)
+{
+    auto p = _detail->plugs.find(std::string(name));
+    if (p == _detail->plugs.end())
+        return {};
+    else
+        return p->second;
+}
+
+void PassRenderer::registerPlug(char const*const name, std::function<void()> plug)
+{
+    _detail->plugs[std::string(name)] = plug;
+}
+
 
 } // lab
