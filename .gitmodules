@@ -13,15 +13,6 @@
 [submodule "3rdParty/tinyobjloader"]
 	path = 3rdParty/tinyobjloader
 	url = https://github.com/tinyobjloader/tinyobjloader.git
-[submodule "3rdParty/glew-build-club"]
-	path = 3rdParty/glew-build-club
-	url = https://github.com/vfxpro99/glew-build-club.git
-[submodule "3rdParty/glfw"]
-	path = 3rdParty/glfw
-	url = https://github.com/glfw/glfw.git
-[submodule "3rdParty/imgui"]
-	path = 3rdParty/imgui
-	url = https://github.com/ocornut/imgui.git
 [submodule "3rdParty/stb"]
 	path = 3rdParty/stb
 	url = https://github.com/nothings/stb.git
