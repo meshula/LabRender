@@ -19,3 +19,6 @@
 [submodule "3rdParty/opengametools"]
 	path = 3rdParty/opengametools
 	url = https://github.com/jpaver/opengametools.git
+[submodule "3rdParty/LabImgui"]
+	path = 3rdParty/LabImgui
+	url = https://github.com/meshula/LabImgui.git
