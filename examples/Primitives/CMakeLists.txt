@@ -23,7 +23,7 @@ target_link_libraries(Primitives
     Lab::Math
     Lab::Render
     Lab::RenderBinder
-    Lab::RenderImgui
+    Lab::Imgui
     Lab::ModelLoader
 )
 

@@ -24,7 +24,7 @@ target_link_libraries(Hydra
     Lab::Math
     Lab::Render
     Lab::RenderBinder
-    Lab::RenderImgui
+    Lab::Imgui
     Lab::ModelLoader
 )
 

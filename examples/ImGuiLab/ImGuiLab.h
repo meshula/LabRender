@@ -9,20 +9,13 @@
 #pragma once
 
 #include "../LabRenderDemoApp.h"
+#include "LabImgui/LabImGui.h"
 
 
 struct GLFWwindow;
 
 namespace lab {
 
-    class ImGuiIntegration : public SupplementalGuiHandler
-    {
-    public:
-        ImGuiIntegration(GLFWwindow* window);
-        ~ImGuiIntegration();
 
-        virtual void ui(int window_width, int widnow_height) override;
-        virtual void render() override;
-    };
 
 }

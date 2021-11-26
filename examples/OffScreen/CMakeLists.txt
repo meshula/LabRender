@@ -22,7 +22,7 @@ target_link_libraries(OffScreen
     Lab::Math
     Lab::Render
     Lab::RenderBinder
-    Lab::RenderImgui
+    Lab::Imgui
     Lab::ModelLoader
 )
 

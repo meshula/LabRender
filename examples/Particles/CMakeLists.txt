@@ -25,7 +25,7 @@ target_link_libraries(Particles
     Lab::Math
     Lab::Render
     Lab::RenderBinder
-    Lab::RenderImgui
+    Lab::Imgui
     Lab::ModelLoader
     "${VFX_ROOT}/lib/Effekseer.lib"
     "${VFX_ROOT}/lib/EffekseerRendererGL.lib"

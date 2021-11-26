@@ -25,7 +25,7 @@ target_link_libraries(CubeMapFilterLab
     Lab::Math
     Lab::Render
     Lab::RenderBinder
-    Lab::RenderImgui
+    Lab::Imgui
     Lab::ModelLoader)
 
 set_property(TARGET CubeMapFilterLab PROPERTY FOLDER "examples")
