@@ -3,11 +3,11 @@
 set(SAMPLES
     CubeMapFilter
     Hydra
-    ImGuiLab
-    Immediate
+    # ImGuiLab relies on docking branch
+    #Immediate update to latest InsectAI
     LabRenderExample
     OffScreen
-    Particles
+    #Particles Effekseer not set up
     Primitives
 )
 

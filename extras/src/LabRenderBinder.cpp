@@ -170,6 +170,9 @@ struct lab_render_mgr
             return {};
 
         auto fb = renderers[lr.handle]->framebuffer(name);
+        if (!fb)
+            return {};
+        
         int index = 0;
         for (auto& i : fb->baseNames)
         {

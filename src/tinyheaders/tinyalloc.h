@@ -38,6 +38,8 @@
 
 #if !defined(TINYALLOC_H)
 
+#include <stddef.h>
+
 typedef struct taStack taStack;
 taStack* taStackCreate(void* memory_chunk, size_t size);
 void* taStackAlloc(taStack* stack, size_t size);

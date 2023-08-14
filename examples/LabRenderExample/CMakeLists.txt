@@ -21,6 +21,7 @@ target_link_libraries(LabRenderExample
     Lab::Math)
 
 set_property(TARGET LabRenderExample PROPERTY FOLDER "examples")
+target_compile_features(LabRenderExample PRIVATE cxx_std_17)
 
 install (TARGETS LabRenderExample RUNTIME DESTINATION bin)
 

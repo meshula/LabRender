@@ -52,6 +52,7 @@ target_link_libraries(${TARGET_NAME}
     Lab::ModelLoader
     glfw
     )
+
 set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "examples")
 
 target_include_directories(${TARGET_NAME} PRIVATE InsectAI/include)

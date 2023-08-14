@@ -21,6 +21,7 @@
 #include "json/json.h"
 
 #include <fstream>
+#include <sys/stat.h>
 
 using namespace std;
 using namespace lab::Render;
@@ -178,7 +179,7 @@ void PassRenderer::configure(char const*const path)
     struct stat st;
     if (stat(p.c_str(), &st) != 0)
     {
-        std::cerr << "Could not open " << p << std::endl;
+        std::cerr << "Could not open pass configuration file" << p << std::endl;
         return;
     }
     size_t sz = st.st_size;

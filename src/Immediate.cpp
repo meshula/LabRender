@@ -188,8 +188,6 @@ struct ImmDrawCmd;
 struct ImmDrawList;
 typedef uint32_t ImmDrawIdx;
 
-void* ImmMemAlloc(size_t sz) { return malloc(sz); }
-inline void ImmMemFree(void* p) { free(p); }
 
 typedef uint8_t ImmDrawListFlags;
 
@@ -1303,7 +1301,7 @@ lab::ImmSpriteId SpriteId(std::shared_ptr<uint8_t> rgb, int w, int h)
         return it->second;
     }
 
-    static std::atomic<int> id = 0;
+    static std::atomic<int> id(0);
     int new_id = ++id;
 
     cached_sprites_reverse[rgb.get()] = new_id;

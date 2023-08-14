@@ -9,6 +9,7 @@
 #pragma once
 
 #include <LabRender/LabRender.h>
+#include <cstddef>
 
 namespace lab {
 

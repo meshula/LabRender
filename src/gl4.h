@@ -9,6 +9,9 @@
 // variables so you can implement functionality that they don't have if needed.
 
 #ifdef __APPLE__
+
+#include <TargetConditionals.h>
+
 #  define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
 #  if TARGET_OS_IPHONE
 #    import <OpenGLES/ES2/gl.h>

@@ -33,3 +33,4 @@ install(TARGETS Primitives
     RUNTIME DESTINATION bin)
 
 set_property(TARGET Primitives PROPERTY FOLDER "examples")
+target_compile_features(Primitives PRIVATE cxx_std_17)

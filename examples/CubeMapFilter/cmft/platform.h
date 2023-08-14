@@ -52,6 +52,7 @@
     || defined (__x86_64__) \
     || defined (__x86_64)   \
     || defined (_M_X64)     \
+    || defined (__arm64__)  \
     || defined (_M_AMD64)   )
 #   undef CMFT_ARCH_64BIT
 #   define CMFT_ARCH_64BIT 1

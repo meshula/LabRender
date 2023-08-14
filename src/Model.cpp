@@ -25,6 +25,8 @@
 #include <map>
 #include <vector>
 
+#include <float.h>
+
 using std::shared_ptr;
 using std::unique_ptr;
 using std::vector;

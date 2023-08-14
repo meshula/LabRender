@@ -2,7 +2,6 @@
 #-------------------------------------------------------------------------------
 # LabModelLoader
 
-
 set(LabModelLoader_PUBLIC_HEADERS
         include/LabRenderModelLoader/modelLoader.h)
 
@@ -23,6 +22,8 @@ set_target_properties(LabModelLoader PROPERTIES
     OUTPUT_NAME "LabModelLoader"
     OUTPUT_NAME_DEBUG "LabModelLoader_d"
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
+
+target_compile_features(LabModelLoader PRIVATE cxx_std_17)
 
 target_link_libraries(LabModelLoader
     Lab::Render
@@ -59,12 +60,13 @@ target_link_libraries(LabRenderBinder
     Lab::ModelLoader
     Lab::Math)
 
+target_compile_features(LabRenderBinder PRIVATE cxx_std_17)
+
 add_library(Lab::RenderBinder ALIAS LabRenderBinder)
 
 
 #-------------------------------------------------------------------------------
 # LabRenderGraph
-
 
 set(LabRenderGraph_PUBLIC_HEADERS
                 RenderGraph/include/LabRenderGraph/LabRenderGraph.h)
@@ -92,6 +94,8 @@ target_link_libraries(LabRenderGraph
 
 add_library(Lab::RenderGraph ALIAS LabRenderGraph)
 
+target_compile_features(LabRenderGraph PRIVATE cxx_std_17)
+
 set(IMGUILAB_SRC
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderDemoApp.h"
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderExampleApp.cpp"
@@ -102,6 +106,8 @@ add_executable(RenderGraphTest RenderGraph/src/test.cpp)
 target_compile_definitions(RenderGraphTest PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(RenderGraphTest PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
 target_link_libraries(RenderGraphTest Lab::RenderGraph)
+
+target_compile_features(RenderGraphTest PRIVATE cxx_std_17)
 
 install (TARGETS RenderGraphTest
     ARCHIVE DESTINATION lib

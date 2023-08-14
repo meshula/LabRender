@@ -36,5 +36,7 @@ install(TARGETS Particles
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin)
 
+target_compile_features(Particles PRIVATE cxx_std_17)
+
 set_property(TARGET Particles PROPERTY FOLDER "examples")
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
 	------------------------------------------------------------------------------
 		Licensing information can be found at the end of the file.
 	------------------------------------------------------------------------------
@@ -85,6 +85,7 @@
 #define TP_ATLAS_EMPTY_COLOR        0x000000FF
 
 #include <stdint.h>
+#include <limits.h>
 
 #ifndef EXTERNC
 # ifdef __cplusplus

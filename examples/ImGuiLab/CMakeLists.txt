@@ -35,4 +35,5 @@ install (TARGETS ImGuiLab
     RUNTIME DESTINATION bin)
 
 set_property(TARGET ImGuiLab PROPERTY FOLDER "examples")
+target_compile_features(ImGuiLab PRIVATE cxx_std_17)
 

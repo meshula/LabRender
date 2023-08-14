@@ -29,6 +29,7 @@ target_link_libraries(CubeMapFilterLab
     Lab::ModelLoader)
 
 set_property(TARGET CubeMapFilterLab PROPERTY FOLDER "examples")
+target_compile_features(CubeMapFilterLab PRIVATE cxx_std_17)
 
 install (TARGETS CubeMapFilterLab RUNTIME DESTINATION bin)
 
