@@ -8,8 +8,29 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <GL/glew.h>
+#ifdef __APPLE__
+
+#include <TargetConditionals.h>
+
+#  define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+#  if TARGET_OS_IPHONE
+#    import <OpenGLES/ES2/gl.h>
+#    import <OpenGLES/ES2/glext.h>
+#    define glBindVertexArray glBindVertexArrayOES
+#    define glGenVertexArrays glGenVertexArraysOES
+#    define glDeleteVertexArrays glDeleteVertexArraysOES
+#  else
+#    import <OpenGL/CGLTypes.h>
+#    import <OpenGL/CGLCurrent.h>
+#    import <OpenGL/gl3.h>
+#  endif
+#elif defined(_WIN32)
+#  include <GL/glew.h>
+#  include <Windows.h>
+#  undef near
+#  undef far
+#else
+#  include <GL/gl.h>
 #endif
 
 #include <LabRender/PassRenderer.h>
@@ -139,13 +160,13 @@ namespace lab {
             glfwSetMouseButtonCallback(window, mouseButtonCallback);
             glfwSetCursorPosCallback(window, mousePosCallback);
 
-            // start GLEW extension handler
             checkError(ErrorPolicy::onErrorThrow,
                 TestConditions::exhaustive, "main loop start");
 
 #           ifdef _WIN32
-                glewExperimental = GL_TRUE;
-                glewInit(); // create GLEW after the context has been created
+            // start GLEW extension handler
+            glewExperimental = GL_TRUE;
+            glewInit(); // create GLEW after the context has been created
 #           endif
 
             // get version info

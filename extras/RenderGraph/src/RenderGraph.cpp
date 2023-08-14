@@ -16,7 +16,7 @@ namespace {
 StrView SkipComments(StrView str)
 {
     if (*str.curr == '-' && str.sz > 0)
-        str = ScanForNonWhiteSpace(ScanForBeginningOfNextLine(str));
+        str = str.ScanForBeginningOfNextLine().ScanForNonWhiteSpace();
 
     return str;
 }
@@ -228,12 +228,11 @@ int semanticTypeStride(SemanticType t)
 const char* semanticTypeName(SemanticType t)
 {
     if (t >= SemanticType::unknown_st)
-        return semanticTypeData[static_cast<typename std::underlying_type<SemanticType>::type>(SemanticType::unknown_st)].name;
+        return "unknown";
 
     unsigned int index = static_cast<typename std::underlying_type<SemanticType>::type>(t);
     return semanticTypeData[index].name;
 }
-
 
 std::string semanticTypeToString(SemanticType st)
 {
@@ -326,46 +325,46 @@ lab::Render::TextureType TextureType_from_str(StrView str)
 
 StrView parse_uniforms(StrView curr, std::vector<uniform>& uniforms)
 {
-    curr = ScanForNonWhiteSpace(Expect(ScanForNonWhiteSpace(curr), StrView{":", 1}));
+    curr = curr.ScanForNonWhiteSpace().Expect(StrView{":", 1}).ScanForNonWhiteSpace();
     if (*curr.curr != '[')
         return curr;
-    curr = Expect(curr, StrView{"[", 1});
+    curr = curr.Expect(StrView{"[", 1});
 
     while (curr.sz > 0)
     {
-        curr = ScanForNonWhiteSpace(curr);
+        curr = curr.ScanForNonWhiteSpace();
         if (!curr.sz)
             break;
 
         if (*curr.curr == ']')
         {
-            curr = Expect(curr, StrView{ "]", 1 });
+            curr = curr.Expect(StrView{ "]", 1 });
             break;
         }
 
         StrView name;
-        curr = ScanForNonWhiteSpace(GetToken(curr, ':', name));
-        curr = Expect(curr, StrView{":", 1});
+        curr = curr.GetToken(':', name).ScanForNonWhiteSpace();
+        curr = curr.Expect(StrView{":", 1});
         StrView type;
-        curr = ScanForNonWhiteSpace(GetTokenAlphaNumeric(curr, type));
+        curr = curr.GetTokenAlphaNumeric(type).ScanForNonWhiteSpace();
         SemanticType st = semanticTypeNamed(type);
 
         // automatic uniform marker
         StrView automatic {"", 0};
         if (*curr.curr == '<')
         {
-            curr = Expect(curr, StrView{ "<", 1 });
+            curr = curr.Expect(StrView{ "<", 1 });
             if (*curr.curr == '-')
             {
-                curr = Expect(curr, StrView{ "-", 1 });
-                curr = ScanForNonWhiteSpace(GetTokenAlphaNumericExt(curr, "-_", automatic));
+                curr = curr.Expect(StrView{ "-", 1 });
+                curr = curr.GetTokenAlphaNumericExt("-_", automatic).ScanForNonWhiteSpace();
             }
         }
         uniforms.push_back(uniform{ std::string(name.curr, name.sz), st, std::string(automatic.curr, automatic.sz) });
 
         if (*curr.curr == ',')  // comma is optional
         {
-            curr = Expect(curr, StrView{ ",", 1 });
+            curr = curr.Expect(StrView{ ",", 1 });
         }
     }
     return curr;
@@ -373,10 +372,10 @@ StrView parse_uniforms(StrView curr, std::vector<uniform>& uniforms)
 
 StrView parse_shader(StrView curr, shader& prg, std::string& source)
 {
-    curr = Expect(curr, StrView{":", 1});
+    curr = curr.Expect(StrView{":", 1});
     while (curr.sz > 0)
     {
-        curr = ScanForNonWhiteSpace(curr);
+        curr = curr.ScanForNonWhiteSpace();
         if (!curr.sz)
             break;
 
@@ -384,27 +383,27 @@ StrView parse_shader(StrView curr, shader& prg, std::string& source)
         static StrView tok_attributes{ "attributes", 10 };
 
         StrView str_token;
-        StrView next = ScanForNonWhiteSpace(GetToken(curr, ':', str_token));
+        StrView next = curr.GetToken(':', str_token).ScanForNonWhiteSpace();
         if (str_token == tok_source)
         {
-            next = Expect(next, StrView{":", 1});
-            next = ScanForNonWhiteSpace(next);
+            next = next.Expect(StrView{":", 1});
+            next = next.ScanForNonWhiteSpace();
             if (*next.curr != '`')
                 return curr;
 
             // could parse for slang (```glsl, etc) here
-            next = ScanForNonWhiteSpace(ScanForBeginningOfNextLine(next));
+            next = next.ScanForBeginningOfNextLine().ScanForNonWhiteSpace();
             StrView src = next;
             while (next.sz > 0)
             {
-                next = ScanForBeginningOfNextLine(next);
-                StrView tmp = ScanForNonWhiteSpace(next);
+                next = next.ScanForBeginningOfNextLine();
+                StrView tmp = next.ScanForNonWhiteSpace();
                 if (*tmp.curr == '`')
                 {
                     // at the end of the source block, assign the source
                     src.sz = tmp.curr - src.curr;
                     source = std::string{ src.curr, src.sz };
-                    next = ScanForBeginningOfNextLine(tmp);
+                    next = tmp.ScanForBeginningOfNextLine();
                     break;
                 }
             }
@@ -424,28 +423,28 @@ StrView parse_shader(StrView curr, shader& prg, std::string& source)
 StrView parse_pass(StrView start, labfx& fx)
 {
     RenderToken token = RenderToken::pass;
-    StrView str_token;
-    StrView curr = ScanForEndOfLine(start, str_token);
-    str_token = ScanForNonWhiteSpace(str_token);
-    str_token = Expect(str_token, StrView{":", 1});
-    str_token = Strip(ScanForNonWhiteSpace(str_token));
-    fx.passes.back().name = std::string(str_token.curr, str_token.sz);
+    StrView str_token = start.ScanForNonWhiteSpace();
+    str_token = str_token.Expect(StrView{":", 1}).ScanForNonWhiteSpace();
+    StrView name;
+    StrView curr = str_token.ScanForEndofLine(name);
+    name = name.Strip();
+    fx.passes.back().name = std::string(name.curr, name.sz);
 
     bool in_pass = true;
     while(in_pass && curr.sz > 0)
     {
-        curr = ScanForNonWhiteSpace(curr);
+        curr = curr.ScanForNonWhiteSpace();
         if (!curr.sz)
             break;
 
         if (*curr.curr == '-')
         {
-            curr = SkipComments(curr);
+            curr = curr.ScanForBeginningOfNextLine();
             continue;
         }
 
         StrView restore = curr;
-        curr = ScanForNonWhiteSpace(GetToken(curr, ':', str_token));
+        curr = curr.GetToken(':', str_token).ScanForNonWhiteSpace();
         token = parse_token(str_token);
         if (token == RenderToken::unknown)
         {
@@ -456,88 +455,88 @@ StrView parse_pass(StrView start, labfx& fx)
         switch(token)
         {
         case RenderToken::use_shader:
-            curr = ScanForEndOfLine(curr, str_token);
-            str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
-            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            curr = curr.ScanForEndofLine(str_token);
+            str_token = str_token.ScanForNonWhiteSpace();
+            str_token = str_token.Expect(StrView{":", 1});
+            str_token = str_token.ScanForNonWhiteSpace().Strip();
             fx.passes.back().shader = std::string(str_token.curr, str_token.sz);
             break;
 
         case RenderToken::active:
-            curr = ScanForEndOfLine(curr, str_token);
-            str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
-            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            curr = curr.ScanForEndofLine(str_token);
+            str_token = str_token.ScanForNonWhiteSpace();
+            str_token = str_token.Expect(StrView{":", 1});
+            str_token = str_token.ScanForNonWhiteSpace().Strip();
             fx.passes.back().active = str_token == tok_yes || str_token == tok_true;
             break;
 
         case RenderToken::draw:
-            curr = ScanForEndOfLine(curr, str_token);
-            str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
-            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            curr = curr.ScanForEndofLine(str_token);
+            str_token = str_token.ScanForNonWhiteSpace();
+            str_token = str_token.Expect(StrView{":", 1});
+            str_token = str_token.ScanForNonWhiteSpace().Strip();
             fx.passes.back().draw = pass_draw_from_str(str_token);
             break;
 
         case RenderToken::clear_depth:
-            curr = ScanForEndOfLine(curr, str_token);
-            str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
-            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            curr = curr.ScanForEndofLine(str_token);
+            str_token = str_token.ScanForNonWhiteSpace();
+            str_token = str_token.Expect(StrView{":", 1});
+            str_token = str_token.ScanForNonWhiteSpace().Strip();
             fx.passes.back().clear_depth = str_token == tok_yes || str_token == tok_true;
             break;
 
         case RenderToken::write_depth:
-            curr = ScanForEndOfLine(curr, str_token);
-            str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
-            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            curr = curr.ScanForEndofLine(str_token);
+            str_token = str_token.ScanForNonWhiteSpace();
+            str_token = str_token.Expect(StrView{":", 1});
+            str_token = str_token.ScanForNonWhiteSpace().Strip();
             fx.passes.back().write_depth = str_token == tok_yes || str_token == tok_true;
             break;
 
         case RenderToken::clear_outputs:
-            curr = ScanForEndOfLine(curr, str_token);
-            str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
-            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            curr = curr.ScanForEndofLine(str_token);
+            str_token = str_token.ScanForNonWhiteSpace();
+            str_token = str_token.Expect(StrView{":", 1});
+            str_token = str_token.ScanForNonWhiteSpace().Strip();
             fx.passes.back().clear_outputs = str_token == tok_yes || str_token == tok_true;
             break;
 
         case RenderToken::depth_test:
-            curr = ScanForEndOfLine(curr, str_token);
-            str_token = ScanForNonWhiteSpace(str_token);
-            str_token = Expect(str_token, StrView{":", 1});
-            str_token = Strip(ScanForNonWhiteSpace(str_token));
+            curr = curr.ScanForEndofLine(str_token);
+            str_token = str_token.ScanForNonWhiteSpace();
+            str_token = str_token.Expect(StrView{":", 1});
+            str_token = str_token.ScanForNonWhiteSpace().Strip();
             fx.passes.back().test = depth_test_from_str(str_token);
             break;
 
         case RenderToken::inputs:
             {
-                curr = ScanForNonWhiteSpace(curr);
-                curr = Expect(curr, StrView{":", 1});
-                curr = ScanForNonWhiteSpace(curr);
-                str_token = Strip(ScanForNonWhiteSpace(str_token));
-                StrView advance = Expect(ScanForNonWhiteSpace(curr), StrView{"[", 1});
+                curr = curr.ScanForNonWhiteSpace();
+                curr = curr.Expect(StrView{":", 1});
+                curr = curr.ScanForNonWhiteSpace();
+                str_token = str_token.ScanForNonWhiteSpace().Strip();
+                StrView advance = curr.ScanForNonWhiteSpace().Expect(StrView{"[", 1});
                 if (advance.curr != curr.curr)
                 {
                     curr = advance;
                     while (curr.sz > 0)
                     {
-                        curr = ScanForNonWhiteSpace(curr);
+                        curr = curr.ScanForNonWhiteSpace();
                         StrView buffer_name;
-                        curr = ScanForNonWhiteSpace(GetToken(curr, '.', buffer_name));
-                        curr = Expect(curr, StrView{".", 1});
+                        curr = curr.GetToken('.', buffer_name).ScanForNonWhiteSpace();
+                        curr = curr.Expect(StrView{".", 1});
                         StrView texture_name;
-                        curr = ScanForNonWhiteSpace(GetTokenAlphaNumeric(curr, texture_name));
+                        curr = curr.GetTokenAlphaNumeric(texture_name).ScanForNonWhiteSpace();
                         fx.passes.back().input_textures.push_back({std::string{buffer_name.curr, buffer_name.sz},
                                                                    std::string{texture_name.curr, texture_name.sz}});
                         if (*curr.curr == ',')
                         {
-                            curr = Expect(curr, StrView{",", 1});
+                            curr = curr.Expect(StrView{",", 1});
                         }
                         else if (*curr.curr == ']')
                         {
-                            curr = Expect(curr, StrView{"]", 1});
+                            curr = curr.Expect(StrView{"]", 1});
                             break;
                         }
                     }
@@ -547,26 +546,26 @@ StrView parse_pass(StrView start, labfx& fx)
 
         case RenderToken::outputs:
             {
-                curr = ScanForNonWhiteSpace(curr);
-                curr = Expect(curr, StrView{":", 1});
+                curr = curr.ScanForNonWhiteSpace();
+                curr = curr.Expect(StrView{":", 1});
                 StrView buffer_name;
-                curr = GetTokenAlphaNumeric(curr, buffer_name);
+                curr = curr.GetTokenAlphaNumeric(buffer_name);
                 fx.passes.back().output_buffer.assign(buffer_name.curr, buffer_name.sz);
-                curr = SkipComments(ScanForNonWhiteSpace(curr));
+                curr = curr.SkipCommentsAndWhiteSpace();
                 if (curr.sz && *curr.curr == '[')
                 {
-                    curr = Expect(curr, StrView{"[", 1});
+                    curr = curr.Expect(StrView{"[", 1});
                     while (curr.sz > 0)
                     {
-                        curr = ScanForNonWhiteSpace(curr);
+                        curr = curr.ScanForNonWhiteSpace();
                         StrView texture_name;
-                        curr = ScanForNonWhiteSpace(GetTokenAlphaNumeric(curr, texture_name));
+                        curr = curr.GetTokenAlphaNumeric(texture_name).ScanForNonWhiteSpace();
                         fx.passes.back().output_textures.push_back(std::string{texture_name.curr, texture_name.sz});
                         if (*curr.curr == ',')
-                            curr = Expect(curr, StrView{",", 1});
+                            curr = curr.Expect(StrView{",", 1});
                         else if (*curr.curr == ']')
                         {
-                            curr = Expect(curr, StrView{"]", 1});
+                            curr = curr.Expect(StrView{"]", 1});
                             break;
                         }
                     }
@@ -609,7 +608,7 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
     bool error_raised = false;
     while(curr.sz > 0 && !error_raised)
     {
-        curr = ScanForNonWhiteSpace(curr);
+        curr = curr.ScanForNonWhiteSpace();
         if (!curr.sz)
             break;
 
@@ -620,7 +619,7 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
         }
 
         StrView str_token;
-        curr = ScanForNonWhiteSpace(GetToken(curr, ':', str_token));
+        curr = curr.GetToken(':', str_token).ScanForNonWhiteSpace();
         RenderToken token = parse_token(str_token);
         if (token == RenderToken::unknown)
         {
@@ -656,10 +655,9 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
             switch(token)
             {
             case RenderToken::shader:
-                curr = ScanForEndOfLine(curr, str_token);
-                str_token = Strip(str_token);
-                str_token = Expect(str_token, StrView{":", 1});
-                str_token = Strip(str_token);
+                curr = curr.ScanForEndofLine(str_token);
+                str_token = str_token.Strip().Expect(StrView{":", 1});
+                str_token = str_token.Strip();
                 fx.shaders.back().name = std::string(str_token.curr, str_token.sz);
                 break;
 
@@ -678,6 +676,8 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
             case RenderToken::uniforms:
                 curr = parse_uniforms(curr, fx.shaders.back().uniforms);
                 break;
+                    
+            default: break;
             }
             break;
 
@@ -690,19 +690,18 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
             switch(token)
             {
                 case RenderToken::texture:
-                    curr = ScanForEndOfLine(curr, str_token);
-                    str_token = Strip(str_token);
-                    str_token = Expect(str_token, StrView{":", 1});
-                    str_token = Strip(str_token);
+                    curr = curr.GetTokenAlphaNumeric(str_token).Strip();
+                    str_token = str_token.Expect(StrView{":", 1}).Strip();
                     fx.textures.back().name = std::string(str_token.curr, str_token.sz);
                     break;
 
                 case RenderToken::path:
-                    curr = ScanForEndOfLine(curr, str_token);
-                    str_token = Strip(str_token);
-                    str_token = Expect(str_token, StrView{":", 1});
-                    str_token = Strip(str_token);
+                    curr = curr.GetTokenAlphaNumeric(str_token).Strip();
+                    str_token = str_token.Expect(StrView{":", 1}).Strip();
                     fx.textures.back().path = std::string(str_token.curr, str_token.sz);
+                    break;
+                    
+                default:
                     break;
             }
             break;
@@ -711,22 +710,21 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
             switch(token)
             {
             case RenderToken::name:
-                curr = ScanForEndOfLine(curr, str_token);
-                str_token = ScanForNonWhiteSpace(str_token);
-                str_token = Expect(str_token, StrView{":", 1});
-                str_token = Strip(str_token);
+                curr = curr.ScanForEndofLine(str_token);
+                str_token = str_token.Expect(StrView{":", 1}).Strip();
                 fx.name = std::string(str_token.curr, str_token.sz);
                 break;
 
             case RenderToken::version:
-                curr = ScanForEndOfLine(curr, str_token);
-                str_token = ScanForNonWhiteSpace(str_token);
-                str_token = Expect(str_token, StrView{":", 1});
-                str_token = Strip(str_token);
+                curr = curr.ScanForEndofLine(str_token);
+                str_token = str_token.Expect(StrView{":", 1}).Strip();
                 fx.version = std::string(str_token.curr, str_token.sz);
                 break;
 
             case RenderToken::unknown:
+                break;
+                    
+            default:
                 break;
             }
             break;
@@ -735,18 +733,14 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
             switch(token)
             {
             case RenderToken::buffer:
-                curr = ScanForEndOfLine(curr, str_token);
-                str_token = ScanForNonWhiteSpace(str_token);
-                str_token = Expect(str_token, StrView{":", 1});
-                str_token = Strip(str_token);
+                curr = curr.ScanForEndofLine(str_token);
+                str_token = str_token.Expect(StrView{":", 1}).Strip();
                 fx.buffers.back().name = std::string(str_token.curr, str_token.sz);
                 break;
 
             case RenderToken::has_depth:
-                curr = ScanForEndOfLine(curr, str_token);
-                str_token = ScanForNonWhiteSpace(str_token);
-                str_token = Expect(str_token, StrView{":", 1});
-                str_token = Strip(str_token);
+                curr = curr.ScanForEndofLine(str_token);
+                str_token = str_token.Expect(StrView{":", 1}).Strip();
                 if (str_token != tok_yes && str_token != tok_no && str_token != tok_true && str_token != tok_false)
                 {
                     Report("has_depth invalid argument: ", str_token);
@@ -758,25 +752,23 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
 
             case RenderToken::textures:
             {
-                curr = ScanForNonWhiteSpace(curr);
-                curr = Expect(curr, StrView{":", 1});
-                curr = ScanForNonWhiteSpace(curr);
-                if (*curr.curr == '[')
-                {
-                    curr = Expect(curr, StrView{"[", 1});
-                    do
-                    {
+                curr = curr.ScanForNonWhiteSpace();
+                curr = curr.Expect(StrView{":", 1}).ScanForNonWhiteSpace();
+                if (*curr.curr == '[') {
+                    curr = curr.Expect(StrView{"[", 1});
+                    do {
                         fx.buffers.back().textures.emplace_back(texture{});
                         texture& curr_texture = fx.buffers.back().textures.back();
 
-                        curr = ScanForEndOfLine(curr, str_token);
+                        str_token = curr;
+                        curr = curr.ScanForEndofLine(str_token);
+                        str_token = str_token.Strip();
 
                         auto crumbs = Split(str_token, ',');
                         for (int i = 0; i < crumbs.size(); ++i)
-                            crumbs[i] = Strip(crumbs[i]);
+                            crumbs[i] = crumbs[i].Strip();
 
-                        if (crumbs.size() > 0)
-                        {
+                        if (crumbs.size() > 0) {
                             curr_texture.name = std::string{crumbs[0].curr, crumbs[0].sz};
                         }
 
@@ -791,7 +783,7 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
                                 if (scale_crumbs.size() > 1 && scale_crumbs[0] == tok_scale)
                                 {
                                     float s;
-                                    GetFloat(scale_crumbs[1], s);
+                                    scale_crumbs[1].GetFloat(s);
                                     curr_texture.scale = s;
                                 }
                                 else
@@ -803,7 +795,7 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
                             }
                         }
 
-                        StrView eol = ScanForCharacter(str_token, ']');
+                        StrView eol = str_token.ScanForCharacter(']');
                         if (eol.sz > 0)
                             break;
                     }
@@ -813,6 +805,9 @@ LRG_API labfx_t* parse_labfx(char const*const input, size_t length)
             break;
 
             case RenderToken::unknown:
+                break;
+                    
+            default:
                 break;
             }
             break;

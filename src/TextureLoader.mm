@@ -7,14 +7,14 @@
 #import <Foundation/Foundation.h>
 #import <ImageIO/CGImageSource.h>
 
-#import "TextureLoader.h"
+#include "LabRender/TextureLoader.h"
 
 #include "LabRender/Texture.h"
-#include "LabRender/gl4.h"
+#include "gl4.h"
 
 namespace LabRender {
 
-    std::unique_ptr<Texture> loadTexture(char const*const urlStr, bool asCube) {
+    std::unique_ptr<lab::Render::Texture> loadTexture(char const*const urlStr, bool asCube) {
         NSString* path = [NSString stringWithCString:urlStr encoding:NSUTF8StringEncoding];
         NSURL* url = [NSURL fileURLWithPath:path];
         CGImageSourceRef imageSource = CGImageSourceCreateWithURL((__bridge CFURLRef) url, nullptr);
@@ -48,19 +48,19 @@ namespace LabRender {
         CGContextRelease(ctx);
         CFRelease(image);
 
-        std::unique_ptr<Texture> texture(new Texture());
+        std::unique_ptr<lab::Render::Texture> texture(new lab::Render::Texture());
         
         if (asCube)
-            texture->create((int)width, (int)height, Texture::Type::u8x4, GL_LINEAR, GL_CLAMP_TO_EDGE, Texture::Type::u8x4, imageData);
+            texture->create((int)width, (int)height, lab::Render::TextureType::u8x4, GL_LINEAR, GL_CLAMP_TO_EDGE, lab::Render::TextureType::u8x4, imageData);
         else
-            texture->create((int)width, (int)height, Texture::Type::u8x4, GL_LINEAR, GL_CLAMP_TO_EDGE, Texture::Type::u8x4, imageData);
+            texture->create((int)width, (int)height, lab::Render::TextureType::u8x4, GL_LINEAR, GL_CLAMP_TO_EDGE, lab::Render::TextureType::u8x4, imageData);
 
         free(imageData);
         return texture;
     }
     
 
-    std::unique_ptr<Texture> loadCubeTexture(std::string url[6]) {
+    std::unique_ptr<lab::Render::Texture> loadCubeTexture(std::string url[6]) {
         void* imageData[6];
 
         size_t width = 0;
@@ -104,9 +104,10 @@ namespace LabRender {
             CFRelease(image);
         }
 
-        std::unique_ptr<Texture> texture(new Texture());
+        std::unique_ptr<lab::Render::Texture> texture(new lab::Render::Texture());
         if (width > 0 && height > 0)
-            texture->createCube((int)width, (int)height, Texture::Type::u8x4, GL_LINEAR, GL_CLAMP_TO_EDGE, Texture::Type::u8x4,
+            texture->createCube((int)width, (int)height, lab::Render::TextureType::u8x4,
+                                GL_LINEAR, GL_CLAMP_TO_EDGE, lab::Render::TextureType::u8x4,
                                 imageData[0], imageData[1], imageData[2], imageData[3], imageData[4], imageData[5]);
 
         for (int i = 0; i < 6; ++i)

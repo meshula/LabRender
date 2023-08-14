@@ -20,7 +20,6 @@ target_link_libraries(CubeMapFilterLab optimized
     glfw)
 
 target_link_libraries(CubeMapFilterLab
-    GLEW::glew
     glfw
     Lab::Cmd
     Lab::Math
@@ -30,6 +29,7 @@ target_link_libraries(CubeMapFilterLab
     Lab::ModelLoader)
 
 set_property(TARGET CubeMapFilterLab PROPERTY FOLDER "examples")
+target_compile_features(CubeMapFilterLab PRIVATE cxx_std_17)
 
 install (TARGETS CubeMapFilterLab RUNTIME DESTINATION bin)
 

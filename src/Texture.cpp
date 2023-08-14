@@ -122,8 +122,6 @@ int glChannelCount(int t) {
         case GL_ALPHA: return 1;
         case GL_RGB: return 3;
         case GL_RGBA: return 4;
-        case GL_LUMINANCE: return 1;
-        case GL_LUMINANCE_ALPHA: return 1;
     }
     return 0;
 }

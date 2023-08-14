@@ -17,6 +17,8 @@
 # define LRG_CLASS
 #endif
 
+#include <stddef.h>
+
 // can be reinterpret casted to labfx
 struct labfx_t {};
 

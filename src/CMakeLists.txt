@@ -97,8 +97,8 @@ target_compile_definitions(LabRender
 
 
 target_include_directories(LabRender 
-    PUBLIC ${LABRENDER_ROOT}/include
-    PUBLIC ${STB_ROOT}
+    PUBLIC "${LABRENDER_ROOT}/include"
+    PUBLIC "${STB_ROOT}"
 )
 
 set_target_properties(
@@ -109,16 +109,17 @@ set_target_properties(
         PUBLIC_HEADER "${LABRENDER_PUBLIC_HEADERS}"
         OUTPUT_NAME "LabRender"
         OUTPUT_NAME_DEBUG "LabRender_d"
-        INTERFACE_INCLUDE_DIRECTORIES ${LABRENDER_ROOT}/include
+        INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include"
 )
 
 target_link_libraries(LabRender 
-    GLEW::glew
     ${OPENGL_LIBRARIES}
     Lab::LabCamera
     Lab::Cmd
     Lab::Math
     Lab::RenderGraph
 )
+
+target_compile_features(LabRender PRIVATE cxx_std_17)
 
 add_library(Lab::Render ALIAS LabRender)

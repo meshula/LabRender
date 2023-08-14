@@ -19,7 +19,6 @@ target_link_libraries(Primitives optimized
 )
 
 target_link_libraries(Primitives
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render
@@ -34,3 +33,4 @@ install(TARGETS Primitives
     RUNTIME DESTINATION bin)
 
 set_property(TARGET Primitives PROPERTY FOLDER "examples")
+target_compile_features(Primitives PRIVATE cxx_std_17)

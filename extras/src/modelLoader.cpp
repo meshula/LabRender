@@ -826,7 +826,7 @@ namespace lab {
 
         if (!ret) {
             std::cerr << "Failed to load " << filename << std::endl;
-            return false;
+            return {};
         }
 
         printf("# of vertices  = %d\n", (int)(attrib.vertices.size()) / 3);

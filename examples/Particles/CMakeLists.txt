@@ -21,7 +21,6 @@ target_link_libraries(Particles optimized
 )
 
 target_link_libraries(Particles
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render
@@ -36,6 +35,8 @@ install(TARGETS Particles
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin)
+
+target_compile_features(Particles PRIVATE cxx_std_17)
 
 set_property(TARGET Particles PROPERTY FOLDER "examples")
 

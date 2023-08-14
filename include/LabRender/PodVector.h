@@ -7,9 +7,13 @@
 #define IMM_ASSERT(_EXPR)    assert(_EXPR)
 #endif
 
+#include "string.h"
+#include "stddef.h"
 
 namespace lab
 {
+inline void ImmMemFree(void* p) { free(p); }
+inline void* ImmMemAlloc(size_t sz) { return malloc(sz); }
 
 
 // Lightweight std::vector<> like class to avoid dragging dependencies

@@ -50,8 +50,7 @@ target_link_libraries(${TARGET_NAME}
     Lab::Cmd 
     Lab::Render 
     Lab::ModelLoader
-    glfw
-    GLEW::glew)
+    glfw)
 
 set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "examples")
 

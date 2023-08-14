@@ -20,13 +20,13 @@ target_link_libraries(Hydra optimized
 )
 
 target_link_libraries(Hydra
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render
     Lab::RenderBinder
     Lab::RenderImgui
     Lab::ModelLoader
+    usdImaging
 )
 
 install(TARGETS Hydra
@@ -35,4 +35,5 @@ install(TARGETS Hydra
     RUNTIME DESTINATION bin)
 
 set_property(TARGET Hydra PROPERTY FOLDER "examples")
+target_compile_features(Hydra PRIVATE cxx_std_17)
 

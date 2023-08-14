@@ -2,7 +2,6 @@
 #-------------------------------------------------------------------------------
 # LabModelLoader
 
-
 set(LabModelLoader_PUBLIC_HEADERS
         include/LabRenderModelLoader/modelLoader.h)
 
@@ -24,8 +23,9 @@ set_target_properties(LabModelLoader PROPERTIES
     OUTPUT_NAME_DEBUG "LabModelLoader_d"
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
+target_compile_features(LabModelLoader PRIVATE cxx_std_17)
+
 target_link_libraries(LabModelLoader
-    GLEW::glew
     Lab::Render
     Lab::Math)
 
@@ -56,17 +56,17 @@ set_target_properties(LabRenderBinder PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
 target_link_libraries(LabRenderBinder
-    GLEW::glew
     Lab::Render
     Lab::ModelLoader
     Lab::Math)
+
+target_compile_features(LabRenderBinder PRIVATE cxx_std_17)
 
 add_library(Lab::RenderBinder ALIAS LabRenderBinder)
 
 
 #-------------------------------------------------------------------------------
 # LabRenderGraph
-
 
 set(LabRenderGraph_PUBLIC_HEADERS
                 RenderGraph/include/LabRenderGraph/LabRenderGraph.h)
@@ -94,6 +94,8 @@ target_link_libraries(LabRenderGraph
 
 add_library(Lab::RenderGraph ALIAS LabRenderGraph)
 
+target_compile_features(LabRenderGraph PRIVATE cxx_std_17)
+
 set(IMGUILAB_SRC
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderDemoApp.h"
     "${LABRENDER_ROOT}/examples/ImGuiLab/LabRenderExampleApp.cpp"
@@ -105,6 +107,8 @@ target_compile_definitions(RenderGraphTest PRIVATE PLATFORM_WINDOWS=1)
 target_compile_definitions(RenderGraphTest PRIVATE ASSET_ROOT="${LABRENDER_ROOT}/assets")
 target_link_libraries(RenderGraphTest Lab::RenderGraph)
 
+target_compile_features(RenderGraphTest PRIVATE cxx_std_17)
+
 install (TARGETS RenderGraphTest
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
@@ -112,9 +116,9 @@ install (TARGETS RenderGraphTest
 
 set_property(TARGET RenderGraphTest PROPERTY FOLDER "examples")
 
+
 #-------------------------------------------------------------------------------
 # LabRenderImgui
-
 
 set(LabRenderImgui_PUBLIC_HEADERS
     ${IMGUI_ROOT}/imconfig.h
@@ -157,6 +161,8 @@ target_include_directories(LabRenderImgui
     PUBLIC "${LABRENDER_ROOT}/extras"
     PRIVATE "${IMGUI_ROOT}/backends")
 
+target_compile_features(LabRenderImgui PRIVATE cxx_std_17)
+
 set_target_properties(LabRenderImgui PROPERTIES
     FOLDER "LabRenderImgui"
     POSITION_INDEPENDENT_CODE ON
@@ -166,7 +172,6 @@ set_target_properties(LabRenderImgui PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${LABRENDER_ROOT}/include")
 
 target_link_libraries(LabRenderImgui
-    GLEW::glew
     glfw
     Lab::Text)
 

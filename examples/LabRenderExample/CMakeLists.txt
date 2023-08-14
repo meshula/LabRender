@@ -15,13 +15,13 @@ target_link_libraries(LabRenderExample optimized
 
 target_link_libraries(LabRenderExample
     glfw
-    GLEW::glew
     Lab::Cmd
     Lab::Render
     Lab::ModelLoader
     Lab::Math)
 
 set_property(TARGET LabRenderExample PROPERTY FOLDER "examples")
+target_compile_features(LabRenderExample PRIVATE cxx_std_17)
 
 install (TARGETS LabRenderExample RUNTIME DESTINATION bin)
 

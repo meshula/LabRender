@@ -24,7 +24,6 @@ target_link_libraries(ImGuiLab optimized
     ${OPENGL_LIBRARIES})
 
 target_link_libraries(ImGuiLab
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render
@@ -39,4 +38,5 @@ install (TARGETS ImGuiLab
     RUNTIME DESTINATION bin)
 
 set_property(TARGET ImGuiLab PROPERTY FOLDER "examples")
+target_compile_features(ImGuiLab PRIVATE cxx_std_17)
 

@@ -34,15 +34,16 @@ option(LABRENDER_EXAMPLES "" ON)
 
 if (LABRENDER_EXAMPLES)
 
-if (NOT TARGET GLEW::glew)
-    find_package(GLEW QUIET)
+if (WIN32)
+    if (NOT TARGET GLEW::glew)
+        find_package(GLEW QUIET)
+    endif()
+    if (NOT TARGET GLEW::glew)
+        add_subdirectory("3rdParty/glew-build-club")
+    else()
+        message(STATUS "Found GLEW::glew")
+    endif()
 endif()
-if (NOT TARGET GLEW::glew)
-    add_subdirectory("3rdParty/glew-build-club")
-else()
-    message(STATUS "Found GLEW::glew")
-endif()
-
 
 # glfw doesn't have a proper install so force it.
 # it would be nice to detect glfw in _deps and simply add_subdirectory without
@@ -97,3 +98,8 @@ configure_file(cmake/LabRenderConfig.cmake.in
 install(FILES
   "${PROJECT_BINARY_DIR}/LabRenderConfig.cmake"
   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake")
+
+install(
+FILES
+  assets/pipelines/deferred-offscreen.labfx
+DESTINATION bin/lab_rsrc/pipelines/)

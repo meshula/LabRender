@@ -18,7 +18,6 @@ target_link_libraries(OffScreen optimized
 )
 
 target_link_libraries(OffScreen
-    GLEW::glew
     Lab::Cmd
     Lab::Math
     Lab::Render
@@ -34,3 +33,4 @@ install(TARGETS OffScreen
 )
 
 set_property(TARGET OffScreen PROPERTY FOLDER "examples")
+target_compile_features(OffScreen PRIVATE cxx_std_17)
