@@ -12,28 +12,10 @@ set(LABRENDER_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 option(LABRENDER_EXAMPLES "" ON)
 
-# notes: this block appears to be the canonically correct way to do FetchContent
-#if (NOT TARGET Lab::LabCamera)
-#    find_package(LabCamera QUIET)
-#endif()
-#if (NOT TARGET Lab::LabCamera)
-#    message(STATUS "Installing LabCamera")
-#    FetchContent_Declare(LabCamera
-#        GIT_REPOSITORY "https://github.com/meshula/LabCamera.git"
-#        GIT_TAG "main"
-#        GIT_SHALLOW ON)
-#
-#    FetchContent_GetProperties(LabCamera)
-#    if(NOT LabCamera_POPULATED)
-#        FetchContent_Populate(LabCamera)
-#        add_subdirectory(${labcamera_SOURCE_DIR} ${labcamera_BINARY_DIR})
-#    endif()
-#else()
-#    message(STATUS "Found Lab::Camera")
-#endif()
+#------------------- glfw
+include(glfw.cmake)
 
-if (LABRENDER_EXAMPLES)
-
+#------------------- glew
 if (WIN32)
     if (NOT TARGET GLEW::glew)
         find_package(GLEW QUIET)
@@ -44,26 +26,6 @@ if (WIN32)
         message(STATUS "Found GLEW::glew")
     endif()
 endif()
-
-# glfw doesn't have a proper install so force it.
-# it would be nice to detect glfw in _deps and simply add_subdirectory without
-# the slow FetchContent step.
-
-#------------------- glfw
-
-message(STATUS "Installing glfw")
-
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "shared")
-set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "glfw examples")
-set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "glfw tests")
-set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "glfw docs")
-set(GLFW_INSTALL OFF CACHE INTERNAL "glfw install")
-set(GLFW_VULKAN_STATIC OFF CACHE INTERNAL "glfw vulkan") # "Assume the Vulkan loader is linked with the application"
-
-add_subdirectory("3rdParty/glfw")
-
-
-endif(LABRENDER_EXAMPLES)
 
 #------------------- OpenGameTools)
 
@@ -85,10 +47,10 @@ add_subdirectory(3rdParty/LabMath)
 add_subdirectory(3rdParty/LabText)
 add_subdirectory(3rdParty/tinyobjloader)
 
-set(IMGUI_BACKEND_OPENGL3 ON)
-set(IMGUI_BACKEND_SOKOL OFF)
-set(IMGUI_BACKEND_GLFW ON)
-set(IMGUI_BACKEND_WINAPI ON) 
+#set(IMGUI_BACKEND_OPENGL3 ON)
+#set(IMGUI_BACKEND_SOKOL OFF)
+#set(IMGUI_BACKEND_GLFW ON)
+#set(IMGUI_BACKEND_WINAPI ON) 
 add_subdirectory(3rdParty/LabImgui)
 
 set(TINYOBJLOADER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/tinyobjloader)
