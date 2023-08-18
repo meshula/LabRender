@@ -472,18 +472,20 @@ StrView parse_pass(StrView start, labfx& fx)
             fx.passes.back().active = str_token == tok_yes || str_token == tok_true;
             break;
 
-       case RenderToken::draw:
-            curr = curr.ScanForEndofLine(str_token);
-            str_token = str_token.ScanForNonWhiteSpace();
-            str_token = str_token.Expect(StrView{":", 1});
-            str_token = str_token.ScanForNonWhiteSpace().Strip();
-            fx.passes.back().draw = pass_draw_from_str(str_token);
-            if (pd == lab::fx::pass_draw::plug) {
-                str_token.curr += 4;
-                str_token.sz -= 4;
+            case RenderToken::draw: {
+                curr = curr.ScanForEndofLine(str_token);
+                str_token = str_token.ScanForNonWhiteSpace();
+                str_token = str_token.Expect(StrView{":", 1});
                 str_token = str_token.ScanForNonWhiteSpace().Strip();
-                // use the shader string as the name of the plug to search for
-                fx.passes.back().shader = std::string(str_token.curr, str_token.sz);
+                pass_draw pd = pass_draw_from_str(str_token);
+                fx.passes.back().draw = pd;
+                if (pd == lab::fx::pass_draw::plug) {
+                    str_token.curr += 4;
+                    str_token.sz -= 4;
+                    str_token = str_token.ScanForNonWhiteSpace().Strip();
+                    // use the shader string as the name of the plug to search for
+                    fx.passes.back().shader = std::string(str_token.curr, str_token.sz);
+                }
             }
             break;
 
