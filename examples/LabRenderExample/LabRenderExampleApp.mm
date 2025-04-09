@@ -8,11 +8,13 @@
 
 #include "../LabRenderDemoApp.h"
 #include "RenderMeshes.hpp"
+#include "LabDirectories.h"
 
 #ifdef HAVE_DEARIMGUI
 #include "LabImgui/LabImGui.h"
 #include "imgui.h"
 #include "implot.h"
+#include <functional>
 
 void imgui_frame()
 {
@@ -44,26 +46,6 @@ void imgui_frame()
     lab_imgui_end_fullscreen_docking(&ws);
 }
 
-int main(int argc, const char* argv[]) try
-{
-    @autoreleasepool {
-        const char* asset_root = lab_application_resource_path(argv[0], "share/lab_font_demo/");
-        lab_imgui_init(argc, argv, asset_root);
-        lab_imgui_create_window("Hello LabImGui", 1024, 768, nullptr, imgui_frame);
-        lab_imgui_shutdown();
-    }
-    return EXIT_SUCCESS;
-}
-catch (std::exception& exc)
-{
-    std::cerr << exc.what();
-    return EXIT_FAILURE;
-}
-
-#endif
-
-#ifdef HAVE_GLFW
-
 class ExampleApp : public lab::LabRenderExampleApp {
 public:
     shared_ptr<lab::Render::PassRenderer> dr;
@@ -78,7 +60,7 @@ public:
     v2f previousMousePosition;
     v2f previousWindowSize;
 
-    ExampleApp() : lab::LabRenderExampleApp("Example") {
+    ExampleApp() : lab::LabRenderExampleApp("Example", nullptr) {
         scene = new ExampleSceneBuilder();
     }
 
@@ -87,26 +69,29 @@ public:
     }
 };
 
-int main(void)
+int main(int argc, const char* argv[]) try
 {
-    shared_ptr<ExampleApp> appPtr = make_shared<ExampleApp>();
+    ExampleApp app;
+    
+    @autoreleasepool {
+        const char* asset_root = lab_application_resource_path(argv[0],
+                                                               "share/lab_font_demo/");
+        lab_imgui_init(argc, argv, asset_root);
 
-	lab::checkError(lab::ErrorPolicy::onErrorThrow,
-		lab::TestConditions::exhaustive, "main loop start");
-
-    ExampleApp* app = appPtr.get();
-
-    app->createScene();
-
-    while (!app->isFinished())
-    {
-        app->update();
-        app->frameBegin();
-        app->render();
-        app->frameEnd();
+        // can't capture app and keep a compatible function signature, so
+        // capture it manually
+        static ExampleApp* capturedApp = &app;
+        lab_imgui_create_window("Hello LabImGui", 1024, 768,
+                                [](){ capturedApp->update(); },
+                                [](){ imgui_frame(); });
+        lab_imgui_shutdown();
     }
-
     return EXIT_SUCCESS;
+}
+catch (std::exception& exc)
+{
+    std::cerr << exc.what();
+    return EXIT_FAILURE;
 }
 
 #endif

@@ -73,7 +73,7 @@ namespace lab { namespace Render {
 
         LR_API void configure(char const*const path);
 
-        LR_API virtual std::shared_ptr<Render::Texture> texture(const std::string & name);
+        LR_API std::shared_ptr<Render::Texture> texture(const std::string & name) override;
 
         LR_API std::shared_ptr<FrameBuffer> framebuffer(const std::string & name);
 
@@ -85,7 +85,7 @@ namespace lab { namespace Render {
             return dynamic_cast<T*>(pass);
         }
 
-        LR_API virtual void render(RenderLock & rl, v2i fbSize, DrawList &) override;
+        LR_API void render(RenderLock & rl, v2i fbSize, DrawList &) override;
 
         LR_API std::function<void()> findPlug(char const* const name);
         LR_API void registerPlug(char const* const name, std::function<void()>);

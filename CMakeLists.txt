@@ -13,7 +13,9 @@ set(LABRENDER_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 option(LABRENDER_EXAMPLES "" ON)
 
 #------------------- glfw
-include(glfw.cmake)
+if (LABRENDER_GLFW_BACKEND)
+    include(glfw.cmake)
+endif()
 
 #------------------- glew
 if (WIN32)
